@@ -25,7 +25,7 @@ class Schema{
 		foreach ($nodi as $nd){
 			$concat[] = $nd->getAttribute("name");
 		}
-		$concat[]="Type";
+		$concat[]="AnonymType";
 		return implode("_",$concat);
 	}
 	public function __construct(DOMElement $schema , SchemaContainer $container) {
@@ -47,11 +47,6 @@ class Schema{
 					
 					$this->types[$node->getAttribute("name")] = new ComplexType($this , $node);
 					
-					if(0 && $this->ns == 'http://webservices.hotel.de/MyRES/V1_1'){
-						echo "TY: " .$node->getAttribute("name")."\n<br/>\n";
-					}
-					
-					
 				break;			
 				case "simpleType":
 					$this->types[$node->getAttribute("name")] = new SimpleType($this , $node);	
@@ -71,10 +66,7 @@ class Schema{
 					
 					$elName = $node->getAttribute("name");
 					$typeName = $node->getAttribute("type");
-					
-					if(0 && $this->ns == 'http://webservices.hotel.de/MyRES/V1_1'){
-						echo "EL: " .$elName." $typeName\n<br/>\n";
-					}				
+								
 					list($ns, $name, $prefix ) = self::findParts( $node,  $typeName);
 						
 					$type = new Type($ns==$this->ns?$this:$this->container->getSchema($ns),$name);

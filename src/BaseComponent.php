@@ -4,10 +4,20 @@ use goetas\xml\XMLDomElement;
 abstract class BaseComponent extends Type {
 	protected $elements = array();
 	protected $attributes = array();
+	protected $simple = array();
+	
+	protected $node = array();
 	
 	public function __construct(Schema $xsd, XMLDomElement $node) {
 		parent::__construct($xsd, $node->getAttribute("name"));
+		$this->node = $node;
 		$this->recurse($node);
+	}
+	public function getNode() {
+		return $this->node;
+	}
+	public function getSimple() {
+		return $this->simple;
 	}
 	public function getElements() {
 		return $this->elements;
@@ -28,31 +38,46 @@ abstract class BaseComponent extends Type {
 			case "complexContent";
 				$this->recurse($node);
 			break;
+			case "simpleContent";
+				$this->simple = true;
+
+				$this->recurse($node);
+	
+			break;
 			case "extension";
+
+			
 				list($ns, $name, $prefix ) = Schema::findParts( $node,  $node->getAttribute("base"));
-				if($ns == $this->xsd->getNs()){
-					$nodes = $node->query("//xsd:schema/xsd:complexType[@name='$name']",array("xsd" => self::NS));
-					
-					$this->recurse($nodes->item(0));
-					foreach ($node->childNodes as $n){
-						if($n instanceof XMLDOMElement){
-							$this->recurse($n);
+				if(!$this->simple){
+				
+					if($ns == $this->xsd->getNs()){
+						$nodes = $node->query("//xsd:schema/xsd:complexType[@name='$name']",array("xsd" => self::NS));
+						
+						$this->recurse($nodes->item(0));
+						foreach ($node->childNodes as $n){
+							if($n instanceof XMLDOMElement){
+								$this->recurse($n);
+							}
 						}
 					}
 					
 				}else{
 					
+					$xsd = $this->xsd->getNs()==$ns?$this->xsd:$this->xsd->getContainer()->getSchema($ns);
+
+					$this->simple = new SimpleType($xsd, $xsd->getType($name)->getNode());
 				}
+				$this->recurse($node);
 				
 			break;
-			case "attributeGroup";
+			case "attributeGroup_";
 				list($ns, $name, $prefix ) = Schema::findParts( $node,  $node->getAttribute("ref"));
 				$g = $this->findGroup($ns, $name);
 				foreach ($g as $el){
 					$this->elements[] = $el;
 				}
 			break;
-			case "attributeGroup";
+			case "attributeGroup_";
 				list($ns, $name, $prefix ) = Schema::findParts( $node,  $node->getAttribute("ref"));
 				$g = $this->findAttributeGroup($ns, $name);
 				foreach ($g as $att){
@@ -74,10 +99,7 @@ abstract class BaseComponent extends Type {
 					
 					list($ns, $name, $prefix ) = Schema::findParts( $node,  $node->getAttribute("type"));
 					
-			
-					
 					$type = new Type($this->xsd->getNs()==$ns?$this->xsd:$this->xsd->getContainer()->getSchema($ns),$name);
-							
 					
 					$this->elements[] = new ComplexElement($this->xsd, $type, $node->getAttribute("name"), $min, $max, $node->getAttribute("nillable")=="true");
 				}	
@@ -92,8 +114,8 @@ abstract class BaseComponent extends Type {
 					list($ns, $name, $prefix ) = Schema::findParts( $node,  $node->getAttribute("type"));
 					
 					$type = new Type($this->xsd->getNs()==$ns?$this->xsd:$this->xsd->getContainer()->getSchema($ns),$name);
-					
-					$this->attributes[] = new Attribute($this->xsd, $type, $node->getAttribute("name"), $required, $node->getAttribute("default"));
+
+					$this->attributes[$node->getAttribute("name")] = new Attribute($this->xsd, $type, $node->getAttribute("name"), $required, $node->getAttribute("default"));
 				}
 					
 					
