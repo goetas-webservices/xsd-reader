@@ -48,11 +48,16 @@ abstract class BaseComponent extends Type {
 
 			
 				list($ns, $name, $prefix ) = Schema::findParts( $node,  $node->getAttribute("base"));
-				if(!$this->simple){
+				if($this->simple){
+					
+					$xsd = $this->xsd->getNs()==$ns?$this->xsd:$this->xsd->getContainer()->getSchema($ns);
+
+					$this->simple = new SimpleType($xsd, $xsd->getType($name)->getNode());
+				}
 				
-					if($ns == $this->xsd->getNs()){
-						$nodes = $node->query("//xsd:schema/xsd:complexType[@name='$name']",array("xsd" => self::NS));
-						
+				if($ns == $this->xsd->getNs()){
+					$nodes = $node->query("//xsd:schema/xsd:complexType[@name='$name']",array("xsd" => self::NS));
+					if($nodes->length){
 						$this->recurse($nodes->item(0));
 						foreach ($node->childNodes as $n){
 							if($n instanceof XMLDOMElement){
@@ -60,13 +65,8 @@ abstract class BaseComponent extends Type {
 							}
 						}
 					}
-					
-				}else{
-					
-					$xsd = $this->xsd->getNs()==$ns?$this->xsd:$this->xsd->getContainer()->getSchema($ns);
-
-					$this->simple = new SimpleType($xsd, $xsd->getType($name)->getNode());
 				}
+				
 				$this->recurse($node);
 				
 			break;
