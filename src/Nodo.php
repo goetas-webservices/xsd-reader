@@ -19,7 +19,13 @@ class Nodo{
 		$this->type = $type;
 		$this->name = $name;
 	}
-	
+	/**
+	 * 
+	 * @return \goetas\xml\xsd\Schema
+	 */
+	public function getSchema() {
+		return $this->xsd;
+	}
 	public function getNs() {
 		return $this->xsd->getNs();
 	}
