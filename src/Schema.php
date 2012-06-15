@@ -8,6 +8,9 @@ class Schema{
 	protected $elements;
 	protected $types;
 	protected $attributes;
+
+	protected $elementFormDefault='unqualified';
+	protected $attributeFormDefault='unqualified';
 	
 	protected $ns;
 	/**
@@ -16,6 +19,20 @@ class Schema{
 	protected $container;
 
 	protected static $anonymTypes = 0;
+	/**
+	 * @return the $elementFormDefault
+	 */
+	public function getElementFormDefault() {
+		return $this->elementFormDefault;
+	}
+
+	/**
+	 * @return the $attributeFormDefault
+	 */
+	public function getAttributeFormDefault() {
+		return $this->attributeFormDefault;
+	}
+
 	public function createAnonymName(DOMElement $node) {
 		$xp = new XPath($node->ownerDocument);
 		$xp->registerNamespace("xsd", self::XSD_NS);
@@ -37,6 +54,11 @@ class Schema{
 		
 		
 		$this->ns = $schema->getAttribute("targetNamespace");
+		
+		$this->ns = $schema->getAttribute("targetNamespace");
+		
+		$this->elementFormDefault = $schema->getAttribute("elementFormDefault")?:"unqualified";
+		$this->attributeFormDefault = $schema->getAttribute("attributeFormDefault")?:"unqualified";
 		
 		
 		
