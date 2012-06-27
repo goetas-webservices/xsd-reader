@@ -56,14 +56,10 @@ abstract class BaseComponent extends Type {
 				}
 				
 				if($ns == $this->xsd->getNs()){
+					
 					$nodes = $node->query("//xsd:schema/xsd:complexType[@name='$name']",array("xsd" => self::NS));
 					if($nodes->length){
-						$this->recurse($nodes->item(0));
-						foreach ($node->childNodes as $n){
-							if($n instanceof XMLDOMElement){
-								$this->recurse($n);
-							}
-						}
+						$this->recurse($nodes->item(0)); // recurse sul tipo padre
 					}
 				}
 				
@@ -94,9 +90,7 @@ abstract class BaseComponent extends Type {
 					$max  =  $node->hasAttribute("maxOccurs")?$node->getAttribute("maxOccurs"):1; 
 					if($max=="unbounded"){
 						$max = PHP_INT_MAX;
-					}
-					
-					
+					}					
 					list($ns, $name, $prefix ) = Schema::findParts( $node,  $node->getAttribute("type"));
 					
 					$type = new Type($this->xsd->getNs()==$ns?$this->xsd:$this->xsd->getContainer()->getSchema($ns),$name);
