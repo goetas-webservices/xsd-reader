@@ -1,10 +1,10 @@
 <?php 
 namespace goetas\xml\xsd;
 
-class Type {
+abstract class Type {
 	const NS = 'http://www.w3.org/2001/XMLSchema';
 	/**
-	 * @var Schema
+	 * @var goetas\xml\xsd\Schema
 	 */
 	protected $xsd;
 	
@@ -14,6 +14,9 @@ class Type {
 		$this->xsd = $xsd;
 		$this->name = $name;
 	}
+	/**
+	 * @return goetas\xml\xsd\Schema
+	 */	
 	public function getSchema() {
 		return $this->xsd;
 	}

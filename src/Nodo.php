@@ -1,7 +1,7 @@
 <?php  
 namespace goetas\xml\xsd;
-use goetas\xml\XMLDomElement;
-class Nodo{
+use DOMElement;
+abstract class Nodo{
 	/**
 	 * @var Schema
 	 */
@@ -11,21 +11,19 @@ class Nodo{
 	 */
 	protected $type;
 	/**
-	 * @var ComplexType
+	 * @var string
 	 */
-	protected $complexType;
-	public function __construct(Schema $xsd, Type $type, $name) {
+	protected $name;
+	
+	protected $qualification = null;
+	
+	public function __construct(Schema $xsd, Type $type, $name, $qualification = null) {
 		$this->xsd = $xsd;
 		$this->type = $type;
 		$this->name = $name;
+		$this->qualification = $qualification;
 	}
-	/**
-	 * 
-	 * @return \goetas\xml\xsd\Schema
-	 */
-	public function getSchema() {
-		return $this->xsd;
-	}
+	abstract public function getQualification();
 	public function getNs() {
 		return $this->xsd->getNs();
 	}
@@ -33,21 +31,12 @@ class Nodo{
 		return $this->name;
 	}
 	/**
-	 * @return Type
+	 * @return \goetas\xml\xsd\Type
 	 */
 	public function getType() {
 		return $this->type;
 	}
-	/**
-	 * @return ComplexType
-	 */
-	public function getComplexType() {
-		if($this->complexType===null){
-			$this->complexType = $this->xsd->getContainer()->getType($this->type->getSchema()->getNs(), $this->type->getName());
-		}
-		return $this->complexType;
-	}
 	public function __toString() {
-		return "{".$this->getNs()."}".$this->getName();
+		return "{".$this->getNs()."}#$this->name";
 	}
 } 

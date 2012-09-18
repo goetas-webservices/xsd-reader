@@ -1,14 +1,19 @@
 <?php  
 
 namespace goetas\xml\xsd;
+
 use DOMElement;
 use goetas\xml\xsd\ComplexType;
 use goetas\xml\xsd\Element; 
 use OutOfRangeException;
+use DOMDocument;
 class SchemaContainer extends \ArrayObject{
+	public function __construct(){
+		$this->addFinderFile("http://www.w3.org/2001/XMLSchema", __DIR__."/res/XMLSchema.xsd");
+	}
 	protected $finders = array();
 	/**
-	 * @return Schema
+	 * @return \goetas\xml\xsd\Schema
 	 */
 	public function getSchema($ns) {
 		if(!isset($this[$ns])){
@@ -25,16 +30,33 @@ class SchemaContainer extends \ArrayObject{
 		}
 		return $this[$ns];
 	}
+	public function addSchemaNode(DOMElement $node) {
+		
+		$ns = $node->getAttribute("targetNamespace");
+		
+		$this[$ns] = new Schema($node, $this);
+	}
 	public function addFinder($callback) {
 		$this->finders[]=$callback;
 	}
+	public function addFinderFile($targetNs, $file) {
+		$this->addFinder(function ($ns) use($targetNs, $file){
+			if($ns==$targetNs){
+				$dom = new DOMDocument("1.0", "UTF-8");
+				$dom->load($file);
+				return $dom->documentElement; 
+			}
+		});
+	}
+	
+	
 	/**
 	 * @param string $ns
 	 * @param string $name
 	 * @return ComplexType
 	 */
 	public function getType($ns, $name) {
-		$typeDef = $this->getSchema($ns)->getType($name);
+		$typeDef = $this->getSchema($ns)->findType($ns, $name);
 		if(!$typeDef){
 			throw new OutOfRangeException("Non trovo una definizione per il tipo {{$ns}}$name");
 		}
@@ -46,7 +68,7 @@ class SchemaContainer extends \ArrayObject{
 	 * @return Element
 	 */
 	public function getElement($ns, $name) {
-		$elementDef = $this->getSchema($ns)->getElement($name);
+		$elementDef = $this->getSchema($ns)->findElement($ns, $name);
 		if(!$elementDef){
 			throw new OutOfRangeException("Non trovo una definizione per il tipo {{$ns}}$name");
 		}

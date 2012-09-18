@@ -2,7 +2,7 @@
 namespace goetas\xml\xsd;
 use DOMElement;
 
-class SimpleType extends BaseType {
+class SimpleContent extends AbstractComplexType {
 	protected $base;
 	/**
 	 * 
@@ -12,13 +12,19 @@ class SimpleType extends BaseType {
 		return $this->base;
 	}
 	protected function parseElement(DOMElement $node) {
+		parent::parseElement ( $node );
 		switch ($node->localName) {
+			case "simpleContent" :
+				$this->recurse($node);
+			break;
 			case "restriction" :
+			case "extension" :
 				list ( $ns, $name, $prefix ) = Schema::findParts ( $node, $node->getAttribute ( "base" ) );
 				
 				$this->base = $this->xsd->findType($ns, $name);
 				
-				//$this->recurse($node);
+				$this->recurse($node);
+				
 				break;
 		}
 	}
