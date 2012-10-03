@@ -15,6 +15,7 @@ class Schema {
 	protected $attributes;
 
 	protected $ns;
+	protected $schemaNode;
 	/**
 	 * @var SchemaContainer
 	 */
@@ -45,11 +46,6 @@ class Schema {
 		$this->ns = $this->schemaNode->getAttribute ( "targetNamespace" );
 		$this->elementQualification = $this->schemaNode->hasAttribute ( "elementFormDefault" )?$this->schemaNode->getAttribute ( "elementFormDefault" ):"unqualified";
 		$this->attributeQualification = $this->schemaNode->hasAttribute ( "attributeFormDefault" )?$this->schemaNode->getAttribute ( "attributeFormDefault" ):"unqualified";
-
-		if($this->ns===self::XSD_NS){
-			$this->types["anySimpleType"] = new SimpleType($this, $schema);
-		}
-
 		$this->parseImports();
 	}
 	public function parseImports() {
@@ -69,11 +65,12 @@ class Schema {
 			}
 		}
 	}
-	public function createAnonymType(DOMElement $node) {
+	public function createAnonymType(DOMElement $node, $name) {
 		$xp = new XPath ( $node->ownerDocument );
 		$xp->registerNamespace ( "xsd", self::XSD_NS );
 		$nodi = $xp->query ( "ancestor::xsd:*[@name]", $node );
 
+		/*
 		$concat = array ($node->getAttribute ( "name" ) );
 		foreach ( $nodi as $nd ) {
 			$concat [] = $nd->getAttribute ( "name" );
@@ -82,15 +79,19 @@ class Schema {
 
 		$typeName = implode ( "_", $concat );
 
-		$tnode = $xp->query("xsd:complexType|xsd:simpleType", $node)->item(0);
+
 		$tnode->setAttribute ( "name", $typeName );
+		*/
 
-		$this->types[$typeName] = $this->buildTypeFromNode($tnode);
-		$this->types[$typeName]->setAnonymous();
+		$tnode = $xp->query("xsd:complexType|xsd:simpleType", $node)->item(0);
+
+		$this->types[] = $type = $this->buildTypeFromNode($tnode);
+
+		$type->setName($name);
+		$type->setAnonymous();
 
 
-
-		return $typeName;
+		return $type;
 	}
 
 	private function buildTypeFromNode(DOMElement $node){
@@ -138,21 +139,21 @@ class Schema {
 
 			if (! $node->hasAttribute ( "type" )) {
 
-				$typeName = $this->createAnonymType ( $node );
+				$type = $this->createAnonymType ( $node , $node->getAttribute ( "name" ));
 
-				$prefix = $node->lookupPrefix ( $this->ns );
 
-				$node->setAttribute ( "type", $prefix . ":" . $typeName );
+				return new Element ( $this, $type, $node->getAttribute ( "name" ), 1, 1, false );
 
+			}else{
+				$elName = $node->getAttribute ( "name" );
+				$typeName = $node->getAttribute ( "type" );
+
+				list ( $ns, $name, $prefix ) = self::findParts ( $node, $typeName );
+
+				$type = $this->findType($ns, $name);
+
+				return new Element ( $this, $type, $node->getAttribute ( "name" ), 1, 1, false );
 			}
-			$elName = $node->getAttribute ( "name" );
-			$typeName = $node->getAttribute ( "type" );
-
-			list ( $ns, $name, $prefix ) = self::findParts ( $node, $typeName );
-
-			$type = $this->findType($ns, $name);
-
-			return new Element ( $this, $type, $node->getAttribute ( "name" ), 1, 1, false );
 
 		}
 		foreach ($this->schemas as $schema){

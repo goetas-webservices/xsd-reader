@@ -1,15 +1,15 @@
-<?php  
+<?php
 
 namespace goetas\xml\xsd;
 
 use DOMElement;
 use goetas\xml\xsd\ComplexType;
-use goetas\xml\xsd\Element; 
+use goetas\xml\xsd\Element;
 use OutOfRangeException;
 use DOMDocument;
 class SchemaContainer extends \ArrayObject{
 	public function __construct(){
-		$this->addFinderFile("http://www.w3.org/2001/XMLSchema", __DIR__."/res/XMLSchema.xsd");
+		$this->addFinderFile(Schema::XSD_NS, __DIR__."/res/XMLSchema.xsd");
 	}
 	protected $finders = array();
 	/**
@@ -31,9 +31,9 @@ class SchemaContainer extends \ArrayObject{
 		return $this[$ns];
 	}
 	public function addSchemaNode(DOMElement $node) {
-		
+
 		$ns = $node->getAttribute("targetNamespace");
-		
+
 		$this[$ns] = new Schema($node, $this);
 	}
 	public function addFinder($callback) {
@@ -44,12 +44,18 @@ class SchemaContainer extends \ArrayObject{
 			if($ns==$targetNs){
 				$dom = new DOMDocument("1.0", "UTF-8");
 				$dom->load($file);
-				return $dom->documentElement; 
+
+				if($targetNs==Schema::XSD_NS){
+					$type = $dom->createElementNS(Schema::XSD_NS, "simpleType");
+					$type->setAttribute("name", "anySimpleType");
+					$dom->documentElement->appendChild($type);
+				}
+				return $dom->documentElement;
 			}
 		});
 	}
-	
-	
+
+
 	/**
 	 * @param string $ns
 	 * @param string $name
@@ -74,4 +80,4 @@ class SchemaContainer extends \ArrayObject{
 		}
 		return $elementDef;
 	}
-} 
+}

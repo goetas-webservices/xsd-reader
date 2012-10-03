@@ -1,4 +1,4 @@
-<?php  
+<?php
 namespace goetas\xml\xsd;
 use DOMElement;
 use DOMXPath;
@@ -7,7 +7,7 @@ abstract class BaseType extends Type {
 	 * @var \DOMElement;
 	 */
 	protected $node;
-	
+
 	public function __construct(Schema $xsd, DOMElement $node) {
 		parent::__construct($xsd, $node->getAttribute("name"));
 		$this->node = $node;
@@ -24,4 +24,4 @@ abstract class BaseType extends Type {
 		}
 	}
 	abstract protected function parseElement(DOMElement $node);
-} 
+}
