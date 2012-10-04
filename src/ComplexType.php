@@ -8,7 +8,7 @@ class ComplexType extends AbstractComplexType {
 	}
 	protected $base;
 	/**
-	 * 
+	 *
 	 * @return \goetas\xml\xsd\SimpleType
 	 */
 	public function getBase() {
@@ -17,6 +17,7 @@ class ComplexType extends AbstractComplexType {
 	protected function parseElement(DOMElement $node) {
 		switch ($node->localName) {
 			case "sequence" :
+			case "choice" :
 				$this->recurse ( $node );
 				break;
 			case "complexContent" :
@@ -24,15 +25,15 @@ class ComplexType extends AbstractComplexType {
 				break;
 			case "extension" :
 			case "restriction" :
-				
+
 				list ( $ns, $name, $prefix ) = Schema::findParts ( $node, $node->getAttribute ( "base" ) );
-				
+
 				$this->base = $this->xsd->findType($ns, $name);
-				
+
 				$this->recurse($node);
-				
+
 				break;
-			
+
 			case "element" :
 				if ($node->hasAttribute ( "ref" )) {
 					list ( $ns, $name, $prefix ) = Schema::findParts ( $node, $node->getAttribute ( "ref" ) );
@@ -44,20 +45,24 @@ class ComplexType extends AbstractComplexType {
 					if ($max == "unbounded") {
 						$max = PHP_INT_MAX;
 					}
-					
+					// hack per gestire gli "choice"
+					if($min>0 && $node->parentNode->localName=='choice'){
+						$min = 0;
+					}
+
 					$nillable = $node->getAttribute ( "nillable" ) == "true";
 					$qualification = $node->hasAttribute ( "form" )?$node->getAttribute ( "form" ):$this->getSchema()->getElementQualification();
-					
+
 					list ( $ns, $name, $prefix ) = Schema::findParts ( $node, $node->getAttribute ( "type" ) );
-					
+
 					$type = $this->xsd->findType($ns, $name);
 
 					$this->elements [] = new Element ( $this->xsd, $type, $node->getAttribute ( "name" ), $min, $max,  $nillable);
 				}
-				
+
 				break;
 			default:
 				parent::parseElement($node);
 		}
 	}
-} 
+}
