@@ -53,9 +53,15 @@ class ComplexType extends AbstractComplexType {
 					$nillable = $node->getAttribute ( "nillable" ) == "true";
 					$qualification = $node->hasAttribute ( "form" )?$node->getAttribute ( "form" ):$this->getSchema()->getElementQualification();
 
-					list ( $ns, $name, $prefix ) = Schema::findParts ( $node, $node->getAttribute ( "type" ) );
 
-					$type = $this->xsd->findType($ns, $name);
+					if($node->hasAttribute ( "type" ) ){
+
+						list ( $ns, $name, $prefix ) = Schema::findParts ( $node, $node->getAttribute ( "type" ) );
+
+						$type = $this->xsd->findType($ns, $name);
+					}else{
+						$type = $this->xsd->createAnonymType($node, $node->getAttribute ( "name" ));
+					}
 
 					$this->elements [] = new Element ( $this->xsd, $type, $node->getAttribute ( "name" ), $min, $max,  $nillable);
 				}

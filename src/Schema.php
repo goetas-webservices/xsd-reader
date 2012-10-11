@@ -44,7 +44,7 @@ class Schema {
 		$this->container = $container;
 		$this->schemaNode = $schema;
 		$this->ns = $this->schemaNode->getAttribute ( "targetNamespace" );
-		$this->elementQualification = $this->schemaNode->hasAttribute ( "elementFormDefault" )?$this->schemaNode->getAttribute ( "elementFormDefault" ):"unqualified";
+		$this->elementQualification = strlen($this->ns) && $this->schemaNode->hasAttribute ( "elementFormDefault" )?$this->schemaNode->getAttribute ( "elementFormDefault" ):"unqualified";
 		$this->attributeQualification = $this->schemaNode->hasAttribute ( "attributeFormDefault" )?$this->schemaNode->getAttribute ( "attributeFormDefault" ):"unqualified";
 		$this->parseImports();
 	}
@@ -209,7 +209,7 @@ class Schema {
 			$this->elements [$name] = $this->loadElement( $name );
 		}
 		if (! $this->elements [$name] ) {
-			throw new \Exception ( "Non trovo l'elemento $name in {$this->ns}" );
+			throw new \Exception ( "Non trovo l'elemento '$name' nel namespace '{$this->ns}'" );
 		}
 		return $this->elements [$name];
 	}
@@ -218,7 +218,7 @@ class Schema {
 			$this->types [$name] = $this->loadType ( $name );
 		}
 		if (! $this->types [$name] ) {
-			throw new \Exception ( "Non trovo il tipo $name in {$this->ns}" );
+			throw new \Exception ( "Non trovo il tipo '$name' namespace '{$this->ns}'" );
 		}
 		return $this->types [$name];
 	}

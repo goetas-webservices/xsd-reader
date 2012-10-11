@@ -8,8 +8,11 @@ use goetas\xml\xsd\Element;
 use OutOfRangeException;
 use DOMDocument;
 class SchemaContainer extends \ArrayObject{
-	public function __construct(){
+	public function __construct(array $nss = array()){
 		$this->addFinderFile(Schema::XSD_NS, __DIR__."/res/XMLSchema.xsd");
+		foreach ($nss as $ns => $path){
+			$this->addFinderFile($ns, $path);
+		}
 	}
 	protected $finders = array();
 	/**
@@ -76,7 +79,7 @@ class SchemaContainer extends \ArrayObject{
 	public function getElement($ns, $name) {
 		$elementDef = $this->getSchema($ns)->findElement($ns, $name);
 		if(!$elementDef){
-			throw new OutOfRangeException("Non trovo una definizione per il tipo {{$ns}}$name");
+			throw new OutOfRangeException("Non trovo una definizione per il tipo {{$ns}}#$name");
 		}
 		return $elementDef;
 	}
