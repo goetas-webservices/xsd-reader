@@ -46,8 +46,14 @@ class ComplexType extends AbstractComplexType {
 						$max = PHP_INT_MAX;
 					}
 					// hack per gestire gli "choice"
-					if($min>0 && $node->parentNode->localName=='choice'){
-						$min = 0;
+					if($min>0){
+						$testNode = $node;
+						while($testNode = $testNode->parentNode){
+							if($testNode->localName=='choice'){
+								$min = 0;
+								break;
+							}
+						}
 					}
 
 					$nillable = $node->getAttribute ( "nillable" ) == "true";
