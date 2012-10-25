@@ -48,6 +48,9 @@ class Schema {
 		$this->attributeQualification = $this->schemaNode->hasAttribute ( "attributeFormDefault" )?$this->schemaNode->getAttribute ( "attributeFormDefault" ):"unqualified";
 		$this->parseImports();
 	}
+	public function addSchema(Schema $schema) {
+		$this->schemas [] = $schema;
+	}
 	public function parseImports() {
 		$xp = new XPath ( $this->schemaNode->ownerDocument);
 		$xp->registerNamespace ( "xsd", self::XSD_NS );
@@ -57,6 +60,7 @@ class Schema {
 			$relPath = UrlUtils::resolve_url($this->schemaNode->ownerDocument->documentURI,$import->getAttribute("schemaLocation"));
 
 			if($import->getAttribute("namespace")){
+				$ns = $import->getAttribute("namespace");
 				$this->container->addFinderFile($import->getAttribute("namespace"), $relPath);
 			}else{
 				$schema = new \DOMDocument('1.0','UTF-8');

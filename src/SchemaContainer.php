@@ -34,16 +34,20 @@ class SchemaContainer extends \ArrayObject{
 		return $this[$ns];
 	}
 	public function addSchemaNode(DOMElement $node) {
-
 		$ns = $node->getAttribute("targetNamespace");
-
-		$this[$ns] = new Schema($node, $this);
+		$schema = new Schema($node, $this);
+		if(isset($this[$ns])){
+			$this[$ns]->addSchema($schema);
+		}else{
+			$this[$ns] = $schema;
+		}		
 	}
 	public function addFinder($callback) {
 		$this->finders[]=$callback;
 	}
 	public function addFinderFile($targetNs, $file) {
-		$this->addFinder(function ($ns) use($targetNs, $file){
+		
+		$finder = function ($ns) use($targetNs, $file){
 			if($ns==$targetNs){
 				$dom = new DOMDocument("1.0", "UTF-8");
 				$dom->load($file);
@@ -55,7 +59,13 @@ class SchemaContainer extends \ArrayObject{
 				}
 				return $dom->documentElement;
 			}
-		});
+		};
+		
+		if(isset($this[$targetNs])){
+			$this->addSchemaNode($finder($targetNs));
+		}else{
+			$this->addFinder($finder);
+		}
 	}
 
 
