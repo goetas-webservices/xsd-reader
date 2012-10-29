@@ -55,7 +55,7 @@ class SchemaContainer extends \ArrayObject{
 				file_put_contents($tmpPath, $cnt);
 			}
 		}
-		$xml->loadXML($tmpPath);
+		$xml->load($tmpPath);
 		$xml->documentURI = $path;
 		return $xml;
 	}
