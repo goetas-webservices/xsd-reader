@@ -45,12 +45,25 @@ class SchemaContainer extends \ArrayObject{
 	public function addFinder($callback) {
 		$this->finders[]=$callback;
 	}
+	protected $cache = 3600;
+	public function getFromCache($path) {
+		$tmpPath = sys_get_temp_dir()."/wsdl".md5($path).".xml";
+		$xml = new DOMDocument();
+		if(!$this->cache || !is_file($tmpPath) || (time()-$this->cache) < filemtime($tmpPath) ){
+			$cnt = file_get_contents($path);
+			if($cnt){
+				file_put_contents($tmpPath, $cnt);
+			}
+		}
+		$xml->loadXML($tmpPath);
+		$xml->documentURI = $path;
+		return $xml;
+	}
 	public function addFinderFile($targetNs, $file) {
-		
-		$finder = function ($ns) use($targetNs, $file){
+		$_this = $this;
+		$finder = function ($ns) use($targetNs, $file, $_this){
 			if($ns==$targetNs){
-				$dom = new DOMDocument("1.0", "UTF-8");
-				$dom->load($file);
+				$dom = $_this->getFromCache($file);
 
 				if($targetNs==Schema::XSD_NS){
 					$type = $dom->createElementNS(Schema::XSD_NS, "simpleType");
