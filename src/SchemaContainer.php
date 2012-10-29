@@ -49,7 +49,7 @@ class SchemaContainer extends \ArrayObject{
 	public function getFromCache($path) {
 		$tmpPath = sys_get_temp_dir()."/wsdl".md5($path).".xml";
 		$xml = new DOMDocument();
-		if(!$this->cache || !is_file($tmpPath) || (time()-$this->cache) < filemtime($tmpPath) ){
+		if(!$this->cache || !is_file($tmpPath) || (time()-$this->cache) > filemtime($tmpPath) ){
 			$cnt = file_get_contents($path);
 			if($cnt){
 				file_put_contents($tmpPath, $cnt);
