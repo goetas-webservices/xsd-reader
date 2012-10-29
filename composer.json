@@ -1,0 +1,23 @@
+{
+    "name": "goetas/goetas-xsd-reader",
+    "description": "Read XSD into PHP",
+    "keywords": ["xsd", "xml"],
+    "homepage": "http://opensource.mercuriosistemi.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Asmir Mustafic",
+            "email": "goetas@lignano.it"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2",
+        "goetas/xmldom": "*"
+    },
+    "autoload": {
+        "files": [
+            "src/autoload.php"
+        ]
+    },
+    "minimum-stability": "dev"
+}
