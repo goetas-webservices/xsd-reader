@@ -40,7 +40,7 @@ class SchemaContainer extends \ArrayObject{
 			$this[$ns]->addSchema($schema);
 		}else{
 			$this[$ns] = $schema;
-		}		
+		}
 	}
 	public function addFinder($callback) {
 		$this->finders[]=$callback;
@@ -73,7 +73,7 @@ class SchemaContainer extends \ArrayObject{
 				return $dom->documentElement;
 			}
 		};
-		
+
 		if(isset($this[$targetNs])){
 			$this->addSchemaNode($finder($targetNs));
 		}else{

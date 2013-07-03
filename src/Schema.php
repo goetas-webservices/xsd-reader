@@ -59,13 +59,17 @@ class Schema {
 		foreach ($imports as $import){
 			$relPath = UrlUtils::resolve_url($this->schemaNode->ownerDocument->documentURI,$import->getAttribute("schemaLocation"));
 
-			if($import->getAttribute("namespace")){
+			if($import->getAttribute("namespace") && strpos($import->getAttribute("namespace"), 'http://www.w3.org/XML/1998/namespace')!==false){
 				$ns = $import->getAttribute("namespace");
 				$this->container->addFinderFile($import->getAttribute("namespace"), $relPath);
 			}else{
-				$schema = new \DOMDocument('1.0','UTF-8');
-				$schema->load($relPath);
-				$this->schemas [] = new Schema($schema->documentElement, $this->container);
+
+				if(!$import->getAttribute("namespace") || !isset($this->container[$import->getAttribute("namespace")])){
+					$schema = new \DOMDocument('1.0','UTF-8');
+					$schema->load($relPath);
+					//$this->schemas [] = new Schema($schema->documentElement, $this->container);
+					$this->container->addSchemaNode($schema->documentElement);
+				}
 			}
 		}
 	}
