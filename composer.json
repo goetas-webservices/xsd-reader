@@ -19,5 +19,7 @@
             "src/autoload.php"
         ]
     },
-    "minimum-stability": "dev"
+    "branch-alias": {
+        "dev-master": "1.0-dev"
+    }
 }
