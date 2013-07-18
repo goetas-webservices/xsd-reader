@@ -19,7 +19,9 @@
             "src/autoload.php"
         ]
     },
-    "branch-alias": {
-        "dev-master": "1.0-dev"
+    "extra":{
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
     }
 }
