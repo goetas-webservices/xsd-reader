@@ -1,5 +1,5 @@
 <?php
-namespace goetas\xml\xsd\utils;
+namespace Goetas\XML\XSDReader\Utils;
 class UrlUtils
 {
     /**
