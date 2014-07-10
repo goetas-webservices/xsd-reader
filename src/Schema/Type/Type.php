@@ -1,8 +1,10 @@
 <?php
 namespace Goetas\XML\XSDReader\Schema\Type;
 
+use Goetas\XML\XSDReader\Schema\Schema;
 abstract class Type
 {
+    protected $schema;
 
     protected $name;
 
@@ -32,6 +34,15 @@ abstract class Type
     public function setDoc($doc)
     {
         $this->doc = $doc;
+        return $this;
+    }
+    public function getSchema()
+    {
+        return $this->schema;
+    }
+    public function setSchema(Schema $schema)
+    {
+        $this->schema = $schema;
         return $this;
     }
 

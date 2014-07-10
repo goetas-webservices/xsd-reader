@@ -6,6 +6,8 @@ use Goetas\XML\XSDReader\Schema\Type\TypeNodeChild;
 class AttributeReal extends TypeNodeChild implements Attribute
 {
 
+    protected $doc;
+
     protected $qualified = true;
 
     protected $nil = false;
@@ -36,17 +38,6 @@ class AttributeReal extends TypeNodeChild implements Attribute
         return $this;
     }
 
-    public function getRef()
-    {
-        return $this->ref;
-    }
-
-    public function setRef($ref)
-    {
-        $this->ref = $ref;
-        return $this;
-    }
-
     public function getUse()
     {
         return $this->use;
@@ -57,5 +48,17 @@ class AttributeReal extends TypeNodeChild implements Attribute
         $this->use = $use;
         return $this;
     }
+
+    public function getDoc()
+    {
+        return $this->doc;
+    }
+
+    public function setDoc($doc)
+    {
+        $this->doc = $doc;
+        return $this;
+    }
+
 
 }

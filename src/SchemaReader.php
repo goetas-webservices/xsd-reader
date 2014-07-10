@@ -30,18 +30,11 @@ class SchemaReader
     {
 
     }
-
-    private function loadDOM($file){
-        $xml = new DOMDocument('1.0', 'UTF-8');
-        if (! $xml->load($file)) {
-            throw new IOException("Non riesco a caricare lo schema {$file}");
-        }
-        return $xml;
-    }
     public function loadAttributeGroup(Schema $schema, DOMElement $node)
     {
         $attGroup = new AttributeGroup();
         $attGroup->setName($node->getAttribute("name"));
+        $attGroup->setDoc($this->getDocumentation($node));
         $schema->addAttributeGroup($attGroup);
         $_this = $this;
         return function () use($schema, $node, $attGroup, $_this)
@@ -81,10 +74,25 @@ class SchemaReader
         };
     }
 
+    protected function getDocumentation(DOMElement $node)
+    {
+        $doc = '';
+        foreach ($node->childNodes as $childNode) {
+            if ($childNode->localName=="annotation") {
+                foreach ($childNode->childNodes as $subChildNode) {
+                    if ($subChildNode->localName=="documentation") {
+                        $doc .= ($subChildNode->nodeValue);
+                    }
+                }
+            }
+        }
+        return $doc;
+    }
     public function schemaNode(Schema $schema, DOMElement $node)
     {
 
         // echo "TNS: " . $node->getAttribute("targetNamespace")."\n";
+        $schema->setDoc($this->getDocumentation($node));
         $schema->setTargetNamespace($node->getAttribute("targetNamespace"));
         $schema->setElementsQualification(! $node->hasAttribute("elementFormDefault") || $node->getAttribute("elementFormDefault") == "qualified");
         $schema->setAttributesQualification(! $node->hasAttribute("attributeFormDefault") || $node->getAttribute("attributeFormDefault") == "qualified");
@@ -123,6 +131,8 @@ class SchemaReader
     public function loadElementReal(Schema $schema, DOMElement $node)
     {
         $element = new ElementReal();
+        $element->setDoc($this->getDocumentation($node));
+        $element->setName($node->getAttribute("name"));
         $this->fillTypeNodeChild($element, $schema, $node);
 
         if ($node->hasAttribute("maxOccurs")) {
@@ -140,9 +150,12 @@ class SchemaReader
         return $element;
     }
 
+
     public function loadAttributeReal(Schema $schema, DOMElement $node)
     {
         $attribute = new AttributeReal();
+        $attribute->setDoc($this->getDocumentation($node));
+        $attribute->setName($node->getAttribute("name"));
         $this->fillTypeNodeChild($attribute, $schema, $node);
 
         if ($node->hasAttribute("nillable")) {
@@ -180,6 +193,7 @@ class SchemaReader
     public function loadGroup(Schema $schema, DOMElement $node)
     {
         $type = new Group();
+        $type->setDoc($this->getDocumentation($node));
         $type->setName($node->getAttribute("name"));
         $schema->addGroup($type);
 
@@ -210,11 +224,9 @@ class SchemaReader
         $type = $isSimple ? new ComplexTypeSimpleContent() : new ComplexType();
 
         $type->setName($node->getAttribute("name"));
-        $schema->addType($type);
-
-
-        if($node->getAttribute("name")=="VehicleLocationLiabilitiesType"){
-            echo "X";
+        $type->setDoc($this->getDocumentation($node));
+        if($node->getAttribute("name")){
+            $schema->addType($type);
         }
 
         $_this = $this;
@@ -244,6 +256,7 @@ class SchemaReader
                         break;
                 }
             }
+
             if ($callback) {
                 call_user_func($callback, $type);
             }
@@ -253,10 +266,13 @@ class SchemaReader
     public function loadSimpleType(Schema $schema, DOMElement $node, $callback = null)
     {
         $type = new SimpleType();
+        $type->setDoc($this->getDocumentation($node));
         $type->setName($node->getAttribute("name"));
-        $schema->addType($type);
+        if($node->getAttribute("name")){
+            $schema->addType($type);
+        }
         $_this = $this;
-        return function () use($type, $schema, $node, $_this, $callback)
+        return function () use ($type, $schema, $node, $_this, $callback)
         {
             $_this->fillTypeNode($type, $schema, $node);
             if ($callback) {
@@ -267,6 +283,7 @@ class SchemaReader
 
     public function fillTypeNode(Type $type, Schema $schema, DOMElement $node)
     {
+        $type->setSchema($schema);
         $functions = array();
         foreach ($node->childNodes as $childNode) {
             switch ($childNode->localName) {
@@ -276,49 +293,68 @@ class SchemaReader
                 case 'extension':
                     $functions[] = $this->loadExtension($type, $schema, $childNode);
                     break;
+                case 'complexContent':
+                    $this->fillTypeNode($type, $schema, $childNode);
+                    break;
             }
         }
-        return function () use($functions)
-        {
-            array_map('call_user_func', array_filter($functions));
-        };
+
+        array_map('call_user_func', array_filter($functions));
+
     }
 
     public function loadExtension(BaseComplexType $type, Schema $schema, DOMElement $node)
     {
         $_this = $this;
-        return function () use($type, $schema, $node, $_this)
-        {
-            $parent = $_this->findType($schema, $node, $node->getAttribute("base"));
-            $type->setParent($parent);
 
-            foreach ($node->childNodes as $childNode) {
-                switch ($childNode->localName) {
-                    case 'attribute':
-                        if ($childNode->hasAttribute("ref")) {
-                            $attribute = $_this->findAttribute($schema, $node, $childNode->getAttribute("ref"));
-                        } else {
-                            $attribute = $_this->loadAttributeReal($schema, $childNode);
-                        }
-                        $type->addAttribute($attribute);
-                        break;
-                    case 'attributeGroup':
-                        $attribute = $_this->findAttributeGroup($schema, $node, $childNode->getAttribute("ref"));
-                        $type->addAttribute($attribute);
-                        break;
+        if($node->hasAttribute("base")){
+
+            return function () use ($type, $schema, $node, $_this)
+            {
+                $parent = $_this->findType($schema, $node, $node->getAttribute("base"));
+                $type->setExtends($parent);
+
+                foreach ($node->childNodes as $childNode) {
+                    switch ($childNode->localName) {
+                        case 'attribute':
+                            if ($childNode->hasAttribute("ref")) {
+                                $attribute = $_this->findAttribute($schema, $node, $childNode->getAttribute("ref"));
+                            } else {
+                                $attribute = $_this->loadAttributeReal($schema, $childNode);
+                            }
+                            $type->addAttribute($attribute);
+                            break;
+                        case 'attributeGroup':
+                            $attribute = $_this->findAttributeGroup($schema, $node, $childNode->getAttribute("ref"));
+                            $type->addAttribute($attribute);
+                            break;
+                    }
                 }
-            }
-        };
+            };
+        } else {
+            return function () use ($type, $schema, $node, $_this){
+                // @todo
+            };
+        }
     }
 
     public function loadRestriction(Type $type, Schema $schema, DOMElement $node)
     {
         $_this = $this;
-        return function () use($type, $schema, $node, $_this)
-        {
-            $parent = $_this->findType($schema, $node, $node->getAttribute("base"));
-            $type->setParent($parent);
-        };
+
+        if($node->hasAttribute("base")){
+            return function () use($type, $schema, $node, $_this)
+            {
+                $parent = $_this->findType($schema, $node, $node->getAttribute("base"));
+                $type->setRestrict($parent);
+            };
+        }else{
+
+            return function () use($type, $schema, $node, $_this)
+            {
+                // @todo
+            };
+        }
     }
 
 
@@ -340,8 +376,6 @@ class SchemaReader
     }
     protected function findType(Schema $schema, DOMElement $node, $typeName)
     {
-        //var_dump($typeName." ".$node->getAttribute("name"));
-
         list ($name, $namespace) = self::splitParts($node, $typeName);
         try {
             return $schema->findType($name, $namespace);
@@ -506,6 +540,14 @@ class SchemaReader
 
     }
 
+    private function loadDOM($file){
+        $xml = new DOMDocument('1.0', 'UTF-8');
+        if (! $xml->load($file)) {
+            throw new IOException("Non riesco a caricare lo schema {$file}");
+        }
+        return $xml;
+    }
+
     public function addGlobalSchemas(Schema $rootSchema)
     {
         $preload = array(
@@ -518,6 +560,9 @@ class SchemaReader
         foreach($preload as $key => $filePath){
             if(!isset($this->loadedFiles[$filePath])){
                 $this->loadedFiles[$key] = $this->loadedFiles[$filePath] = $schema = new Schema();
+
+                $schema->addType(new SimpleType("anySimpleType"));
+
                 $schema->setFile($filePath);
                 $rootSchema->addSchema($schema);
                 $callbacks = $this->loadSchema($schema, $filePath);
@@ -530,6 +575,8 @@ class SchemaReader
 
         if(!$this->loadedFiles["xml"]->getSchemas()){
             $this->loadedFiles["xml"]->addSchema($this->loadedFiles["xsd"]);
+
+            $this->loadedFiles["xsd"]->addType(new SimpleType("anySimpleType"));
         }
         if(!$this->loadedFiles["xsd"]->getSchemas()){
             $this->loadedFiles["xsd"]->addSchema($this->loadedFiles["xml"]);
@@ -538,7 +585,8 @@ class SchemaReader
     }
     private $loadedFiles = array();
 
-    public function readSchema($file)
+
+    public function readFile($file)
     {
         if (isset($this->loadedFiles[$file])) {
             return $this->loadedFiles[$file];

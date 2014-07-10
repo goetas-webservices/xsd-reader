@@ -21,6 +21,12 @@ abstract class BaseComplexType extends Type implements AttributeHolder
 
     protected $attributes = array();
 
+
+    public function set()
+    {
+        $this->elements = array();
+        $this->attributes = array();
+    }
     public function getParent()
     {
         return $this->restrict ?  : $this->extends;
@@ -51,5 +57,31 @@ abstract class BaseComplexType extends Type implements AttributeHolder
     {
         $this->extends = $extends;
         return $this;
+    }
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+    private static function navAttributes(Attribute $attr){
+        $attrs = array();
+        if ($attr instanceof AttributeHolder) {
+            foreach ($attr->getAttributes() as $attrExtra) {
+                $attrs = array_merge($attrs, self::navAttributes($attrExtra));
+            }
+        } else {
+            $attrs[] = $attr;
+        }
+        return $attrs;
+
+    }
+    public function getAllAttributes()
+    {
+        $attrs = array();
+        foreach ($this->getAttributes() as $attr) {
+            foreach (self::navAttributes($attr) as $attrExtra) {
+                $attrs[] = $attrExtra;
+            }
+        }
+        return $attrs;
     }
 }

@@ -10,10 +10,6 @@ class SimpleType extends Type
      */
     protected $restrict;
 
-
-    protected $attributes = array();
-
-
     public function getRestrict()
     {
         return $this->restrict;

@@ -4,13 +4,10 @@ PHP XSD Reader
 Read any [XML Schema](http://www.w3.org/XML/Schema) (XSD) programmatically with PHP.
 
 
-
-
-
 Installation
------------
+------------
 
-There are two recommended ways to install Twital via [Composer](https://getcomposer.org/):
+There are two recommended ways to install the `goetas-xsd-reader` via [Composer](https://getcomposer.org/):
 
 * using the ``composer require`` command:
 
@@ -23,7 +20,7 @@ composer require 'goetas/goetas-xsd-reader:2.*'
 ```js
 "require": {
     ..
-    "goetas/goetas-xsd-reader":"2.*",
+    "goetas/goetas-xsd-reader" : "2.*",
     ..
 }
 ```
