@@ -130,7 +130,7 @@ class Schema
      */
     public function addSchema(Schema $schema)
     {
-        if ($schema->getTargetNamespace()) {
+        if (strlen(trim($schema->getTargetNamespace()))) {
             $this->schemas[$this->getTargetNamespace()] = $schema;
         } else {
             $this->schemas[] = $schema;

@@ -12,11 +12,7 @@ class ComplexType extends BaseComplexType implements ElementHolder
     {
         return $this->elements;
     }
-    public function set()
-    {
-        $this->elements = array();
-        $this->attributes = array();
-    }
+
     public function addElement(Element $element)
     {
         $this->elements[] = $element;

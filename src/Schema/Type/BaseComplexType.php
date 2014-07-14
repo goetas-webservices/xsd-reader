@@ -3,33 +3,33 @@ namespace Goetas\XML\XSDReader\Schema\Type;
 
 use Goetas\XML\XSDReader\Schema\Attribute\Attribute;
 use Goetas\XML\XSDReader\Schema\Attribute\AttributeHolder;
+use Goetas\XML\XSDReader\Schema\Inheritance\Extension;
+use Goetas\XML\XSDReader\Schema\Inheritance\Restriction;
 
 abstract class BaseComplexType extends Type implements AttributeHolder
 {
 
     /**
      *
-     * @var Type
+     * @var Restriction
      */
-    protected $restrict;
+    protected $restriction;
 
     /**
      *
-     * @var Type
+     * @var Extension
      */
     protected $extends;
 
     protected $attributes = array();
 
-
-    public function set()
-    {
-        $this->elements = array();
-        $this->attributes = array();
-    }
+    /**
+     *
+     * @return \Goetas\XML\XSDReader\Schema\Inheritance\Base
+     */
     public function getParent()
     {
-        return $this->restrict ?  : $this->extends;
+        return $this->restriction ?  : $this->extends;
     }
 
     public function addAttribute(Attribute $attribute)
@@ -37,14 +37,14 @@ abstract class BaseComplexType extends Type implements AttributeHolder
         $this->attributes[] = $attribute;
     }
 
-    public function getRestrict()
+    public function getRestriction()
     {
-        return $this->restrict;
+        return $this->restriction;
     }
 
-    public function setRestrict(Type $restrict)
+    public function setRestriction(Restriction $restriction)
     {
-        $this->restrict = $restrict;
+        $this->restriction = $restriction;
         return $this;
     }
 
@@ -53,7 +53,7 @@ abstract class BaseComplexType extends Type implements AttributeHolder
         return $this->extends;
     }
 
-    public function setExtends(Type $extends)
+    public function setExtends(Extension $extends)
     {
         $this->extends = $extends;
         return $this;

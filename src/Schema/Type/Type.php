@@ -36,6 +36,10 @@ abstract class Type
         $this->doc = $doc;
         return $this;
     }
+    /**
+     *
+     * @return Schema
+     */
     public function getSchema()
     {
         return $this->schema;
@@ -44,6 +48,10 @@ abstract class Type
     {
         $this->schema = $schema;
         return $this;
+    }
+    public function __toString()
+    {
+        return strval($this->name);
     }
 
 }
