@@ -33,28 +33,6 @@ class Group implements Element, ElementHolder
         $this->elements[] = $element;
     }
 
-    private static function nav(Element $item)
-    {
-        $items = array();
-        if ($item instanceof ElementHolder) {
-            foreach ($item->getElements() as $attrExtra) {
-                $items = array_merge($items, self::nav($attrExtra));
-            }
-        } else {
-            $items[] = $item;
-        }
-        return $items;
-    }
-
-    public function getAllElements()
-    {
-        $items = array();
-        foreach ($this->getElements() as $item) {
-            $items = array_merge($items, self::nav($item));
-        }
-        return $items;
-    }
-
     public function getDoc()
     {
         return $this->doc;

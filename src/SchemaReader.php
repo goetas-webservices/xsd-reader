@@ -28,6 +28,9 @@ use Goetas\XML\XSDReader\Schema\Inheritance\Extension;
 class SchemaReader
 {
 
+    const XSD_NS = "http://www.w3.org/2001/XMLSchema";
+    const XML_NS = "http://www.w3.org/XML/1998/namespace";
+
     public function __construct()
     {
 
@@ -90,16 +93,20 @@ class SchemaReader
         }
         return $doc;
     }
-    public function schemaNode(Schema $schema, DOMElement $node)
+    public function schemaNode(Schema $schema, DOMElement $node, Schema $parent = null)
     {
 
-        // echo "TNS: " . $node->getAttribute("targetNamespace")."\n";
         $schema->setDoc($this->getDocumentation($node));
-        $schema->setTargetNamespace($node->getAttribute("targetNamespace"));
+        if($node->hasAttribute("targetNamespace")){
+            $schema->setTargetNamespace($node->getAttribute("targetNamespace"));
+        }elseif($parent){
+            $schema->setTargetNamespace($parent->getTargetNamespace("targetNamespace"));
+        }
         $schema->setElementsQualification(! $node->hasAttribute("elementFormDefault") || $node->getAttribute("elementFormDefault") == "qualified");
         $schema->setAttributesQualification(! $node->hasAttribute("attributeFormDefault") || $node->getAttribute("attributeFormDefault") == "qualified");
-        // $schema->setDoc($node->get(self::NS, "annotation"));
+        $schema->setDoc($this->getDocumentation($node));
         $functions = array();
+
         foreach ($node->childNodes as $childNode) {
             switch ($childNode->localName) {
                 case 'include':
@@ -122,6 +129,7 @@ class SchemaReader
                     $functions[] = $this->loadComplexType($schema, $childNode);
                     break;
                 case 'simpleType':
+
                     $functions[] = $this->loadSimpleType($schema, $childNode);
                     break;
             }
@@ -129,12 +137,12 @@ class SchemaReader
 
         return array_filter($functions);
     }
-
     public function loadElementReal(Schema $schema, DOMElement $node)
     {
         $element = new ElementReal();
         $element->setDoc($this->getDocumentation($node));
         $element->setName($node->getAttribute("name"));
+
         $this->fillTypeNodeChild($element, $schema, $node);
 
         if ($node->hasAttribute("maxOccurs")) {
@@ -175,12 +183,13 @@ class SchemaReader
     public function loadSequence(ElementHolder $elementHolder, Schema $schema, DOMElement $node)
     {
         foreach ($node->childNodes as $childNode) {
+
             switch ($childNode->localName) {
                 case 'element':
                     if ($childNode->hasAttribute("ref")) {
                         $element = $this->findElement($schema, $node, $childNode->getAttribute("ref"));
                     } else {
-                        $element = $this->loadElementReal($schema, $childNode, $childNode->getAttribute("name"));
+                        $element = $this->loadElementReal($schema, $childNode);
                     }
                     $elementHolder->addElement($element);
                     break;
@@ -293,8 +302,7 @@ class SchemaReader
     }
     public function loadUnion(SimpleType $type, Schema $schema, DOMElement $node)
     {
-
-        if($node->hasAttribute("memberTypes")){
+        if ($node->hasAttribute("memberTypes")) {
             $types = preg_split('/\s+/', $node->getAttribute("memberTypes"));
             foreach ($types as $typeName){
                 $type->addUnion($this->findType($schema, $node, $typeName));
@@ -395,8 +403,21 @@ class SchemaReader
     protected function findType(Schema $schema, DOMElement $node, $typeName)
     {
         list ($name, $namespace) = self::splitParts($node, $typeName);
+
+        if($name=="OTA_CodeType"){
+            try {
+                return $schema->findType($name, $namespace?:$schema->getTargetNamespace());
+            } catch (Exception $e) {
+                var_Dump($schema->getFile());
+                var_Dump($schema->getTargetNamespace());
+                var_Dump($node->ownerDocument->saveXML($node));
+                die();
+            }
+
+        }
+
         try {
-            return $schema->findType($name, $namespace);
+            return $schema->findType($name, $namespace?:$schema->getTargetNamespace());
         } catch (Exception $e) {
             throw new TypeException("Non trovo il tipo $typeName $namespace, alla riga ".$node->getLineNo()." di ".$node->ownerDocument->documentURI, 0, $e);
         }
@@ -414,7 +435,7 @@ class SchemaReader
     {
         list ($name, $namespace) = self::splitParts($node, $typeName);
         try {
-            return $schema->findGroup($name, $namespace);
+            return $schema->findGroup($name, $namespace?:$schema->getTargetNamespace());
         } catch (Exception $e) {
             throw new TypeException("Non trovo il gruppo, alla riga ".$node->getLineNo()." di ".$node->ownerDocument->documentURI, 0, $e);
         }
@@ -432,7 +453,7 @@ class SchemaReader
     {
         list ($name, $namespace) = self::splitParts($node, $typeName);
         try {
-            return $schema->findElement($name, $namespace);
+            return $schema->findElement($name, $namespace?:$schema->getTargetNamespace());
         } catch (Exception $e) {
             throw new TypeException("Non trovo l'elemento, alla riga ".$node->getLineNo()." di ".$node->ownerDocument->documentURI, 0, $e);
         }
@@ -450,7 +471,7 @@ class SchemaReader
     {
         list ($name, $namespace) = self::splitParts($node, $typeName);
         try {
-            return $schema->findAttribute($name, $namespace);
+            return $schema->findAttribute($name, $namespace?:$schema->getTargetNamespace());
         } catch (Exception $e) {
             throw new TypeException("Non trovo l'attributo, alla riga ".$node->getLineNo()." di ".$node->ownerDocument->documentURI, 0, $e);
         }
@@ -468,7 +489,7 @@ class SchemaReader
     {
         list ($name, $namespace) = self::splitParts($node, $typeName);
         try {
-            return $schema->findAttributeGroup($name, $namespace);
+            return $schema->findAttributeGroup($name, $namespace?:$schema->getTargetNamespace());
         } catch (Exception $e) {
             throw new TypeException("Non trovo il gruppo di attributi, alla riga ".$node->getLineNo()." di ".$node->ownerDocument->documentURI, 0, $e);
         }
@@ -484,34 +505,35 @@ class SchemaReader
         $_this = $this;
         return function () use($element, $schema, $node, $_this)
         {
-            $_this->fillTypeNodeChild($element, $schema, $node, $element->getName());
+            $_this->fillTypeNodeChild($element, $schema, $node);
         };
     }
 
     public function fillTypeNodeChild(TypeNodeChild $element, Schema $schema, DOMElement $node)
     {
+
         $element->setIsAnonymousType(! $node->hasAttribute("type"));
 
         if ($element->isAnonymousType()) {
 
+
+            $addCallback = function ($type) use($element)
+            {
+                $element->setType($type);
+            };
+            $functions = array();
             foreach ($node->childNodes as $childNode) {
-                $addCallback = function ($type) use($element)
-                {
-                    $element->setType($type);
-                };
-                $functions = array();
-                foreach ($node->childNodes as $childNode) {
-                    switch ($childNode->localName) {
-                        case 'complexType':
-                            $functions[] = $this->loadComplexType($schema, $childNode, $addCallback);
-                            break;
-                        case 'simpleType':
-                            $functions[] = $this->loadSimpleType($schema, $childNode, $addCallback);
-                            break;
-                    }
+                switch ($childNode->localName) {
+                    case 'complexType':
+                        $functions[] = $this->loadComplexType($schema, $childNode, $addCallback);
+                        break;
+                    case 'simpleType':
+                        $functions[] = $this->loadSimpleType($schema, $childNode, $addCallback);
+                        break;
                 }
-                array_map('call_user_func', array_filter($functions));
             }
+            array_map('call_user_func', array_filter($functions));
+
         } else {
             $type = $this->findType($schema, $node, $node->getAttribute("type"));
             $element->setType($type);
@@ -536,23 +558,38 @@ class SchemaReader
 
         $file = UrlUtils::resolve_url($node->ownerDocument->documentURI, $node->getAttribute("schemaLocation"));
 
-        if (isset($this->loadedFiles[$file])) {
-            $schema->addSchema($this->loadedFiles[$file]);
+        if ($node->hasAttribute("namespace")) {
+            $cid = $file."|".$node->hasAttribute("namespace");
+        }else{
+
+            $xml = $this->getDOM($file);
+
+            if ($xml->documentElement->hasAttribute("targetNamespace")) {
+                $cid = $file."|".$xml->documentElement->getAttribute("targetNamespace");
+            }else{
+                $cid = $file."|".$schema->getTargetNamespace();
+            }
+        }
+
+        $ns = $node->hasAttribute("namespace")?$node->getAttribute("namespace"):null;
+
+        if (isset($this->loadedFiles[$cid])) {
+            $schema->addSchema($this->loadedFiles[$cid], $ns);
             return function(){
 
             };
         }
 
-        $this->loadedFiles[$file] = $newSchema = new Schema();
+        $this->loadedFiles[$cid] = $newSchema = new Schema();
         $newSchema->setFile($file);
-        $newSchema->addSchema($this->loadedFiles["xml"]);
-        $newSchema->addSchema($this->loadedFiles["xsd"]);
+        foreach($this->globalSchemas as $globaSchemaNS => $globaSchema){
+            $newSchema->addSchema($globaSchema, $globaSchemaNS);
+        }
+        $schema->addSchema($newSchema, $ns);
 
-        $schema->addSchema($newSchema);
+        $callbacks = $this->schemaNode($newSchema, $xml->documentElement, $schema);
 
-        $callbacks = $this->loadSchemaFromFile($newSchema, $file);
-
-        return function() use ($callbacks) {
+        return function () use ($callbacks) {
             array_map('call_user_func', $callbacks);
         };
 
@@ -560,14 +597,15 @@ class SchemaReader
     private $globalSchemas = array();
     public function addGlobalSchemas(Schema $rootSchema)
     {
+
         $callbacksAll = array();
         if(!$this->globalSchemas){
             $preload = array(
-                "xsd" => __DIR__ . '/res/XMLSchema.xsd',
-                "xml" => __DIR__ . '/res/xml.xsd'
+                self::XSD_NS => __DIR__ . '/res/XMLSchema.xsd',
+                self::XML_NS => __DIR__ . '/res/xml.xsd'
             );
             foreach($preload as $key => $filePath){
-                $this->loadedFiles[$key] = $this->globalSchemas[$key] = $schema = new Schema();
+                $this->globalSchemas[$key] = $schema = new Schema();
                 $schema->setFile($filePath);
 
                 $callbacks = $this->loadSchemaFromFile($schema, $filePath);
@@ -577,10 +615,10 @@ class SchemaReader
                 };
             }
 
-            $this->globalSchemas["xsd"]->addType(new SimpleType("anySimpleType"));
+            $this->globalSchemas[self::XSD_NS]->addType(new SimpleType("anySimpleType"));
 
-            $this->globalSchemas["xml"]->addSchema($this->globalSchemas["xsd"]);
-            $this->globalSchemas["xsd"]->addSchema($this->globalSchemas["xml"]);
+            $this->globalSchemas[self::XML_NS]->addSchema($this->globalSchemas[self::XSD_NS], self::XSD_NS);
+            $this->globalSchemas[self::XSD_NS]->addSchema($this->globalSchemas[self::XML_NS], self::XML_NS);
         }
         foreach($this->globalSchemas as $globalSchema){
             $rootSchema->addSchema($globalSchema);
@@ -589,16 +627,8 @@ class SchemaReader
     }
     private $loadedFiles = array();
 
-    public function readSchemas(array $files)
-    {
-        return array_map(array($this, 'readFile'), $files);
-    }
-
     public function readFile($file)
     {
-        if (isset($this->loadedFiles[$file])) {
-            return $this->loadedFiles[$file];
-        }
 
         $this->loadedFiles[$file] = $rootSchema = new Schema();
         $rootSchema->setFile($file);
@@ -624,9 +654,6 @@ class SchemaReader
     }
     public function readString($content, $fileName)
     {
-        if (isset($this->loadedFiles[$fileName])) {
-            return $this->loadedFiles[$fileName];
-        }
 
         $this->loadedFiles[$fileName] = $rootSchema = new Schema();
         $rootSchema->setFile($fileName);
@@ -650,17 +677,13 @@ class SchemaReader
 
         return $rootSchema;
     }
-    protected function loadSchemaFromFile(Schema $schema, $file)
+    protected function loadSchemaFromFile(Schema $schema, $file, Schema $parent = null)
     {
 
-        $xml = new DOMDocument('1.0', 'UTF-8');
-        if (! $xml->load($file)) {
-            throw new IOException("Non riesco a caricare lo schema {$file}");
-        }
-
-        return $this->schemaNode($schema, $xml->documentElement);
+        $xml = $this->getDOM($file);
+        return $this->schemaNode($schema, $xml->documentElement, $parent);
     }
-    protected function loadSchemaFromString(Schema $schema, $contents, $fileName)
+    protected function loadSchemaFromString(Schema $schema, $contents, $fileName, Schema $parent = null)
     {
 
         $xml = new DOMDocument('1.0', 'UTF-8');
@@ -668,8 +691,15 @@ class SchemaReader
             throw new IOException("Non riesco a caricare lo schema");
         }
 
-        return $this->schemaNode($schema, $xml->documentElement);
+        return $this->schemaNode($schema, $xml->documentElement, $parent);
     }
+    private function getDOM($file){
+        $xml = new DOMDocument('1.0', 'UTF-8');
+        if (! $xml->load($file)) {
+            throw new IOException("Non riesco a caricare lo schema");
+        }
+        return $xml;
 
+    }
 
 }

@@ -128,11 +128,15 @@ class Schema
      *
      * @param unknown_type $thiss
      */
-    public function addSchema(Schema $schema)
+    public function addSchema(Schema $schema, $namespace = null)
     {
-        if (strlen(trim($schema->getTargetNamespace()))) {
-            $this->schemas[$this->getTargetNamespace()] = $schema;
-        } else {
+        if($namespace!==null && $schema->getTargetNamespace()!==$namespace){
+            throw TypeException("Invalid namespace $namespace");
+        }
+
+        if($namespace !=null){
+            $this->schemas[$namespace] = $schema;
+        }else{
             $this->schemas[] = $schema;
         }
     }
@@ -206,9 +210,11 @@ class Schema
     public function findType($name, $namespace = null)
     {
         $cid = "$name, $namespace";
+
         if (isset($this->typeCache[$cid])) {
             return $this->typeCache[$cid];
         }
+
         if (! $this->getTargetNamespace() || $this->getTargetNamespace() === $namespace) {
             foreach ($this->getTypes() as $item) {
                 if ($item->getName() === $name) {
