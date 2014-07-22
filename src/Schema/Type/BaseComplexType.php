@@ -19,7 +19,7 @@ abstract class BaseComplexType extends Type implements AttributeHolder
      *
      * @var Extension
      */
-    protected $extends;
+    protected $extension;
 
     protected $attributes = array();
 
@@ -29,7 +29,7 @@ abstract class BaseComplexType extends Type implements AttributeHolder
      */
     public function getParent()
     {
-        return $this->restriction ?  : $this->extends;
+        return $this->restriction ?  : $this->extension;
     }
 
     public function addAttribute(Attribute $attribute)
@@ -48,14 +48,14 @@ abstract class BaseComplexType extends Type implements AttributeHolder
         return $this;
     }
 
-    public function getExtends()
+    public function getExtension()
     {
-        return $this->extends;
+        return $this->extension;
     }
 
-    public function setExtends(Extension $extends)
+    public function setExtension(Extension $extension)
     {
-        $this->extends = $extends;
+        $this->extension = $extension;
         return $this;
     }
     public function getAttributes()

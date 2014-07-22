@@ -7,8 +7,8 @@ use Goetas\XML\XSDReader\Schema\Type\SimpleType;
 use Goetas\XML\XSDReader\Schema\Attribute\AttributeGroup;
 use Goetas\XML\XSDReader\Schema\Attribute\Attribute;
 use Goetas\XML\XSDReader\Schema\Element\Group;
-use Goetas\XML\XSDReader\Exception\TypeException;
 use Goetas\XML\XSDReader\Schema\Element\ElementNode;
+use Goetas\XML\XSDReader\Exception\TypeException;
 
 class Schema
 {
@@ -131,11 +131,13 @@ class Schema
     public function addSchema(Schema $schema, $namespace = null)
     {
         if($namespace!==null && $schema->getTargetNamespace()!==$namespace){
-            throw TypeException("Invalid namespace $namespace");
+            throw new TypeException("Invalid namespace $namespace vs ".$schema->getTargetNamespace());
         }
 
         if($namespace !=null){
             $this->schemas[$namespace] = $schema;
+        }elseif(!$namespace && $schema->getTargetNamespace()){
+            $this->schemas[$schema->getTargetNamespace()] = $schema;
         }else{
             $this->schemas[] = $schema;
         }
@@ -206,7 +208,13 @@ class Schema
     }
 
     private $typeCache = array();
-
+    /**
+     *
+     * @param string $name
+     * @param string $namespace
+     * @throws TypeException
+     * @return Type
+     */
     public function findType($name, $namespace = null)
     {
         $cid = "$name, $namespace";

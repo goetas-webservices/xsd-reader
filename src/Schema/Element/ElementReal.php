@@ -34,25 +34,25 @@ class ElementReal extends TypeNodeChild implements Element
         return $this;
     }
 
-    public function getQualified()
+    public function isQualified()
     {
         return $this->qualified;
     }
 
     public function setQualified($qualified)
     {
-        $this->qualified = $qualified;
+        $this->qualified = !!$qualified;
         return $this;
     }
 
-    public function getNil()
+    public function isNil()
     {
         return $this->nil;
     }
 
     public function setNil($nil)
     {
-        $this->nil = $nil;
+        $this->nil = !!$nil;
         return $this;
     }
 

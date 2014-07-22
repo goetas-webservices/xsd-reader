@@ -1,0 +1,149 @@
+<?php
+namespace Goetas\XML\XSDReader\Tests;
+
+class TypeInheritanceTest extends BaseTest
+{
+    public function testBase()
+    {
+        $schema = $this->reader->readString('
+            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+                <xs:simpleType name="mySimple">
+                    <xs:restriction base="xs:string"></xs:restriction>
+                </xs:simpleType>
+
+                <xs:simpleType name="mySimpleWithRestr">
+                    <xs:restriction base="mySimple"></xs:restriction>
+                </xs:simpleType>
+
+                <xs:complexType name="myComplex">
+                    <xs:simpleContent>
+                        <xs:extension base="mySimpleWithRestr"></xs:extension>
+                    </xs:simpleContent>
+                </xs:complexType>
+
+                <xs:simpleType name="mySimpleWithUnion">
+                    <xs:union memberTypes="xs:string mySimpleWithRestr"></xs:union>
+                </xs:simpleType>
+
+            </xs:schema>');
+
+        $this->assertCount(4, $schema->getTypes());
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\SimpleType', $type = $schema->findType('mySimple', 'http://www.example.com'));
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\SimpleType', $type2 = $schema->findType('mySimpleWithRestr', 'http://www.example.com'));
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\ComplexTypeSimpleContent', $type3 = $schema->findType('myComplex', 'http://www.example.com'));
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\SimpleType', $type4 = $schema->findType('mySimpleWithUnion', 'http://www.example.com'));
+
+        $restriction1 = $type->getRestriction();
+        $base1 = $restriction1->getBase();
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\SimpleType', $base1);
+        $this->assertEquals('http://www.w3.org/2001/XMLSchema', $base1->getSchema()->getTargetNamespace());
+        $this->assertEquals('string', $base1->getName());
+
+        $restriction2 = $type2->getRestriction();
+        $base2 = $restriction2->getBase();
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\SimpleType', $base2);
+        $this->assertEquals('http://www.example.com', $base2->getSchema()->getTargetNamespace());
+        $this->assertEquals('mySimple', $base2->getName());
+
+        $extension = $type3->getExtension();
+        $base3 = $extension->getBase();
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\SimpleType', $base3);
+        $this->assertEquals('http://www.example.com', $base3->getSchema()->getTargetNamespace());
+        $this->assertEquals('mySimpleWithRestr', $base3->getName());
+
+        $unions = $type4->getUnions();
+        $this->assertCount(2, $unions);
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\SimpleType', $unions[0]);
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\SimpleType', $unions[1]);
+
+        $this->assertEquals('http://www.w3.org/2001/XMLSchema', $unions[0]->getSchema()->getTargetNamespace());
+        $this->assertEquals('string', $unions[0]->getName());
+
+        $this->assertEquals('http://www.example.com', $unions[1]->getSchema()->getTargetNamespace());
+        $this->assertEquals('mySimpleWithRestr', $unions[1]->getName());
+    }
+
+    public function testAnonyeExtension()
+    {
+        $schema = $this->reader->readString('
+            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+                <xs:simpleType name="myType">
+                    <xs:restriction>
+                        <xs:simpleType>
+                            <xs:restriction base="xs:string"></xs:restriction>
+                        </xs:simpleType>
+                    </xs:restriction>
+                </xs:simpleType>
+
+            </xs:schema>');
+
+        $this->assertCount(1, $schema->getTypes());
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\SimpleType', $type = $schema->findType('myType', 'http://www.example.com'));
+
+        $restriction = $type->getRestriction();
+        $base = $restriction->getBase();
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\SimpleType', $base);
+        $this->assertEquals('http://www.example.com', $base->getSchema()->getTargetNamespace());
+        $this->assertTrue(!$base->getName());
+
+
+        $restriction2 = $base->getRestriction();
+        $base2 = $restriction2->getBase();
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\SimpleType', $base2);
+        $this->assertEquals('http://www.w3.org/2001/XMLSchema', $base2->getSchema()->getTargetNamespace());
+        $this->assertEquals('string', $base2->getName());
+
+    }
+
+    public function testAnonymUnion()
+    {
+        $schema = $this->reader->readString('
+            <xs:schema targetNamespace="http://www.example.com"
+            xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            xmlns:ex="http://www.example.com">
+
+                <xs:simpleType name="myType">
+                    <xs:restriction base="xs:string"></xs:restriction>
+                </xs:simpleType>
+
+                <xs:simpleType name="myAnonUnion">
+                    <xs:union>
+                        <xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType>
+                        <xs:simpleType><xs:restriction base="ex:myType"></xs:restriction></xs:simpleType>
+                    </xs:union>
+                </xs:simpleType>
+
+            </xs:schema>');
+
+
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\SimpleType', $type = $schema->findType('myAnonUnion', 'http://www.example.com'));
+
+
+        $unions = $type->getUnions();
+
+        $this->assertCount(2, $unions);
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\SimpleType', $unions[0]);
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\SimpleType', $unions[1]);
+
+        $this->assertEquals('http://www.example.com', $unions[0]->getSchema()->getTargetNamespace());
+        $this->assertTrue(!$unions[0]->getName());
+
+        $this->assertEquals('http://www.example.com', $unions[1]->getSchema()->getTargetNamespace());
+        $this->assertTrue(!$unions[1]->getName());
+
+        $restriction1 = $unions[0]->getRestriction();
+        $base1 = $restriction1->getBase();
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\SimpleType', $base1);
+        $this->assertEquals('http://www.w3.org/2001/XMLSchema', $base1->getSchema()->getTargetNamespace());
+        $this->assertEquals('string', $base1->getName());
+
+        $restriction2 = $unions[1]->getRestriction();
+        $base2 = $restriction2->getBase();
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\SimpleType', $base2);
+        $this->assertEquals('http://www.example.com', $base2->getSchema()->getTargetNamespace());
+        $this->assertEquals('myType', $base2->getName());
+
+    }
+}

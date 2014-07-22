@@ -10,7 +10,7 @@ class Group implements Element, ElementHolder
 
     protected $name;
 
-    protected $elements;
+    protected $elements=array();
 
     public function getName()
     {

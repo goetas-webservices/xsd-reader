@@ -46,7 +46,7 @@ abstract class TypeNodeChild
 
     public function setIsAnonymousType($isAnonymousType)
     {
-        $this->isAnonymousType = $isAnonymousType;
+        $this->isAnonymousType = !!$isAnonymousType;
         return $this;
     }
 }
