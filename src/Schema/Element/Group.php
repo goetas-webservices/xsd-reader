@@ -2,9 +2,15 @@
 namespace Goetas\XML\XSDReader\Schema\Element;
 
 use Goetas\XML\XSDReader\Schema\Type\Type;
+use Goetas\XML\XSDReader\Schema\Schema;
 
 class Group implements Element, ElementHolder
 {
+    /**
+     *
+     * @var Schema
+     */
+    protected $schema;
 
     protected $doc;
 
@@ -12,6 +18,11 @@ class Group implements Element, ElementHolder
 
     protected $elements=array();
 
+    public function __construct(Schema $schema, $name)
+    {
+        $this->schema = $schema;
+        $this->name = $name;
+    }
     public function getName()
     {
         return $this->name;
@@ -43,5 +54,11 @@ class Group implements Element, ElementHolder
         $this->doc = $doc;
         return $this;
     }
+
+    public function getSchema()
+    {
+        return $this->schema;
+    }
+
 
 }

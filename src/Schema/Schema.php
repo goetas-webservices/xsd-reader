@@ -111,7 +111,6 @@ class Schema
      */
     public function addType(Type $type)
     {
-        $type->setSchema($this);
         $this->types[$type->getName()] = $type;
     }
 

@@ -10,9 +10,10 @@ abstract class Type
 
     protected $doc;
 
-    public function __construct($name = null)
+    public function __construct(Schema $schema, $name = null)
     {
         $this->name = $name;
+        $this->schema = $schema;
     }
 
     public function getName()
@@ -43,11 +44,6 @@ abstract class Type
     public function getSchema()
     {
         return $this->schema;
-    }
-    public function setSchema(Schema $schema)
-    {
-        $this->schema = $schema;
-        return $this;
     }
     public function __toString()
     {

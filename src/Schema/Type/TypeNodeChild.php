@@ -2,9 +2,13 @@
 namespace Goetas\XML\XSDReader\Schema\Type;
 
 use Goetas\XML\XSDReader\Schema\Type\Type;
+use Goetas\XML\XSDReader\Schema\Schema;
 
 abstract class TypeNodeChild
 {
+    protected $doc;
+
+    protected $schema;
 
     protected $name;
 
@@ -12,8 +16,11 @@ abstract class TypeNodeChild
 
     protected $isAnonymousType = false;
 
-    public function __construct($name = null)
+
+
+    public function __construct(Schema $schema, $name)
     {
+        $this->schema = $schema;
         $this->name = $name;
     }
 
@@ -49,4 +56,21 @@ abstract class TypeNodeChild
         $this->isAnonymousType = !!$isAnonymousType;
         return $this;
     }
+
+    public function getDoc()
+    {
+        return $this->doc;
+    }
+
+    public function setDoc($doc)
+    {
+        $this->doc = $doc;
+        return $this;
+    }
+
+    public function getSchema()
+    {
+        return $this->schema;
+    }
+
 }

@@ -2,8 +2,9 @@
 namespace Goetas\XML\XSDReader\Schema\Attribute;
 
 use Goetas\XML\XSDReader\Schema\Type\TypeNodeChild;
+use Goetas\XML\XSDReader\Schema\SchemaItem;
 
-interface Attribute
+interface Attribute extends SchemaItem
 {
     const USE_OPTIONAL = 'optional';
     const USE_PROHIBITED = 'prohibited';

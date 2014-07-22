@@ -5,7 +5,6 @@ use Goetas\XML\XSDReader\Schema\Type\TypeNodeChild;
 
 class ElementReal extends TypeNodeChild implements Element
 {
-    protected $doc;
     protected $min = 1;
     protected $max = 1;
     protected $qualified = true;
@@ -66,18 +65,6 @@ class ElementReal extends TypeNodeChild implements Element
         $this->ref = $ref;
         return $this;
     }
-
-    public function getDoc()
-    {
-        return $this->doc;
-    }
-
-    public function setDoc($doc)
-    {
-        $this->doc = $doc;
-        return $this;
-    }
-
 
 
 }
