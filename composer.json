@@ -5,7 +5,7 @@
 		"xsd",
 		"xml",
 		"php",
-		"parser"
+		"parser",
 		"xmlschema"
 	],
 	"homepage" : "https://github.com/goetas/xsd-reader",
