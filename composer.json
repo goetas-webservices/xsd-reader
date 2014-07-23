@@ -3,9 +3,12 @@
 	"description" : "Read XSD into PHP",
 	"keywords" : [
 		"xsd",
-		"xml"
+		"xml",
+		"php",
+		"parser"
+		"xmlschema"
 	],
-	"homepage" : "http://opensource.mercuriosistemi.com",
+	"homepage" : "https://github.com/goetas/xsd-reader",
 	"license" : "MIT",
 	"authors" : [{
 			"name" : "Asmir Mustafic",

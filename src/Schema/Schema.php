@@ -9,6 +9,7 @@ use Goetas\XML\XSDReader\Schema\Element\Group;
 use Goetas\XML\XSDReader\Schema\Element\Element;
 use Goetas\XML\XSDReader\Schema\Element\ElementNode;
 use Goetas\XML\XSDReader\Schema\Exception\TypeNotFoundException;
+use Goetas\XML\XSDReader\Schema\Exception\SchemaException;
 
 
 class Schema
@@ -120,10 +121,10 @@ class Schema
     public function addSchema(Schema $schema, $namespace = null)
     {
         if ($namespace !== null && $schema->getTargetNamespace() !== $namespace) {
-            throw new TypeNotFoundException("Invalid namespace $namespace vs " . $schema->getTargetNamespace());
+            throw new SchemaException(sprintf("The target namespace ('%s') for schema '%s', does not match the declared namespace '%s'", $schema->getTargetNamespace(), $schema->getFile(), $namespace));
         }
 
-        if ($namespace != null) {
+        if ($namespace !== null) {
             $this->schemas[$namespace] = $schema;
         } else {
             $this->schemas[] = $schema;

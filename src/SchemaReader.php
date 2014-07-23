@@ -69,7 +69,7 @@ class SchemaReader
 
         $schema->addAttribute($attribute);
 
-        return function () use($attribute, $schema, $node)
+        return function () use ($attribute, $schema, $node)
         {
             $this->fillTypeNodeChild($attribute, $node);
         };
@@ -202,7 +202,7 @@ class SchemaReader
         $type->setDoc($this->getDocumentation($node));
         $schema->addGroup($type);
 
-        return function () use($type, $node, $schema)
+        return function () use($type, $node)
         {
             foreach ($node->childNodes as $childNode) {
                 switch ($childNode->localName) {
@@ -222,6 +222,7 @@ class SchemaReader
         foreach ($node->childNodes as $childNode) {
             if ($childNode->localName === "simpleContent") {
                 $isSimple = true;
+                break;
             }
         }
 
@@ -493,12 +494,12 @@ class SchemaReader
             };
         }
 
-        $file = UrlUtils::resolve_url($node->ownerDocument->documentURI, $node->getAttribute("schemaLocation"));
+        $file = UrlUtils::resolveRelativeUrl($node->ownerDocument->documentURI, $node->getAttribute("schemaLocation"));
 
         $xml = null;
         $targetNS = null;
         if ($node->hasAttribute("namespace")) {
-            $cid = $file . "|" . $node->getAttribute("namespace");
+            $cid = $file ."|". $node->getAttribute("namespace");
         } else {
 
             $xml = $this->getDOM($file);
@@ -519,6 +520,9 @@ class SchemaReader
             return function ()
             {
             };
+        }else{
+            $xml = $xml?:$this->getDOM($file);
+            $targetNS = $xml->documentElement->getAttribute("targetNamespace");
         }
 
         $this->loadedFiles[$cid] = $newSchema = new Schema();
@@ -543,8 +547,9 @@ class SchemaReader
 
     protected function addGlobalSchemas(Schema $rootSchema)
     {
-        $callbacksAll = array();
+
         if (! $this->globalSchemas) {
+            $callbacksAll = array();
             $preload = array(
                 self::XSD_NS => __DIR__ . '/Resources/XMLSchema.xsd',
                 self::XML_NS => __DIR__ . '/Resources/xml.xsd'
@@ -567,11 +572,12 @@ class SchemaReader
 
             $this->globalSchemas[self::XML_NS]->addSchema($this->globalSchemas[self::XSD_NS], self::XSD_NS);
             $this->globalSchemas[self::XSD_NS]->addSchema($this->globalSchemas[self::XML_NS], self::XML_NS);
+            array_map('call_user_func', $callbacksAll);
         }
+
         foreach ($this->globalSchemas as $globalSchema) {
             $rootSchema->addSchema($globalSchema, $globalSchema->getTargetNamespace());
         }
-        return $callbacksAll;
     }
 
     private $loadedFiles = array();
@@ -585,8 +591,8 @@ class SchemaReader
         $this->loadedFiles[$cid] = $rootSchema = new Schema();
         $rootSchema->setFile($file);
 
-        $callbacks = $this->addGlobalSchemas($rootSchema);
-        $callbacks = array_merge($callbacks, $this->schemaNode($rootSchema, $xml->documentElement));
+        $this->addGlobalSchemas($rootSchema);
+        $callbacks = $this->schemaNode($rootSchema, $xml->documentElement);
 
         array_map('call_user_func', $callbacks);
 
@@ -612,8 +618,8 @@ class SchemaReader
         $rootSchema->setFile($file);
 
 
-        $callbacks = $this->addGlobalSchemas($rootSchema);
-        $callbacks = array_merge($callbacks, $this->schemaNode($rootSchema, $xml->documentElement));
+        $this->addGlobalSchemas($rootSchema);
+        $callbacks = $this->schemaNode($rootSchema, $xml->documentElement);
 
         array_map('call_user_func', $callbacks);
 
