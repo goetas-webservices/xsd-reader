@@ -3,8 +3,9 @@ namespace Goetas\XML\XSDReader\Schema\Type;
 
 use Goetas\XML\XSDReader\Schema\Type\Type;
 use Goetas\XML\XSDReader\Schema\Schema;
+use Goetas\XML\XSDReader\Schema\SchemaItem;
 
-abstract class TypeNodeChild
+abstract class TypeNodeChild implements SchemaItem
 {
     protected $doc;
 

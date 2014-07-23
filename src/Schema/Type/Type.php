@@ -2,7 +2,8 @@
 namespace Goetas\XML\XSDReader\Schema\Type;
 
 use Goetas\XML\XSDReader\Schema\Schema;
-abstract class Type
+use Goetas\XML\XSDReader\Schema\SchemaItem;
+abstract class Type implements SchemaItem
 {
     protected $schema;
 
