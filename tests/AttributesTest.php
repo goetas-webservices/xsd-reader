@@ -7,6 +7,9 @@ class AttributesTest extends BaseTest
 
     public function testBase()
     {
+
+
+
         $schema = $this->reader->readString(
             '
             <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">

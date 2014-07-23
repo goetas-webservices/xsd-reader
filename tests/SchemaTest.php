@@ -32,7 +32,7 @@ class SchemaTest extends BaseTest
     {
         $schema = $this->reader->readString('<xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema"/>');
 
-        $this->setExpectedException('Goetas\XML\XSDReader\Exception\TypeException');
+        $this->setExpectedException('Goetas\XML\XSDReader\Schema\Exception\TypeNotFoundException');
         $schema->$find('foo');
     }
 

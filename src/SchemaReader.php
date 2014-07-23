@@ -23,6 +23,7 @@ use Goetas\XML\XSDReader\Schema\Type\ComplexTypeSimpleContent;
 use Goetas\XML\XSDReader\Schema\Element\ElementNode;
 use Goetas\XML\XSDReader\Schema\Inheritance\Restriction;
 use Goetas\XML\XSDReader\Schema\Inheritance\Extension;
+use Goetas\XML\XSDReader\Schema\Exception\TypeNotFoundException;
 
 class SchemaReader
 {
@@ -47,14 +48,14 @@ class SchemaReader
                 switch ($childNode->localName) {
                     case 'attribute':
                         if ($childNode->hasAttribute("ref")) {
-                            $attribute = $this->findAttribute($schema, $node, $childNode->getAttribute("ref"));
+                            $attribute = $this->findSomething('findAttribute', $schema, $node, $childNode->getAttribute("ref"));
                         } else {
                             $attribute = $this->loadAttributeReal($schema, $childNode);
                         }
                         $attGroup->addAttribute($attribute);
                         break;
                     case 'attributeGroup':
-                        $attribute = $this->findAttributeGroup($schema, $node, $childNode->getAttribute("ref"));
+                        $attribute = $this->findSomething('findAttributeGroup', $schema, $node, $childNode->getAttribute("ref"));
                         $attGroup->addAttribute($attribute);
                         break;
                 }
@@ -95,7 +96,7 @@ class SchemaReader
         if ($node->hasAttribute("targetNamespace")) {
             $schema->setTargetNamespace($node->getAttribute("targetNamespace"));
         } elseif ($parent) {
-            $schema->setTargetNamespace($parent->getTargetNamespace("targetNamespace"));
+            $schema->setTargetNamespace($parent->getTargetNamespace());
         }
         $schema->setElementsQualification(! $node->hasAttribute("elementFormDefault") || $node->getAttribute("elementFormDefault") == "qualified");
         $schema->setAttributesQualification(! $node->hasAttribute("attributeFormDefault") || $node->getAttribute("attributeFormDefault") == "qualified");
@@ -180,14 +181,14 @@ class SchemaReader
             switch ($childNode->localName) {
                 case 'element':
                     if ($childNode->hasAttribute("ref")) {
-                        $element = $this->findElement($elementHolder->getSchema(), $node, $childNode->getAttribute("ref"));
+                        $element = $this->findSomething('findElement', $elementHolder->getSchema(), $node, $childNode->getAttribute("ref"));
                     } else {
                         $element = $this->loadElementReal($elementHolder->getSchema(), $childNode);
                     }
                     $elementHolder->addElement($element);
                     break;
                 case 'group':
-                    $element = $this->findGroup($elementHolder->getSchema(), $node, $childNode->getAttribute("ref"));
+                    $element = $this->findSomething('findGroup', $elementHolder->getSchema(), $node, $childNode->getAttribute("ref"));
                     $elementHolder->addElement($element);
                     break;
             }
@@ -243,7 +244,7 @@ class SchemaReader
                         break;
                     case 'attribute':
                         if ($childNode->hasAttribute("ref")) {
-                            $attribute = $this->findAttribute($schema, $node, $childNode->getAttribute("ref"));
+                            $attribute = $this->findSomething('findAttribute', $schema, $node, $childNode->getAttribute("ref"));
                         } else {
                             $attribute = $this->loadAttributeReal($schema, $childNode);
                         }
@@ -251,7 +252,7 @@ class SchemaReader
                         $type->addAttribute($attribute);
                         break;
                     case 'attributeGroup':
-                        $attribute = $this->findAttributeGroup($schema, $node, $childNode->getAttribute("ref"));
+                        $attribute = $this->findSomething('findAttributeGroup', $schema, $node, $childNode->getAttribute("ref"));
                         $type->addAttribute($attribute);
                         break;
                 }
@@ -271,7 +272,7 @@ class SchemaReader
             $schema->addType($type);
         }
 
-        return function () use($type, $schema, $node, $callback)
+        return function () use($type, $node, $callback)
         {
             $this->fillTypeNode($type, $node);
 
@@ -294,7 +295,7 @@ class SchemaReader
         if ($node->hasAttribute("memberTypes")) {
             $types = preg_split('/\s+/', $node->getAttribute("memberTypes"));
             foreach ($types as $typeName) {
-                $type->addUnion($this->findType($type->getSchema(), $node, $typeName));
+                $type->addUnion($this->findSomething('findType', $type->getSchema(), $node, $typeName));
             }
         }
         $addCallback = function ($unType) use($type)
@@ -335,7 +336,7 @@ class SchemaReader
         $type->setExtension($extension);
 
         if ($node->hasAttribute("base")) {
-            $parent = $this->findType($type->getSchema(), $node, $node->getAttribute("base"));
+            $parent = $this->findSomething('findType', $type->getSchema(), $node, $node->getAttribute("base"));
             $extension->setBase($parent);
         }
 
@@ -343,14 +344,14 @@ class SchemaReader
             switch ($childNode->localName) {
                 case 'attribute':
                     if ($childNode->hasAttribute("ref")) {
-                        $attribute = $this->findAttribute($type->getSchema(), $node, $childNode->getAttribute("ref"));
+                        $attribute = $this->findSomething('findAttribute', $type->getSchema(), $node, $childNode->getAttribute("ref"));
                     } else {
                         $attribute = $this->loadAttributeReal($type->getSchema(), $childNode);
                     }
                     $type->addAttribute($attribute);
                     break;
                 case 'attributeGroup':
-                    $attribute = $this->findAttributeGroup($type->getSchema(), $node, $childNode->getAttribute("ref"));
+                    $attribute = $this->findSomething('findAttributeGroup', $type->getSchema(), $node, $childNode->getAttribute("ref"));
                     $type->addAttribute($attribute);
                     break;
             }
@@ -362,7 +363,7 @@ class SchemaReader
         $restriction = new Restriction();
         $type->setRestriction($restriction);
         if ($node->hasAttribute("base")) {
-            $restrictedType = $this->findType($type->getSchema(), $node, $node->getAttribute("base"));
+            $restrictedType = $this->findSomething('findType', $type->getSchema(), $node, $node->getAttribute("base"));
             $restriction->setBase($restrictedType);
         } else {
             $addCallback = function ($restType) use($restriction)
@@ -379,21 +380,23 @@ class SchemaReader
             }
         }
         foreach ($node->childNodes as $childNode) {
-            if (in_array($childNode->localName, [
-                'enumeration',
-                'pattern',
-                'length',
-                'minLength',
-                'maxLength',
-                'minInclusve',
-                'maxInclusve',
-                'minExclusve',
-                'maxEXclusve'
-            ], true)) {
-                $restriction->addCheck($childNode->localName, [
-                    'value' => $childNode->getAttribute("value"),
-                    'doc' => $this->getDocumentation($childNode)
-                ]);
+            if (in_array($childNode->localName,
+                [
+                    'enumeration',
+                    'pattern',
+                    'length',
+                    'minLength',
+                    'maxLength',
+                    'minInclusve',
+                    'maxInclusve',
+                    'minExclusve',
+                    'maxEXclusve'
+                ], true)) {
+                $restriction->addCheck($childNode->localName,
+                    [
+                        'value' => $childNode->getAttribute("value"),
+                        'doc' => $this->getDocumentation($childNode)
+                    ]);
             }
         }
     }
@@ -413,98 +416,22 @@ class SchemaReader
             $prefix
         );
     }
-
-    protected function findType(Schema $schema, DOMElement $node, $typeName)
-    {
-        list ($name, $namespace) = self::splitParts($node, $typeName);
-
-        if ($name == "OTA_CodeType") {
-            try {
-                return $schema->findType($name, $namespace ?  : $schema->getTargetNamespace());
-            } catch (Exception $e) {
-                var_Dump($schema->getFile());
-                var_Dump($schema->getTargetNamespace());
-                var_Dump($node->ownerDocument->saveXML($node));
-                die();
-            }
-        }
-
-        try {
-            return $schema->findType($name, $namespace ?  : $schema->getTargetNamespace());
-        } catch (Exception $e) {
-            throw new TypeException("Non trovo il tipo $typeName $namespace, alla riga " . $node->getLineNo() . " di " . $node->ownerDocument->documentURI, 0, $e);
-        }
-    }
-
     /**
      *
+     * @param string $finder
      * @param Schema $schema
      * @param DOMElement $node
      * @param string $typeName
      * @throws TypeException
-     * @return Group
+     * @return \Goetas\XML\XSDReader\Schema\SchemaItem
      */
-    protected function findGroup(Schema $schema, DOMElement $node, $typeName)
+    protected function findSomething($finder, Schema $schema, DOMElement $node, $typeName)
     {
         list ($name, $namespace) = self::splitParts($node, $typeName);
         try {
-            return $schema->findGroup($name, $namespace ?  : $schema->getTargetNamespace());
-        } catch (Exception $e) {
-            throw new TypeException("Non trovo il gruppo, alla riga " . $node->getLineNo() . " di " . $node->ownerDocument->documentURI, 0, $e);
-        }
-    }
-
-    /**
-     *
-     * @param Schema $schema
-     * @param DOMElement $node
-     * @param string $typeName
-     * @throws TypeException
-     * @return Group
-     */
-    protected function findElement(Schema $schema, DOMElement $node, $typeName)
-    {
-        list ($name, $namespace) = self::splitParts($node, $typeName);
-        try {
-            return $schema->findElement($name, $namespace ?  : $schema->getTargetNamespace());
-        } catch (Exception $e) {
-            throw new TypeException("Non trovo l'elemento, alla riga " . $node->getLineNo() . " di " . $node->ownerDocument->documentURI, 0, $e);
-        }
-    }
-
-    /**
-     *
-     * @param Schema $schema
-     * @param DOMElement $node
-     * @param string $typeName
-     * @throws TypeException
-     * @return Attribute
-     */
-    protected function findAttribute(Schema $schema, DOMElement $node, $typeName)
-    {
-        list ($name, $namespace) = self::splitParts($node, $typeName);
-        try {
-            return $schema->findAttribute($name, $namespace ?  : $schema->getTargetNamespace());
-        } catch (Exception $e) {
-            throw new TypeException("Non trovo l'attributo, alla riga " . $node->getLineNo() . " di " . $node->ownerDocument->documentURI, 0, $e);
-        }
-    }
-
-    /**
-     *
-     * @param Schema $schema
-     * @param DOMElement $node
-     * @param string $typeName
-     * @throws TypeException
-     * @return Attribute
-     */
-    protected function findAttributeGroup(Schema $schema, DOMElement $node, $typeName)
-    {
-        list ($name, $namespace) = self::splitParts($node, $typeName);
-        try {
-            return $schema->findAttributeGroup($name, $namespace ?  : $schema->getTargetNamespace());
-        } catch (Exception $e) {
-            throw new TypeException("Non trovo il gruppo di attributi, alla riga " . $node->getLineNo() . " di " . $node->ownerDocument->documentURI, 0, $e);
+            return $schema->$finder($name, $namespace ?  : $schema->getTargetNamespace());
+        } catch (TypeNotFoundException $e) {
+            throw new TypeException(sprintf("Can't find %s named {%s}#%s, at line %d in %s ", substr($finder, 4), $namespace, $name, $typeName->getLineNo(), $node->ownerDocument->documentURI), 0, $e);
         }
     }
 
@@ -542,7 +469,7 @@ class SchemaReader
             }
             array_map('call_user_func', array_filter($functions));
         } else {
-            $type = $this->findType($element->getSchema(), $node, $node->getAttribute("type"));
+            $type = $this->findSomething('findType', $element->getSchema(), $node, $node->getAttribute("type"));
             $element->setType($type);
         }
     }
@@ -643,7 +570,7 @@ class SchemaReader
             $this->globalSchemas[self::XSD_NS]->addSchema($this->globalSchemas[self::XML_NS], self::XML_NS);
         }
         foreach ($this->globalSchemas as $globalSchema) {
-            $rootSchema->addSchema($globalSchema);
+            $rootSchema->addSchema($globalSchema, $globalSchema->getTargetNamespace());
         }
         return $callbacksAll;
     }
