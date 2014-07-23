@@ -537,9 +537,11 @@ class SchemaReader
 
         $callbacks = $this->schemaNode($newSchema, $xml->documentElement, $schema);
 
-        return function () use($callbacks)
+        return function () use ($callbacks)
         {
-            array_map('call_user_func', $callbacks);
+            foreach($callbacks as $callback){
+                call_user_func($callback);
+            }
         };
     }
 
@@ -549,30 +551,29 @@ class SchemaReader
     {
 
         if (! $this->globalSchemas) {
-            $callbacksAll = array();
             $preload = array(
                 self::XSD_NS => __DIR__ . '/Resources/XMLSchema.xsd',
                 self::XML_NS => __DIR__ . '/Resources/xml.xsd'
             );
+            $callbacks = array();
             foreach ($preload as $key => $filePath) {
                 $this->globalSchemas[$key] = $schema = new Schema();
                 $schema->setFile($filePath);
 
                 $xml = $this->getDOM($filePath);
 
-                $callbacks = $this->schemaNode($schema, $xml->documentElement);
+                $callbacks = array_merge($callbacks, $this->schemaNode($schema, $xml->documentElement));
 
-                $callbacksAll[] = function () use($callbacks)
-                {
-                    array_map('call_user_func', $callbacks);
-                };
             }
 
             $this->globalSchemas[self::XSD_NS]->addType(new SimpleType($this->globalSchemas[self::XSD_NS], "anySimpleType"));
 
             $this->globalSchemas[self::XML_NS]->addSchema($this->globalSchemas[self::XSD_NS], self::XSD_NS);
             $this->globalSchemas[self::XSD_NS]->addSchema($this->globalSchemas[self::XML_NS], self::XML_NS);
-            array_map('call_user_func', $callbacksAll);
+
+            foreach($callbacks as $callback){
+                $callback();
+            }
         }
 
         foreach ($this->globalSchemas as $globalSchema) {
@@ -594,7 +595,9 @@ class SchemaReader
         $this->addGlobalSchemas($rootSchema);
         $callbacks = $this->schemaNode($rootSchema, $xml->documentElement);
 
-        array_map('call_user_func', $callbacks);
+        foreach($callbacks as $callback){
+            call_user_func($callback);
+        }
 
         return $rootSchema;
     }
@@ -621,7 +624,9 @@ class SchemaReader
         $this->addGlobalSchemas($rootSchema);
         $callbacks = $this->schemaNode($rootSchema, $xml->documentElement);
 
-        array_map('call_user_func', $callbacks);
+        foreach($callbacks as $callback){
+            call_user_func($callback);
+        }
 
         return $rootSchema;
     }
