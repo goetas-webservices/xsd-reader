@@ -32,8 +32,28 @@ class SchemaReader
 
     const XML_NS = "http://www.w3.org/XML/1998/namespace";
 
+    protected $loadedFiles = array();
+
+    protected $globalSchemas = array();
+
+    protected $knowLocationSchemas = array();
+
+    private static $globalSchemaInfo = array(
+        self::XML_NS => 'http://www.w3.org/2001/xml.xsd',
+        self::XSD_NS => 'http://www.w3.org/2001/XMLSchema.xsd'
+    );
+
     public function __construct()
     {
+        $this->knowLocationSchemas = array(
+            'http://www.w3.org/2001/xml.xsd' => __DIR__ . '/Resources/xml.xsd',
+            'http://www.w3.org/2001/XMLSchema.xsd' => __DIR__ . '/Resources/XMLSchema.xsd'
+        );
+    }
+
+    public function addKnownSchemaLocation($remote, $local)
+    {
+        $this->knowLocationSchemas[$remote] = $local;
     }
 
     protected function loadAttributeGroup(Schema $schema, DOMElement $node)
@@ -69,7 +89,7 @@ class SchemaReader
 
         $schema->addAttribute($attribute);
 
-        return function () use ($attribute, $schema, $node)
+        return function () use($attribute, $schema, $node)
         {
             $this->fillTypeNodeChild($attribute, $node);
         };
@@ -126,7 +146,6 @@ class SchemaReader
                     $functions[] = $this->loadComplexType($schema, $childNode);
                     break;
                 case 'simpleType':
-
                     $functions[] = $this->loadSimpleType($schema, $childNode);
                     break;
             }
@@ -418,6 +437,7 @@ class SchemaReader
             $prefix
         );
     }
+
     /**
      *
      * @param string $finder
@@ -474,96 +494,50 @@ class SchemaReader
         }
     }
 
-    protected function getSchemaCid($file, \DOMNode $xml)
-    {
-        return $file . "|" . $xml->documentElement->getAttribute("targetNamespace");
-    }
-
     protected function loadImport(Schema $schema, DOMElement $node)
     {
-        if (! $node->getAttribute("schemaLocation")) {
-            return function ()
-            {
-            };
-        }
-        if (in_array($node->getAttribute("schemaLocation"), array(
-            'http://www.w3.org/2001/xml.xsd'
-        ))) {
-            return function ()
-            {
-            };
-        }
+
 
         $file = UrlUtils::resolveRelativeUrl($node->ownerDocument->documentURI, $node->getAttribute("schemaLocation"));
-
-        $xml = null;
-        $targetNS = null;
-        if ($node->hasAttribute("namespace")) {
-            $cid = $file ."|". $node->getAttribute("namespace");
-        } else {
-
-            $xml = $this->getDOM($file);
-
-            if ($xml->documentElement->hasAttribute("targetNamespace")) {
-                $cid = $this->getSchemaCid($file, $xml);
-                $targetNS = $xml->documentElement->getAttribute("targetNamespace");
-            } else {
-                $cid = $file . "|" . $schema->getTargetNamespace();
-                $targetNS = $schema->getTargetNamespace();
-            }
-        }
-
-        $ns = $node->hasAttribute("namespace") ? $node->getAttribute("namespace") : null;
-
-        if (isset($this->loadedFiles[$cid])) {
-            $schema->addSchema($this->loadedFiles[$cid], $ns);
+        if ($node->hasAttribute("namespace") && in_array($node->getAttribute("namespace"), array_keys(self::$globalSchemaInfo), true)){
             return function ()
             {
             };
-        }else{
-            $xml = $xml?:$this->getDOM($file);
-            $targetNS = $xml->documentElement->getAttribute("targetNamespace");
+        }elseif (isset($this->loadedFiles[$file])) {
+            $schema->addSchema($this->loadedFiles[$file]);
+            return function ()
+            {
+            };
         }
 
-        $this->loadedFiles[$cid] = $newSchema = new Schema();
-
-        $newSchema->setTargetNamespace($targetNS);
-
-        $newSchema->setFile($file);
+        $this->loadedFiles[$file] = $newSchema = new Schema($file);
         foreach ($this->globalSchemas as $globaSchemaNS => $globaSchema) {
             $newSchema->addSchema($globaSchema, $globaSchemaNS);
         }
-        $schema->addSchema($newSchema, $ns);
 
+        $xml = $this->getDOM(isset($this->knowLocationSchemas[$file])?$this->knowLocationSchemas[$file]:$file);
         $callbacks = $this->schemaNode($newSchema, $xml->documentElement, $schema);
 
-        return function () use ($callbacks)
+        $schema->addSchema($newSchema);
+
+        return function () use($callbacks)
         {
-            foreach($callbacks as $callback){
+            foreach ($callbacks as $callback) {
                 call_user_func($callback);
             }
         };
     }
 
-    private $globalSchemas = array();
-
     protected function addGlobalSchemas(Schema $rootSchema)
     {
-
         if (! $this->globalSchemas) {
-            $preload = array(
-                self::XSD_NS => __DIR__ . '/Resources/XMLSchema.xsd',
-                self::XML_NS => __DIR__ . '/Resources/xml.xsd'
-            );
+
             $callbacks = array();
-            foreach ($preload as $key => $filePath) {
-                $this->globalSchemas[$key] = $schema = new Schema();
-                $schema->setFile($filePath);
+            foreach (self::$globalSchemaInfo as $namespace => $uri) {
+                $this->globalSchemas[$namespace] = $schema = new Schema($uri);
 
-                $xml = $this->getDOM($filePath);
-
+                $xml = $this->getDOM($this->knowLocationSchemas[$uri]);
                 $callbacks = array_merge($callbacks, $this->schemaNode($schema, $xml->documentElement));
-
             }
 
             $this->globalSchemas[self::XSD_NS]->addType(new SimpleType($this->globalSchemas[self::XSD_NS], "anySimpleType"));
@@ -571,7 +545,7 @@ class SchemaReader
             $this->globalSchemas[self::XML_NS]->addSchema($this->globalSchemas[self::XSD_NS], self::XSD_NS);
             $this->globalSchemas[self::XSD_NS]->addSchema($this->globalSchemas[self::XML_NS], self::XML_NS);
 
-            foreach($callbacks as $callback){
+            foreach ($callbacks as $callback) {
                 $callback();
             }
         }
@@ -581,26 +555,37 @@ class SchemaReader
         }
     }
 
-    private $loadedFiles = array();
-
     public function readFile($file)
     {
         $xml = $this->getDOM($file);
 
-        $cid = $this->getSchemaCid($file, $xml);
-
-        $this->loadedFiles[$cid] = $rootSchema = new Schema();
-        $rootSchema->setFile($file);
+        $this->loadedFiles[$file] = $rootSchema = new Schema($file);
 
         $this->addGlobalSchemas($rootSchema);
         $callbacks = $this->schemaNode($rootSchema, $xml->documentElement);
 
-        foreach($callbacks as $callback){
+        foreach ($callbacks as $callback) {
             call_user_func($callback);
         }
 
         return $rootSchema;
     }
+
+
+    public function readNode(\DOMNode $node, $file = 'schema.xsd')
+    {
+        $this->loadedFiles[] = $rootSchema = new Schema($file);
+
+        $this->addGlobalSchemas($rootSchema);
+        $callbacks = $this->schemaNode($rootSchema, $node);
+
+        foreach ($callbacks as $callback) {
+            call_user_func($callback);
+        }
+
+        return $rootSchema;
+    }
+
 
     /**
      *
@@ -615,16 +600,13 @@ class SchemaReader
             throw new IOException("Non riesco a caricare lo schema");
         }
         $xml->documentURI = $file;
-        $cid = $this->getSchemaCid($file, $xml);
 
-        $this->loadedFiles[$cid] = $rootSchema = new Schema();
-        $rootSchema->setFile($file);
-
+        $this->loadedFiles[$file] = $rootSchema = new Schema($file);
 
         $this->addGlobalSchemas($rootSchema);
         $callbacks = $this->schemaNode($rootSchema, $xml->documentElement);
 
-        foreach($callbacks as $callback){
+        foreach ($callbacks as $callback) {
             call_user_func($callback);
         }
 

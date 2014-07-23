@@ -39,8 +39,9 @@ class Schema
 
     private $typeCache = array();
 
-    public function __construct()
+    public function __construct($schemaLocation)
     {
+        $this->file = $schemaLocation;
     }
 
     public function getElementsQualification()
