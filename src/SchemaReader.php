@@ -93,6 +93,7 @@ class SchemaReader
     protected function schemaNode(Schema $schema, DOMElement $node, Schema $parent = null)
     {
         $schema->setDoc($this->getDocumentation($node));
+
         if ($node->hasAttribute("targetNamespace")) {
             $schema->setTargetNamespace($node->getAttribute("targetNamespace"));
         } elseif ($parent) {
@@ -131,7 +132,7 @@ class SchemaReader
             }
         }
 
-        return array_filter($functions);
+        return $functions;
     }
 
     protected function loadElementReal(Schema $schema, DOMElement $node)
@@ -431,7 +432,7 @@ class SchemaReader
         try {
             return $schema->$finder($name, $namespace ?  : $schema->getTargetNamespace());
         } catch (TypeNotFoundException $e) {
-            throw new TypeException(sprintf("Can't find %s named {%s}#%s, at line %d in %s ", substr($finder, 4), $namespace, $name, $typeName->getLineNo(), $node->ownerDocument->documentURI), 0, $e);
+            throw new TypeException(sprintf("Can't find %s named {%s}#%s, at line %d in %s ", substr($finder, 4), $namespace, $name, $node->getLineNo(), $node->ownerDocument->documentURI), 0, $e);
         }
     }
 
@@ -456,18 +457,16 @@ class SchemaReader
             {
                 $element->setType($type);
             };
-            $functions = array();
             foreach ($node->childNodes as $childNode) {
                 switch ($childNode->localName) {
                     case 'complexType':
-                        $functions[] = $this->loadComplexType($element->getSchema(), $childNode, $addCallback);
+                        call_user_func($this->loadComplexType($element->getSchema(), $childNode, $addCallback));
                         break;
                     case 'simpleType':
-                        $functions[] = $this->loadSimpleType($element->getSchema(), $childNode, $addCallback);
+                        call_user_func($this->loadSimpleType($element->getSchema(), $childNode, $addCallback));
                         break;
                 }
             }
-            array_map('call_user_func', array_filter($functions));
         } else {
             $type = $this->findSomething('findType', $element->getSchema(), $node, $node->getAttribute("type"));
             $element->setType($type);
@@ -586,22 +585,10 @@ class SchemaReader
         $this->loadedFiles[$cid] = $rootSchema = new Schema();
         $rootSchema->setFile($file);
 
-        $callbacksAll = array();
-
         $callbacks = $this->addGlobalSchemas($rootSchema);
+        $callbacks = array_merge($callbacks, $this->schemaNode($rootSchema, $xml->documentElement));
 
-        $callbacksAll[] = function () use($callbacks)
-        {
-            array_map('call_user_func', $callbacks);
-        };
-
-        $callbacks = $this->schemaNode($rootSchema, $xml->documentElement);
-        $callbacksAll[] = function () use($callbacks)
-        {
-            array_map('call_user_func', $callbacks);
-        };
-
-        array_map('call_user_func', $callbacksAll);
+        array_map('call_user_func', $callbacks);
 
         return $rootSchema;
     }
@@ -624,23 +611,11 @@ class SchemaReader
         $this->loadedFiles[$cid] = $rootSchema = new Schema();
         $rootSchema->setFile($file);
 
-        $callbacksAll = array();
 
         $callbacks = $this->addGlobalSchemas($rootSchema);
+        $callbacks = array_merge($callbacks, $this->schemaNode($rootSchema, $xml->documentElement));
 
-        $callbacksAll[] = function () use($callbacks)
-        {
-            array_map('call_user_func', $callbacks);
-        };
-
-        $callbacks = $this->schemaNode($rootSchema, $xml->documentElement);
-
-        $callbacksAll[] = function () use($callbacks)
-        {
-            array_map('call_user_func', $callbacks);
-        };
-
-        array_map('call_user_func', $callbacksAll);
+        array_map('call_user_func', $callbacks);
 
         return $rootSchema;
     }
