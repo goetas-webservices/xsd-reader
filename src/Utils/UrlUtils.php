@@ -6,6 +6,11 @@ class UrlUtils
 
     public static function resolveRelativeUrl($base, $rel)
     {
+        $re = array(
+            '#(/\.?/)#',
+            '#/(?!\.\.)[^/]+/\.\./#'
+        );
+
         /* return if already absolute URL */
         if (parse_url($rel, PHP_URL_SCHEME) != '' || substr($rel, 0, 2) == '//') {
             return $rel;
@@ -34,17 +39,19 @@ class UrlUtils
         $abs = $parts["host"].(isset($parts["port"])?(":".$parts["port"]):"").$path."/".$rel;
 
         /* replace '//' or '/./' or '/foo/../' with '/' */
-        $re = array(
-            '#(/\.?/)#',
-            '#/(?!\.\.)[^/]+/\.\./#'
-        );
+
         $n = 1;
         do {
             $abs = preg_replace($re, '/', $abs, - 1, $n);
         } while ($n > 0);
 
         /* absolute URL is ready! */
-        return $parts["scheme"] . '://' . $abs;
+        if($parts["scheme"] ){
+            return $parts["scheme"] . '://' . $abs;
+        }else{
+            return $abs;
+        }
+
     }
 
 }
