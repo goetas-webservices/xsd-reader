@@ -3,6 +3,44 @@ namespace Goetas\XML\XSDReader\Tests;
 
 class TypeInheritanceTest extends BaseTest
 {
+
+    public function testInheritanceWithExtension()
+    {
+        $schema = $this->reader->readString('
+             <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema"  xmlns:ex="http://www.example.com">
+                <xs:complexType name="complexType-1">
+                     <xs:attribute name="attribute-2" type="xs:string"/>
+                     <xs:sequence>
+                            <xs:element name="complexType-1-el-1" type="xs:string"/>
+                     </xs:sequence>
+                </xs:complexType>
+                <xs:complexType name="complexType-2">
+                     <xs:complexContent>
+                        <xs:extension base="ex:complexType-1">
+                             <xs:sequence>
+                                <xs:element name="complexType-2-el1" type="xs:string"></xs:element>
+                            </xs:sequence>
+                            <xs:attribute name="complexType-2-att1" type="xs:string"></xs:attribute>
+                        </xs:extension>
+                    </xs:complexContent>
+                </xs:complexType>
+            </xs:schema>
+            ');
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\ComplexType', $type1 = $schema->findType('complexType-1', 'http://www.example.com'));
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\ComplexType', $type2 = $schema->findType('complexType-2', 'http://www.example.com'));
+
+        $this->assertSame($type1, $type2->getExtension()->getBase());
+
+        $elements = $type2->getElements();
+        $attributes = $type2->getAttributes();
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\ElementReal', $elements[0]);
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\AttributeReal', $attributes[0]);
+
+        $this->assertEquals('complexType-2-el1', $elements[0]->getName());
+        $this->assertEquals('complexType-2-att1', $attributes[0]->getName());
+
+
+    }
     public function testBase()
     {
         $schema = $this->reader->readString('

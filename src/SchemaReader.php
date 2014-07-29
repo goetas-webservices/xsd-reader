@@ -75,6 +75,7 @@ class SchemaReader
                         $attGroup->addAttribute($attribute);
                         break;
                     case 'attributeGroup':
+
                         $attribute = $this->findSomething('findAttributeGroup', $schema, $node, $childNode->getAttribute("ref"));
                         $attGroup->addAttribute($attribute);
                         break;
@@ -226,7 +227,7 @@ class SchemaReader
             foreach ($node->childNodes as $childNode) {
                 switch ($childNode->localName) {
                     case 'sequence':
-                    case 'choiche':
+                    case 'choice':
                         $this->loadSequence($type, $childNode);
                         break;
                 }
@@ -260,7 +261,7 @@ class SchemaReader
             foreach ($node->childNodes as $childNode) {
                 switch ($childNode->localName) {
                     case 'sequence':
-                    case 'choiche':
+                    case 'choice':
                         $this->loadSequence($type, $childNode);
                         break;
                     case 'attribute':
@@ -363,6 +364,10 @@ class SchemaReader
 
         foreach ($node->childNodes as $childNode) {
             switch ($childNode->localName) {
+                case 'sequence':
+                case 'choice':
+                    $this->loadSequence($type, $childNode);
+                    break;
                 case 'attribute':
                     if ($childNode->hasAttribute("ref")) {
                         $attribute = $this->findSomething('findAttribute', $type->getSchema(), $node, $childNode->getAttribute("ref"));
