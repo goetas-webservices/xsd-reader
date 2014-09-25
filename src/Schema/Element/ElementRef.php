@@ -3,13 +3,27 @@ namespace Goetas\XML\XSDReader\Schema\Element;
 
 use Goetas\XML\XSDReader\Schema\Type\TypeNodeChild;
 
-class ElementReal extends TypeNodeChild implements ElementItem
+class ElementRef extends TypeNodeChild implements ElementItem
 {
+    protected $wrapped;
     protected $min = 1;
     protected $max = 1;
     protected $qualified = true;
     protected $nil = false;
 
+    public function __construct(Element $element)
+    {
+        parent::__construct($element->getSchema(), $element->getName());
+        $this->wrapped = $element;
+    }
+    public function isAnonymousType()
+    {
+        return $this->wrapped->isAnonymousType();
+    }
+    public function getType()
+    {
+        return $this->wrapped->getType();
+    }
     public function getMin()
     {
         return $this->min;
@@ -64,6 +78,4 @@ class ElementReal extends TypeNodeChild implements ElementItem
         $this->ref = $ref;
         return $this;
     }
-
-
 }

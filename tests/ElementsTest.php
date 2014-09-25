@@ -44,7 +44,7 @@ class ElementsTest extends BaseTest
         $this->assertCount(3, $elementsInGroup);
 
         $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\ElementReal', $elementsInGroup[0]);
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\ElementNode', $elementsInGroup[1]);
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\ElementItem', $elementsInGroup[1]);
         $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\Group', $elementsInGroup[2]);
 
     }

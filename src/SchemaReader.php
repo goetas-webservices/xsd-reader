@@ -24,6 +24,9 @@ use Goetas\XML\XSDReader\Schema\Element\ElementNode;
 use Goetas\XML\XSDReader\Schema\Inheritance\Restriction;
 use Goetas\XML\XSDReader\Schema\Inheritance\Extension;
 use Goetas\XML\XSDReader\Schema\Exception\TypeNotFoundException;
+use Goetas\XML\XSDReader\Schema\Element\ElementRef;
+use Goetas\XML\XSDReader\Schema\Attribute\Attribute;
+use Goetas\XML\XSDReader\Schema\Attribute\AttributeRef;
 
 class SchemaReader
 {
@@ -177,11 +180,48 @@ class SchemaReader
         return $element;
     }
 
+    protected function loadElementRef(Element $referencedElement, DOMElement $node)
+    {
+        $element = new ElementRef($referencedElement);
+        $element->setDoc($this->getDocumentation($node));
+
+        if ($node->hasAttribute("maxOccurs")) {
+            $element->setMax($node->getAttribute("maxOccurs") == "unbounded" ? - 1 : $node->getAttribute("maxOccurs"));
+        }
+        if ($node->hasAttribute("minOccurs")) {
+            $element->setMin($node->getAttribute("minOccurs"));
+        }
+        if ($node->hasAttribute("nillable")) {
+            $element->setNil($node->getAttribute("nillable") == "true");
+        }
+        if ($node->hasAttribute("form")) {
+            $element->setQualified($node->getAttribute("form") == "qualified");
+        }
+
+        return $element;
+    }
+
     protected function loadAttributeReal(Schema $schema, DOMElement $node)
     {
         $attribute = new AttributeReal($schema, $node->getAttribute("name"));
         $attribute->setDoc($this->getDocumentation($node));
         $this->fillTypeNodeChild($attribute, $node);
+
+        if ($node->hasAttribute("nillable")) {
+            $attribute->setNil($node->getAttribute("nillable") == "true");
+        }
+        if ($node->hasAttribute("form")) {
+            $attribute->setQualified($node->getAttribute("form") == "qualified");
+        }
+        if ($node->hasAttribute("use")) {
+            $attribute->setUse($node->getAttribute("use"));
+        }
+        return $attribute;
+    }
+    protected function loadAttributeRef(Attribute $referencedAttribiute, DOMElement $node)
+    {
+        $attribute = new AttributeRef($referencedAttribiute);
+        $attribute->setDoc($this->getDocumentation($node));
 
         if ($node->hasAttribute("nillable")) {
             $attribute->setNil($node->getAttribute("nillable") == "true");
@@ -202,7 +242,8 @@ class SchemaReader
             switch ($childNode->localName) {
                 case 'element':
                     if ($childNode->hasAttribute("ref")) {
-                        $element = $this->findSomething('findElement', $elementHolder->getSchema(), $node, $childNode->getAttribute("ref"));
+                        $referencedElement = $this->findSomething('findElement', $elementHolder->getSchema(), $node, $childNode->getAttribute("ref"));
+                        $element = $this->loadElementRef($referencedElement, $childNode);
                     } else {
                         $element = $this->loadElementReal($elementHolder->getSchema(), $childNode);
                     }
@@ -266,7 +307,8 @@ class SchemaReader
                         break;
                     case 'attribute':
                         if ($childNode->hasAttribute("ref")) {
-                            $attribute = $this->findSomething('findAttribute', $schema, $node, $childNode->getAttribute("ref"));
+                            $referencedAttribute = $this->findSomething('findAttribute', $schema, $node, $childNode->getAttribute("ref"));
+                            $attribute = $this->loadAttributeRef($referencedAttribute, $childNode);
                         } else {
                             $attribute = $this->loadAttributeReal($schema, $childNode);
                         }

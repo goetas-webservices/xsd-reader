@@ -3,16 +3,30 @@ namespace Goetas\XML\XSDReader\Schema\Attribute;
 
 use Goetas\XML\XSDReader\Schema\Type\TypeNodeChild;
 
-class AttributeReal extends TypeNodeChild implements AttributeItem
+class AttributeRef extends TypeNodeChild implements AttributeItem
 {
 
     protected $qualified = true;
 
     protected $nil = false;
 
-    protected $ref;
-
     protected $use = self::USE_OPTIONAL;
+
+    protected $wrapped;
+
+    public function __construct(Attribute $att)
+    {
+        parent::__construct($att->getSchema(), $att->getName());
+        $this->wrapped = $att;
+    }
+    public function isAnonymousType()
+    {
+        return $this->wrapped->isAnonymousType();
+    }
+    public function getType()
+    {
+        return $this->wrapped->getType();
+    }
 
     public function isQualified()
     {
