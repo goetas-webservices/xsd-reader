@@ -1,21 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="true"
-         backupStaticAttributes="false"
-         bootstrap="./vendor/autoload.php"
-         colors="false"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="false"
-         convertWarningsToExceptions="true"
-         forceCoversAnnotation="false"
-
-         processIsolation="false"
-         stopOnError="false"
-         stopOnFailure="false"
-         stopOnIncomplete="false"
-         stopOnSkipped="false"
-         
-         strict="false"
-         verbose="false">
+<phpunit bootstrap="./vendor/autoload.php"
+         colors="true"
+         convertNoticesToExceptions="false">
          
     <testsuites>
         <testsuite name="Goetas XSD Reader Test Suite">
