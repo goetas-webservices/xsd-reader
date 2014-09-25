@@ -455,10 +455,13 @@ class SchemaReader
     protected function findSomething($finder, Schema $schema, DOMElement $node, $typeName)
     {
         list ($name, $namespace) = self::splitParts($node, $typeName);
+
+        $namespace = $namespace ?: $schema->getTargetNamespace();
+
         try {
-            return $schema->$finder($name, $namespace ?  : $schema->getTargetNamespace());
+            return $schema->$finder($name, $namespace);
         } catch (TypeNotFoundException $e) {
-            throw new TypeException(sprintf("Can't find %s named {%s}#%s, at line %d in %s ", substr($finder, 4), $namespace, $name, $node->getLineNo(), $node->ownerDocument->documentURI), 0, $e);
+            throw new TypeException(sprintf("Can't find %s named {%s}#%s, at line %d in %s ", strtolower(substr($finder, 4)), $namespace, $name, $node->getLineNo(), $node->ownerDocument->documentURI), 0, $e);
         }
     }
 
@@ -467,7 +470,7 @@ class SchemaReader
         $element = new ElementNode($schema, $node->getAttribute("name"));
         $schema->addElement($element);
 
-        return function () use($element, $node)
+        return function () use ($element, $node)
         {
             $this->fillTypeNodeChild($element, $node);
         };
@@ -501,8 +504,6 @@ class SchemaReader
 
     protected function loadImport(Schema $schema, DOMElement $node)
     {
-
-
         $file = UrlUtils::resolveRelativeUrl($node->ownerDocument->documentURI, $node->getAttribute("schemaLocation"));
         if ($node->hasAttribute("namespace") && in_array($node->getAttribute("namespace"), array_keys(self::$globalSchemaInfo), true)){
             return function ()
@@ -510,20 +511,31 @@ class SchemaReader
             };
         }elseif (isset($this->loadedFiles[$file])) {
             $schema->addSchema($this->loadedFiles[$file]);
-            return function ()
-            {
+            return function () {
             };
         }
 
-        $this->loadedFiles[$file] = $newSchema = new Schema($file);
+        if (!$node->getAttribute("namespace")){
+            $this->loadedFiles[$file] = $newSchema = $schema;
+        }else{
+            $this->loadedFiles[$file] = $newSchema = new Schema($file);
+        }
+
+
+
         foreach ($this->globalSchemas as $globaSchemaNS => $globaSchema) {
             $newSchema->addSchema($globaSchema, $globaSchemaNS);
         }
 
         $xml = $this->getDOM(isset($this->knowLocationSchemas[$file])?$this->knowLocationSchemas[$file]:$file);
+
+
         $callbacks = $this->schemaNode($newSchema, $xml->documentElement, $schema);
 
-        $schema->addSchema($newSchema);
+        if ($node->getAttribute("namespace")){
+            $schema->addSchema($newSchema);
+        }
+
 
         return function () use($callbacks)
         {
