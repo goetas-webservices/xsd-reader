@@ -12,12 +12,12 @@ class UrlUtils
         );
 
         /* return if already absolute URL */
-        if (parse_url($rel, PHP_URL_SCHEME) !== null || substr($rel, 0, 2) == '//') {
+        if (parse_url($rel, PHP_URL_SCHEME) !== null || substr($rel, 0, 2) === '//') {
             return $rel;
         }
 
         /* queries and anchors */
-        if ($rel[0] == '#' || $rel[0] == '?') {
+        if ($rel[0] === '#' || $rel[0] === '?') {
             return $base.$rel;
         }
 
