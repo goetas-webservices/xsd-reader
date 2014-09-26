@@ -138,8 +138,8 @@ class TypesTest extends BaseTest
         $elements = $complex->getElements();
         $this->assertCount(4, $elements);
 
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\ElementReal', $elements[0]);
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\ElementReal', $elements[1]);
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\Element', $elements[0]);
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\Element', $elements[1]);
         $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\ElementItem', $elements[2]);
         $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\Group', $elements[3]);
 
@@ -154,10 +154,10 @@ class TypesTest extends BaseTest
         $attributes = $complex->getAttributes();
         $this->assertCount(4, $attributes);
 
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\AttributeReal', $attributes[0]);
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\AttributeReal', $attributes[1]);
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\Attribute', $attributes[0]);
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\Attribute', $attributes[1]);
         $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\AttributeItem', $attributes[2]);
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\AttributeGroup', $attributes[3]);
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\Group', $attributes[3]);
 
         $this->assertEquals('att1', $attributes[0]->getName());
         $this->assertEquals('att2', $attributes[1]->getName());
@@ -220,10 +220,10 @@ class TypesTest extends BaseTest
         $attributes = $complex->getAttributes();
         $this->assertCount(4, $attributes);
 
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\AttributeReal', $attributes[0]);
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\AttributeReal', $attributes[1]);
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\Attribute', $attributes[0]);
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\Attribute', $attributes[1]);
         $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\AttributeItem', $attributes[2]);
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\AttributeGroup', $attributes[3]);
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\Group', $attributes[3]);
 
         $this->assertEquals('att1', $attributes[0]->getName());
         $this->assertEquals('att2', $attributes[1]->getName());

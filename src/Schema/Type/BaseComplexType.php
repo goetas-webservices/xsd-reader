@@ -2,11 +2,13 @@
 namespace Goetas\XML\XSDReader\Schema\Type;
 
 use Goetas\XML\XSDReader\Schema\Attribute\Attribute;
-use Goetas\XML\XSDReader\Schema\Attribute\AttributeHolder;
 use Goetas\XML\XSDReader\Schema\Inheritance\Extension;
 use Goetas\XML\XSDReader\Schema\Inheritance\Restriction;
+use Goetas\XML\XSDReader\Schema\Attribute\AttributeBase;
+use Goetas\XML\XSDReader\Schema\Attribute\AttributeItem;
+use Goetas\XML\XSDReader\Schema\Attribute\AttributeContainer;
 
-abstract class BaseComplexType extends Type implements AttributeHolder
+abstract class BaseComplexType extends Type implements AttributeContainer
 {
 
     /**
@@ -32,7 +34,7 @@ abstract class BaseComplexType extends Type implements AttributeHolder
         return $this->restriction ?  : $this->extension;
     }
 
-    public function addAttribute(Attribute $attribute)
+    public function addAttribute(AttributeItem $attribute)
     {
         $this->attributes[] = $attribute;
     }
@@ -58,6 +60,7 @@ abstract class BaseComplexType extends Type implements AttributeHolder
         $this->extension = $extension;
         return $this;
     }
+
     public function getAttributes()
     {
         return $this->attributes;

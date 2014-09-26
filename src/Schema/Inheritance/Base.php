@@ -3,7 +3,9 @@ namespace Goetas\XML\XSDReader\Schema\Inheritance;
 
 use Goetas\XML\XSDReader\Schema\Type\Type;
 
-abstract class Base {
+abstract class Base
+{
+
     /**
      *
      * @var Type
@@ -20,5 +22,4 @@ abstract class Base {
         $this->base = $base;
         return $this;
     }
-
 }

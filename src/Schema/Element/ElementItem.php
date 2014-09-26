@@ -1,7 +1,8 @@
 <?php
 namespace Goetas\XML\XSDReader\Schema\Element;
 
-interface ElementItem extends Element
+interface ElementItem
 {
-    public function getType();
+
+    public function getName();
 }

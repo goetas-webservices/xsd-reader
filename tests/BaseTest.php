@@ -12,5 +12,6 @@ abstract class BaseTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->reader = new SchemaReader();
+        error_reporting(error_reporting() &~E_NOTICE);
     }
 }

@@ -1,9 +1,9 @@
 <?php
 namespace Goetas\XML\XSDReader\Schema\Attribute;
 
-use Goetas\XML\XSDReader\Schema\Type\TypeNodeChild;
+use Goetas\XML\XSDReader\Schema\Item;
 
-class AttributeRef extends TypeNodeChild implements AttributeItem
+class AttributeRef extends Item implements AttributeSingle
 {
 
     protected $qualified = true;
@@ -12,17 +12,23 @@ class AttributeRef extends TypeNodeChild implements AttributeItem
 
     protected $use = self::USE_OPTIONAL;
 
+    /**
+     *
+     * @var Attribute
+     */
     protected $wrapped;
 
-    public function __construct(Attribute $att)
+    public function __construct(AttributeDef $att)
     {
         parent::__construct($att->getSchema(), $att->getName());
         $this->wrapped = $att;
     }
+
     public function isAnonymousType()
     {
         return $this->wrapped->isAnonymousType();
     }
+
     public function getType()
     {
         return $this->wrapped->getType();
@@ -60,5 +66,4 @@ class AttributeRef extends TypeNodeChild implements AttributeItem
         $this->use = $use;
         return $this;
     }
-
 }

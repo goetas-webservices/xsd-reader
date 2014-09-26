@@ -2,14 +2,15 @@
 namespace Goetas\XML\XSDReader\Schema;
 
 use Goetas\XML\XSDReader\Schema\Type\Type;
-use Goetas\XML\XSDReader\Schema\Attribute\AttributeGroup;
+use Goetas\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
 use Goetas\XML\XSDReader\Schema\Attribute\Attribute;
-use Goetas\XML\XSDReader\Schema\Attribute\AttributeReal;
 use Goetas\XML\XSDReader\Schema\Element\Group;
 use Goetas\XML\XSDReader\Schema\Element\Element;
-use Goetas\XML\XSDReader\Schema\Element\ElementNode;
+use Goetas\XML\XSDReader\Schema\Element\ElementDef;
 use Goetas\XML\XSDReader\Schema\Exception\TypeNotFoundException;
 use Goetas\XML\XSDReader\Schema\Exception\SchemaException;
+use Goetas\XML\XSDReader\Schema\Attribute\AttributeItem;
+use Goetas\XML\XSDReader\Schema\Attribute\AttributeDef;
 
 
 class Schema
@@ -114,7 +115,7 @@ class Schema
         $this->types[$type->getName()] = $type;
     }
 
-    public function addElement(ElementNode $element)
+    public function addElement(ElementDef $element)
     {
         $this->elements[$element->getName()] = $element;
     }
@@ -132,7 +133,7 @@ class Schema
         }
     }
 
-    public function addAttribute(AttributeReal $attribute)
+    public function addAttribute(AttributeDef $attribute)
     {
         $this->attributes[$attribute->getName()] = $attribute;
     }
@@ -168,7 +169,7 @@ class Schema
     /**
      *
      * @param string $name
-     * @return ElementNode
+     * @return ElementDef
      */
     public function getElement($name)
     {
@@ -291,7 +292,7 @@ class Schema
      *
      * @param string $name
      * @param string $namespace
-     * @return ElementNode
+     * @return ElementDef
      */
     public function findElement($name, $namespace = null)
     {

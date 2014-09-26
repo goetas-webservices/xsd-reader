@@ -33,8 +33,8 @@ class TypeInheritanceTest extends BaseTest
 
         $elements = $type2->getElements();
         $attributes = $type2->getAttributes();
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\ElementReal', $elements[0]);
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\AttributeReal', $attributes[0]);
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\Element', $elements[0]);
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\Attribute', $attributes[0]);
 
         $this->assertEquals('complexType-2-el1', $elements[0]->getName());
         $this->assertEquals('complexType-2-att1', $attributes[0]->getName());

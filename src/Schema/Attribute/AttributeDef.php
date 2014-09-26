@@ -1,0 +1,34 @@
+<?php
+namespace Goetas\XML\XSDReader\Schema\Attribute;
+
+use Goetas\XML\XSDReader\Schema\Item;
+
+class AttributeDef extends Item implements AttributeSingle
+{
+
+    protected $fixed;
+
+    protected $default;
+
+    public function getFixed()
+    {
+        return $this->fixed;
+    }
+
+    public function setFixed($fixed)
+    {
+        $this->fixed = $fixed;
+        return $this;
+    }
+
+    public function getDefault()
+    {
+        return $this->default;
+    }
+
+    public function setDefault($default)
+    {
+        $this->default = $default;
+        return $this;
+    }
+}

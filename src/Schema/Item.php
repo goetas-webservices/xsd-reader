@@ -1,12 +1,13 @@
 <?php
-namespace Goetas\XML\XSDReader\Schema\Type;
+namespace Goetas\XML\XSDReader\Schema;
 
 use Goetas\XML\XSDReader\Schema\Type\Type;
 use Goetas\XML\XSDReader\Schema\Schema;
 use Goetas\XML\XSDReader\Schema\SchemaItem;
 
-abstract class TypeNodeChild implements SchemaItem
+abstract class Item implements SchemaItem
 {
+
     protected $doc;
 
     protected $schema;
@@ -16,8 +17,6 @@ abstract class TypeNodeChild implements SchemaItem
     protected $type;
 
     protected $isAnonymousType = false;
-
-
 
     public function __construct(Schema $schema, $name)
     {
@@ -35,7 +34,10 @@ abstract class TypeNodeChild implements SchemaItem
         $this->name = $name;
         return $this;
     }
-
+    /**
+     *
+     * @return Type
+     */
     public function getType()
     {
         return $this->type;
@@ -54,7 +56,7 @@ abstract class TypeNodeChild implements SchemaItem
 
     public function setIsAnonymousType($isAnonymousType)
     {
-        $this->isAnonymousType = !!$isAnonymousType;
+        $this->isAnonymousType = (boolean) $isAnonymousType;
         return $this;
     }
 
@@ -73,5 +75,4 @@ abstract class TypeNodeChild implements SchemaItem
     {
         return $this->schema;
     }
-
 }

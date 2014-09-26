@@ -1,14 +1,47 @@
 <?php
 namespace Goetas\XML\XSDReader\Schema\Attribute;
 
-use Goetas\XML\XSDReader\Schema\Type\TypeNodeChild;
-use Goetas\XML\XSDReader\Schema\SchemaItem;
+use Goetas\XML\XSDReader\Schema\Item;
 
-interface Attribute extends SchemaItem
+class Attribute extends AttributeDef implements AttributeSingle
 {
-    const USE_OPTIONAL = 'optional';
-    const USE_PROHIBITED = 'prohibited';
-    const USE_REQUIRED = 'required';
 
-    public function getName();
+    protected $qualified = true;
+
+    protected $nil = false;
+
+    protected $use = self::USE_OPTIONAL;
+
+    public function isQualified()
+    {
+        return $this->qualified;
+    }
+
+    public function setQualified($qualified)
+    {
+        $this->qualified = $qualified;
+        return $this;
+    }
+
+    public function isNil()
+    {
+        return $this->nil;
+    }
+
+    public function setNil($nil)
+    {
+        $this->nil = $nil;
+        return $this;
+    }
+
+    public function getUse()
+    {
+        return $this->use;
+    }
+
+    public function setUse($use)
+    {
+        $this->use = $use;
+        return $this;
+    }
 }

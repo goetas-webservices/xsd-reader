@@ -2,9 +2,10 @@
 namespace Goetas\XML\XSDReader\Schema\Type;
 
 use Goetas\XML\XSDReader\Schema\Element\Element;
-use Goetas\XML\XSDReader\Schema\Element\ElementHolder;
+use Goetas\XML\XSDReader\Schema\Element\ElementContainer;
+use Goetas\XML\XSDReader\Schema\Element\ElementItem;
 
-class ComplexType extends BaseComplexType implements ElementHolder
+class ComplexType extends BaseComplexType implements ElementContainer
 {
     protected $elements = array();
 
@@ -13,7 +14,7 @@ class ComplexType extends BaseComplexType implements ElementHolder
         return $this->elements;
     }
 
-    public function addElement(Element $element)
+    public function addElement(ElementItem $element)
     {
         $this->elements[] = $element;
     }

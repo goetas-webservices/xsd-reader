@@ -56,16 +56,16 @@ class SchemaTest extends BaseTest
 
 
         $this->assertCount(1, $schema->getElements());
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\ElementNode', $schema->findElement('myElement', 'http://www.example.com'));
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\ElementDef', $schema->findElement('myElement', 'http://www.example.com'));
 
         $this->assertCount(1, $schema->getGroups());
         $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\Group', $schema->findGroup('myGroup', 'http://www.example.com'));
 
         $this->assertCount(1, $schema->getAttributeGroups());
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\AttributeGroup', $schema->findAttributeGroup('myAttributeGroup', 'http://www.example.com'));
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\Group', $schema->findAttributeGroup('myAttributeGroup', 'http://www.example.com'));
 
         $this->assertCount(1, $schema->getAttributes());
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\AttributeReal', $schema->findAttribute('myAttribute', 'http://www.example.com'));
+        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\AttributeDef', $schema->findAttribute('myAttribute', 'http://www.example.com'));
 
     }
 }

@@ -1,24 +1,22 @@
 <?php
 namespace Goetas\XML\XSDReader\Schema\Attribute;
 
-use Goetas\XML\XSDReader\Schema\Type\TypeNodeChild;
 use Goetas\XML\XSDReader\Schema\Schema;
 
-class AttributeGroup implements Attribute, AttributeHolder
+class Group implements AttributeItem, AttributeContainer
 {
+
     /**
      *
      * @var Schema
      */
     protected $schema;
 
-
     protected $doc;
 
     protected $name;
 
     protected $attributes = array();
-
 
     public function __construct(Schema $schema, $name)
     {
@@ -37,10 +35,11 @@ class AttributeGroup implements Attribute, AttributeHolder
         return $this;
     }
 
-    public function addAttribute(Attribute $attribute)
+    public function addAttribute(AttributeItem $attribute)
     {
         $this->attributes[] = $attribute;
     }
+
     public function getAttributes()
     {
         return $this->attributes;
@@ -61,6 +60,4 @@ class AttributeGroup implements Attribute, AttributeHolder
     {
         return $this->schema;
     }
-
-
 }

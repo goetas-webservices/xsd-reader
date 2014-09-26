@@ -1,11 +1,60 @@
 <?php
 namespace Goetas\XML\XSDReader\Schema\Element;
 
-use Goetas\XML\XSDReader\Schema\Type\Type;
-use Goetas\XML\XSDReader\Schema\Type\TypeNodeChild;
-use Goetas\XML\XSDReader\Schema\SchemaItem;
+use Goetas\XML\XSDReader\Schema\Item;
 
-interface Element extends SchemaItem
+class Element extends ElementDef implements ElementSingle
 {
-    public function getName();
+
+    protected $min = 1;
+
+    protected $max = 1;
+
+    protected $qualified = true;
+
+    protected $nil = false;
+
+    public function getMin()
+    {
+        return $this->min;
+    }
+
+    public function setMin($min)
+    {
+        $this->min = $min;
+        return $this;
+    }
+
+    public function getMax()
+    {
+        return $this->max;
+    }
+
+    public function setMax($max)
+    {
+        $this->max = $max;
+        return $this;
+    }
+
+    public function isQualified()
+    {
+        return $this->qualified;
+    }
+
+    public function setQualified($qualified)
+    {
+        $this->qualified = (boolean) $qualified;
+        return $this;
+    }
+
+    public function isNil()
+    {
+        return $this->nil;
+    }
+
+    public function setNil($nil)
+    {
+        $this->nil = (boolean) $nil;
+        return $this;
+    }
 }

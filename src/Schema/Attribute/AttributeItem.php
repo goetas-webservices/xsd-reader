@@ -1,10 +1,9 @@
 <?php
 namespace Goetas\XML\XSDReader\Schema\Attribute;
 
-use Goetas\XML\XSDReader\Schema\Type\TypeNodeChild;
 use Goetas\XML\XSDReader\Schema\SchemaItem;
 
-interface AttributeItem extends Attribute
+interface AttributeItem extends SchemaItem
 {
-    public function getType();
+    public function getName();
 }
