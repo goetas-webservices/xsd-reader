@@ -4,6 +4,13 @@ use Goetas\XML\XSDReader\Utils\UrlUtils;
 
 class UrlUtilsTest extends BaseTest {
 
+    public function testHttpWithout()
+    {
+        $this->assertEquals('http://example.com/', UrlUtils::resolveRelativeUrl('http://example.com/', ''));
+        $this->assertEquals('http://example.com', UrlUtils::resolveRelativeUrl('http://example.com', ''));
+        $this->assertEquals('http://example.com/test', UrlUtils::resolveRelativeUrl('http://example.com/test', ''));
+    }
+
     public function testHttpPaths()
     {
         $this->assertEquals('http://example.com/test', UrlUtils::resolveRelativeUrl('http://example.com/', '/test'));
