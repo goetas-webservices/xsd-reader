@@ -11,6 +11,11 @@ class UrlUtils
             '#/(?!\.\.)[^/]+/\.\./#'
         );
 
+
+        if (!$rel) {
+            return $base;
+        }
+
         /* return if already absolute URL */
         if (parse_url($rel, PHP_URL_SCHEME) !== null || substr($rel, 0, 2) === '//') {
             return $rel;
