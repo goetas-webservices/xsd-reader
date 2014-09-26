@@ -7,9 +7,10 @@ php:
   - hhvm
 
 before_script:
-  - composer install --prefer-dist --dev
+  - travis_retry composer self-update
+  - travis_retry composer install --prefer-dist --no-interaction --dev
 
-script: vendor/phpunit/phpunit/phpunit --coverage-clover=coverage.clover
+script: vendor/bin/phpunit --coverage-clover=coverage.clover
 
 after_script:
   - wget https://scrutinizer-ci.com/ocular.phar
