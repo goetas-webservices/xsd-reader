@@ -14,4 +14,15 @@ interface AttributeSingle extends AttributeItem
 
     public function getType();
 
+    public function isQualified();
+
+    public function setQualified($qualified);
+
+    public function isNil();
+
+    public function setNil($nil);
+
+    public function getUse();
+
+    public function setUse($use);
 }

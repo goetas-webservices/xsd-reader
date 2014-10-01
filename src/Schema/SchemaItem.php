@@ -7,4 +7,9 @@ interface SchemaItem
      * @return Schema
      */
     public function getSchema();
+
+    /**
+     * @return string
+     */
+    public function getDoc();
 }

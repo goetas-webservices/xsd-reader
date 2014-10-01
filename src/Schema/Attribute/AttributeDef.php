@@ -3,7 +3,7 @@ namespace Goetas\XML\XSDReader\Schema\Attribute;
 
 use Goetas\XML\XSDReader\Schema\Item;
 
-class AttributeDef extends Item implements AttributeSingle
+class AttributeDef extends Item implements AttributeItem
 {
 
     protected $fixed;
