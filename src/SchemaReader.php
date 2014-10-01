@@ -116,6 +116,10 @@ class SchemaReader
         };
     }
 
+    /**
+     * @param DOMElement $node
+     * @return string
+     */
     private function getDocumentation(DOMElement $node)
     {
         $doc = '';
@@ -131,6 +135,13 @@ class SchemaReader
         return $doc;
     }
 
+    /**
+     *
+     * @param Schema $schema
+     * @param DOMElement $node
+     * @param Schema $parent
+     * @return array
+     */
     private function schemaNode(Schema $schema, DOMElement $node, Schema $parent = null)
     {
         $schema->setDoc($this->getDocumentation($node));
@@ -183,10 +194,10 @@ class SchemaReader
         $this->fillItem($element, $node);
 
         if ($node->hasAttribute("maxOccurs")) {
-            $element->setMax($node->getAttribute("maxOccurs") == "unbounded" ? - 1 : $node->getAttribute("maxOccurs"));
+            $element->setMax($node->getAttribute("maxOccurs") == "unbounded" ? - 1 : (int)$node->getAttribute("maxOccurs"));
         }
         if ($node->hasAttribute("minOccurs")) {
-            $element->setMin($node->getAttribute("minOccurs"));
+            $element->setMin((int)$node->getAttribute("minOccurs"));
         }
         if ($node->hasAttribute("nillable")) {
             $element->setNil($node->getAttribute("nillable") == "true");
@@ -203,10 +214,10 @@ class SchemaReader
         $element->setDoc($this->getDocumentation($node));
 
         if ($node->hasAttribute("maxOccurs")) {
-            $element->setMax($node->getAttribute("maxOccurs") == "unbounded" ? - 1 : $node->getAttribute("maxOccurs"));
+            $element->setMax($node->getAttribute("maxOccurs") == "unbounded" ? - 1 : (int)$node->getAttribute("maxOccurs"));
         }
         if ($node->hasAttribute("minOccurs")) {
-            $element->setMin($node->getAttribute("minOccurs"));
+            $element->setMin((int)$node->getAttribute("minOccurs"));
         }
         if ($node->hasAttribute("nillable")) {
             $element->setNil($node->getAttribute("nillable") == "true");
@@ -493,7 +504,7 @@ class SchemaReader
      * @param DOMElement $node
      * @param string $typeName
      * @throws TypeException
-     * @return \Goetas\XML\XSDReader\Schema\SchemaItem
+     * @return ElementItem|Group|AttributeItem|AttribiuteGroup|Type
      */
     private function findSomething($finder, Schema $schema, DOMElement $node, $typeName)
     {
@@ -655,6 +666,11 @@ class SchemaReader
         return $this->readNode($xml->documentElement, $file);
     }
 
+    /**
+     * @param string $file
+     * @throws IOException
+     * @return \DOMDocument
+     */
     private function getDOM($file)
     {
         $xml = new DOMDocument('1.0', 'UTF-8');

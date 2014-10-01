@@ -7,11 +7,11 @@ use Goetas\XML\XSDReader\Schema\Attribute\Attribute;
 use Goetas\XML\XSDReader\Schema\Element\Group;
 use Goetas\XML\XSDReader\Schema\Element\Element;
 use Goetas\XML\XSDReader\Schema\Element\ElementDef;
+use Goetas\XML\XSDReader\Schema\Element\ElementItem;
 use Goetas\XML\XSDReader\Schema\Exception\TypeNotFoundException;
 use Goetas\XML\XSDReader\Schema\Exception\SchemaException;
 use Goetas\XML\XSDReader\Schema\Attribute\AttributeItem;
 use Goetas\XML\XSDReader\Schema\Attribute\AttributeDef;
-
 
 class Schema
 {
@@ -156,7 +156,7 @@ class Schema
     /**
      *
      * @param string $name
-     * @return Group
+     * @return Group|false
      */
     public function getGroup($name)
     {
@@ -169,7 +169,7 @@ class Schema
     /**
      *
      * @param string $name
-     * @return ElementDef
+     * @return ElementItem|false
      */
     public function getElement($name)
     {
@@ -182,7 +182,7 @@ class Schema
     /**
      *
      * @param string $name
-     * @return Type
+     * @return Type|false
      */
     public function getType($name)
     {
@@ -195,7 +195,7 @@ class Schema
     /**
      *
      * @param string $name
-     * @return AttributeReal
+     * @return AttributeItem|false
      */
     public function getAttribute($name)
     {
@@ -208,7 +208,7 @@ class Schema
     /**
      *
      * @param string $name
-     * @return AttributeGroup
+     * @return AttributeGroup|false
      */
     public function getAttributeGroup($name)
     {
