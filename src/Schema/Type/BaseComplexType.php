@@ -1,10 +1,8 @@
 <?php
 namespace Goetas\XML\XSDReader\Schema\Type;
 
-use Goetas\XML\XSDReader\Schema\Attribute\Attribute;
 use Goetas\XML\XSDReader\Schema\Inheritance\Extension;
 use Goetas\XML\XSDReader\Schema\Inheritance\Restriction;
-use Goetas\XML\XSDReader\Schema\Attribute\AttributeBase;
 use Goetas\XML\XSDReader\Schema\Attribute\AttributeItem;
 use Goetas\XML\XSDReader\Schema\Attribute\AttributeContainer;
 

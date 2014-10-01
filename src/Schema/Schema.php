@@ -3,9 +3,7 @@ namespace Goetas\XML\XSDReader\Schema;
 
 use Goetas\XML\XSDReader\Schema\Type\Type;
 use Goetas\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
-use Goetas\XML\XSDReader\Schema\Attribute\Attribute;
 use Goetas\XML\XSDReader\Schema\Element\Group;
-use Goetas\XML\XSDReader\Schema\Element\Element;
 use Goetas\XML\XSDReader\Schema\Element\ElementDef;
 use Goetas\XML\XSDReader\Schema\Element\ElementItem;
 use Goetas\XML\XSDReader\Schema\Exception\TypeNotFoundException;

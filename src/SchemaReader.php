@@ -24,7 +24,6 @@ use Goetas\XML\XSDReader\Schema\Inheritance\Extension;
 use Goetas\XML\XSDReader\Schema\Exception\TypeNotFoundException;
 use Goetas\XML\XSDReader\Schema\Element\ElementRef;
 use Goetas\XML\XSDReader\Schema\Attribute\AttributeRef;
-use Goetas\XML\XSDReader\Schema\Element\ElementSingle;
 use Goetas\XML\XSDReader\Schema\Element\ElementItem;
 use Goetas\XML\XSDReader\Schema\Attribute\AttributeDef;
 

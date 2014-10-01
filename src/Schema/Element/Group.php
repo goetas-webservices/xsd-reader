@@ -1,7 +1,6 @@
 <?php
 namespace Goetas\XML\XSDReader\Schema\Element;
 
-use Goetas\XML\XSDReader\Schema\Type\Type;
 use Goetas\XML\XSDReader\Schema\Schema;
 
 class Group implements ElementItem, ElementContainer

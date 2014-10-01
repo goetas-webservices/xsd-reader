@@ -1,8 +1,6 @@
 <?php
 namespace Goetas\XML\XSDReader\Schema\Element;
 
-use Goetas\XML\XSDReader\Schema\Item;
-
 class Element extends ElementDef implements ElementSingle
 {
 
