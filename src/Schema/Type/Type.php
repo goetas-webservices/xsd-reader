@@ -9,6 +9,8 @@ abstract class Type implements SchemaItem
 
     protected $name;
 
+    protected $abstract = false;
+
     protected $doc;
 
     public function __construct(Schema $schema, $name = null)
@@ -50,5 +52,17 @@ abstract class Type implements SchemaItem
     {
         return strval($this->name);
     }
+
+    public function isAbstract()
+    {
+        return $this->abstract;
+    }
+
+    public function setAbstract($abstract)
+    {
+        $this->abstract = $abstract;
+        return $this;
+    }
+
 
 }

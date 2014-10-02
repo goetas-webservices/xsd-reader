@@ -26,6 +26,7 @@ use Goetas\XML\XSDReader\Schema\Element\ElementRef;
 use Goetas\XML\XSDReader\Schema\Attribute\AttributeRef;
 use Goetas\XML\XSDReader\Schema\Element\ElementItem;
 use Goetas\XML\XSDReader\Schema\Attribute\AttributeDef;
+use Goetas\XML\XSDReader\Schema\Element\GroupRef;
 
 class SchemaReader
 {
@@ -207,25 +208,40 @@ class SchemaReader
         return $element;
     }
 
-    private function loadElementRef(ElementDef $referencedElement, DOMElement $node)
+    private function loadGroupRef(Group $referenced, DOMElement $node)
     {
-        $element = new ElementRef($referencedElement);
-        $element->setDoc($this->getDocumentation($node));
+        $ref = new GroupRef($referenced);
+        $ref->setDoc($this->getDocumentation($node));
 
         if ($node->hasAttribute("maxOccurs")) {
-            $element->setMax($node->getAttribute("maxOccurs") == "unbounded" ? - 1 : (int)$node->getAttribute("maxOccurs"));
+            $ref->setMax($node->getAttribute("maxOccurs") == "unbounded" ? - 1 : (int)$node->getAttribute("maxOccurs"));
         }
         if ($node->hasAttribute("minOccurs")) {
-            $element->setMin((int)$node->getAttribute("minOccurs"));
-        }
-        if ($node->hasAttribute("nillable")) {
-            $element->setNil($node->getAttribute("nillable") == "true");
-        }
-        if ($node->hasAttribute("form")) {
-            $element->setQualified($node->getAttribute("form") == "qualified");
+            $ref->setMin((int)$node->getAttribute("minOccurs"));
         }
 
-        return $element;
+        return $ref;
+    }
+
+    private function loadElementRef(ElementDef $referenced, DOMElement $node)
+    {
+        $ref = new ElementRef($referenced);
+        $ref->setDoc($this->getDocumentation($node));
+
+        if ($node->hasAttribute("maxOccurs")) {
+            $ref->setMax($node->getAttribute("maxOccurs") == "unbounded" ? - 1 : (int)$node->getAttribute("maxOccurs"));
+        }
+        if ($node->hasAttribute("minOccurs")) {
+            $ref->setMin((int)$node->getAttribute("minOccurs"));
+        }
+        if ($node->hasAttribute("nillable")) {
+            $ref->setNil($node->getAttribute("nillable") == "true");
+        }
+        if ($node->hasAttribute("form")) {
+            $ref->setQualified($node->getAttribute("form") == "qualified");
+        }
+
+        return $ref;
     }
 
 
@@ -251,6 +267,10 @@ class SchemaReader
         foreach ($node->childNodes as $childNode) {
 
             switch ($childNode->localName) {
+                case 'choice':
+                case 'sequence':
+                    $this->loadSequence($elementContainer, $childNode);
+                    break;
                 case 'element':
                     if ($childNode->hasAttribute("ref")) {
                         $referencedElement = $this->findSomething('findElement', $elementContainer->getSchema(), $node, $childNode->getAttribute("ref"));
@@ -261,8 +281,10 @@ class SchemaReader
                     $elementContainer->addElement($element);
                     break;
                 case 'group':
-                    $element = $this->findSomething('findGroup', $elementContainer->getSchema(), $node, $childNode->getAttribute("ref"));
-                    $elementContainer->addElement($element);
+                    $referencedGroup = $this->findSomething('findGroup', $elementContainer->getSchema(), $node, $childNode->getAttribute("ref"));
+
+                    $group = $this->loadGroupRef($referencedGroup, $childNode);
+                    $elementContainer->addElement($group);
                     break;
             }
         }
@@ -270,17 +292,25 @@ class SchemaReader
 
     private function loadGroup(Schema $schema, DOMElement $node)
     {
-        $type = new Group($schema, $node->getAttribute("name"));
-        $type->setDoc($this->getDocumentation($node));
-        $schema->addGroup($type);
+        $group = new Group($schema, $node->getAttribute("name"));
+        $group->setDoc($this->getDocumentation($node));
 
-        return function () use($type, $node)
+        if ($node->hasAttribute("maxOccurs")) {
+            $group->setMax($node->getAttribute("maxOccurs") == "unbounded" ? - 1 : (int)$node->getAttribute("maxOccurs"));
+        }
+        if ($node->hasAttribute("minOccurs")) {
+            $group->setMin((int)$node->getAttribute("minOccurs"));
+        }
+
+        $schema->addGroup($group);
+
+        return function () use($group, $node)
         {
             foreach ($node->childNodes as $childNode) {
                 switch ($childNode->localName) {
                     case 'sequence':
                     case 'choice':
-                        $this->loadSequence($type, $childNode);
+                        $this->loadSequence($group, $childNode);
                         break;
                 }
             }
@@ -387,8 +417,13 @@ class SchemaReader
         }
     }
 
-    private function fillTypeNode(Type $type, DOMElement $node)
+    private function fillTypeNode(Type $type, DOMElement $node, $checkAbstract = true)
     {
+
+        if($checkAbstract){
+            $type->setAbstract($node->getAttribute("abstract")==="true" || $node->getAttribute("abstract")==="1");
+        }
+
         foreach ($node->childNodes as $childNode) {
             switch ($childNode->localName) {
                 case 'restriction':
@@ -399,7 +434,7 @@ class SchemaReader
                     break;
                 case 'simpleContent':
                 case 'complexContent':
-                    $this->fillTypeNode($type, $childNode);
+                    $this->fillTypeNode($type, $childNode, false);
                     break;
             }
         }
@@ -569,7 +604,7 @@ class SchemaReader
         if (!$node->getAttribute("namespace")){
             $this->loadedFiles[$file] = $newSchema = $schema;
         }else{
-            $this->loadedFiles[$file] = $newSchema = new Schema($file);
+            $this->loadedFiles[$file] = $newSchema = new Schema();
         }
 
 
@@ -596,43 +631,44 @@ class SchemaReader
         };
     }
 
-    private function addGlobalSchemas(Schema $rootSchema)
+    protected $globalSchema;
+
+    /**
+     *
+     * @return \Goetas\XML\XSDReader\Schema\Schema
+     */
+    public function getGlobalSchema()
     {
-        if (! $this->globalSchemas) {
-
+        if (! $this->globalSchema) {
             $callbacks = array();
+            $globalSchemas = array();
             foreach (self::$globalSchemaInfo as $namespace => $uri) {
-                $this->globalSchemas[$namespace] = $schema = new Schema($uri);
-
+                $globalSchemas [$namespace] = $schema = new Schema();
                 $xml = $this->getDOM($this->knowLocationSchemas[$uri]);
                 $callbacks = array_merge($callbacks, $this->schemaNode($schema, $xml->documentElement));
             }
 
-            $this->globalSchemas[self::XSD_NS]->addType(new SimpleType($this->globalSchemas[self::XSD_NS], "anySimpleType"));
+            $globalSchemas[self::XSD_NS]->addType(new SimpleType($globalSchemas[self::XSD_NS], "anySimpleType"));
 
-            $this->globalSchemas[self::XML_NS]->addSchema($this->globalSchemas[self::XSD_NS], self::XSD_NS);
-            $this->globalSchemas[self::XSD_NS]->addSchema($this->globalSchemas[self::XML_NS], self::XML_NS);
+            $globalSchemas[self::XML_NS]->addSchema($globalSchemas[self::XSD_NS], self::XSD_NS);
+            $globalSchemas[self::XSD_NS]->addSchema($globalSchemas[self::XML_NS], self::XML_NS);
 
             foreach ($callbacks as $callback) {
                 $callback();
             }
+            $this->globalSchema = $globalSchemas[self::XSD_NS];
         }
-
-        foreach ($this->globalSchemas as $globalSchema) {
-            $rootSchema->addSchema($globalSchema, $globalSchema->getTargetNamespace());
-        }
+        return $this->globalSchema;
     }
-
-
 
     /**
      * @return \Goetas\XML\XSDReader\Schema\Schema
      */
     public function readNode(\DOMNode $node, $file = 'schema.xsd')
     {
-        $this->loadedFiles[$file] = $rootSchema = new Schema($file);
+        $this->loadedFiles[$file] = $rootSchema = new Schema();
 
-        $this->addGlobalSchemas($rootSchema);
+        $rootSchema->addSchema($this->getGlobalSchema());
         $callbacks = $this->schemaNode($rootSchema, $node);
 
         foreach ($callbacks as $callback) {

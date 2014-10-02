@@ -14,8 +14,6 @@ use Goetas\XML\XSDReader\Schema\Attribute\AttributeDef;
 class Schema
 {
 
-    protected $file;
-
     protected $elementsQualification = true;
 
     protected $attributesQualification = false;
@@ -38,10 +36,6 @@ class Schema
 
     private $typeCache = array();
 
-    public function __construct($schemaLocation)
-    {
-        $this->file = $schemaLocation;
-    }
 
     public function getElementsQualification()
     {
@@ -121,7 +115,7 @@ class Schema
     public function addSchema(Schema $schema, $namespace = null)
     {
         if ($namespace !== null && $schema->getTargetNamespace() !== $namespace) {
-            throw new SchemaException(sprintf("The target namespace ('%s') for schema '%s', does not match the declared namespace '%s'", $schema->getTargetNamespace(), $schema->getFile(), $namespace));
+            throw new SchemaException(sprintf("The target namespace ('%s') for schema, does not match the declared namespace '%s'", $schema->getTargetNamespace(), $namespace));
         }
 
         if ($namespace !== null) {
@@ -218,18 +212,7 @@ class Schema
 
     public function __toString()
     {
-        return sprintf("Schema %s, target namespaace %s", $this->getFile(), $this->getTargetNamespace());
-    }
-
-    public function getFile()
-    {
-        return $this->file;
-    }
-
-    public function setFile($file)
-    {
-        $this->file = $file;
-        return $this;
+        return sprintf("Target namespaace %s", $this->getTargetNamespace());
     }
 
     /**
