@@ -3,6 +3,8 @@ namespace Goetas\XML\XSDReader\Schema\Type;
 
 use Goetas\XML\XSDReader\Schema\Schema;
 use Goetas\XML\XSDReader\Schema\SchemaItem;
+use Goetas\XML\XSDReader\Schema\Inheritance\Extension;
+use Goetas\XML\XSDReader\Schema\Inheritance\Restriction;
 abstract class Type implements SchemaItem
 {
     protected $schema;
@@ -12,6 +14,18 @@ abstract class Type implements SchemaItem
     protected $abstract = false;
 
     protected $doc;
+
+    /**
+     *
+     * @var Restriction
+     */
+    protected $restriction;
+
+    /**
+     *
+     * @var Extension
+     */
+    protected $extension;
 
     public function __construct(Schema $schema, $name = null)
     {
@@ -64,5 +78,34 @@ abstract class Type implements SchemaItem
         return $this;
     }
 
+    /**
+     *
+     * @return \Goetas\XML\XSDReader\Schema\Inheritance\Base
+    */
+    public function getParent()
+    {
+        return $this->restriction ?  : $this->extension;
+    }
 
+    public function getRestriction()
+    {
+        return $this->restriction;
+    }
+
+    public function setRestriction(Restriction $restriction)
+    {
+        $this->restriction = $restriction;
+        return $this;
+    }
+
+    public function getExtension()
+    {
+        return $this->extension;
+    }
+
+    public function setExtension(Extension $extension)
+    {
+        $this->extension = $extension;
+        return $this;
+    }
 }

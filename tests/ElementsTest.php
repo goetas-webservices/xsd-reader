@@ -46,8 +46,8 @@ class ElementsTest extends BaseTest
         $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\Element', $elementsInGroup[0]);
         $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\ElementItem', $elementsInGroup[1]);
         $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\Group', $elementsInGroup[2]);
-
     }
+
     public function testAnonym()
     {
         $schema = $this->reader->readString(
@@ -81,7 +81,6 @@ class ElementsTest extends BaseTest
         $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\SimpleType', $base3);
         $this->assertEquals('http://www.w3.org/2001/XMLSchema', $base3->getSchema()->getTargetNamespace());
         $this->assertEquals('string', $base3->getName());
-
-
     }
+
 }

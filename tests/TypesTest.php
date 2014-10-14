@@ -4,6 +4,32 @@ namespace Goetas\XML\XSDReader\Tests;
 class TypesTest extends BaseTest
 {
 
+    public function testAnonymousTypes()
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xs:complexType name="complexType">
+                    <xs:sequence>
+                        <xs:element name="el1"></xs:element>
+                    </xs:sequence>
+                    <xs:attribute name="att1"></xs:attribute>
+                </xs:complexType>
+            </xs:schema>');
+
+
+        $complex = $schema->findType('complexType', 'http://www.example.com');
+        $attrs = $complex->getAttributes();
+        $elements = $complex->getAttributes();
+
+        $this->assertTrue($attrs[0]->isAnonymousType());
+        $this->assertTrue($attrs[0]->getType()->getName()=="anyType");
+
+        $this->assertTrue($elements[0]->isAnonymousType());
+        $this->assertTrue($elements[0]->getType()->getName()=="anyType");
+
+    }
+
     public function testAttrAttr()
     {
         $schema = $this->reader->readString(

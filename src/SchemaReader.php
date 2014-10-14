@@ -569,25 +569,38 @@ class SchemaReader
 
     private function fillItem(Item $element, DOMElement $node)
     {
-        $element->setIsAnonymousType(! $node->hasAttribute("type"));
+        $anonymous = null;
+        foreach ($node->childNodes as $childNode) {
+            switch ($childNode->localName) {
+                case 'complexType':
+                case 'simpleType':
+                    $anonymous = $childNode;
+                    break 2;
+            }
+        }
 
-        if ($element->isAnonymousType()) {
-
+        if ($anonymous) {
+            $element->setIsAnonymousType(true);
             $addCallback = function ($type) use($element) {
                 $element->setType($type);
             };
-            foreach ($node->childNodes as $childNode) {
-                switch ($childNode->localName) {
-                    case 'complexType':
-                        call_user_func($this->loadComplexType($element->getSchema(), $childNode, $addCallback));
-                        break;
-                    case 'simpleType':
-                        call_user_func($this->loadSimpleType($element->getSchema(), $childNode, $addCallback));
-                        break;
-                }
+            switch ($anonymous->localName) {
+                case 'complexType':
+                    call_user_func($this->loadComplexType($element->getSchema(), $anonymous, $addCallback));
+                    break;
+                case 'simpleType':
+                    call_user_func($this->loadSimpleType($element->getSchema(), $anonymous, $addCallback));
+                    break;
             }
         } else {
-            $type = $this->findSomething('findType', $element->getSchema(), $node, $node->getAttribute("type"));
+
+            if ($node->getAttribute("type")) {
+                $type = $this->findSomething('findType', $element->getSchema(), $node, $node->getAttribute("type"));
+            } else {
+                $element->setIsAnonymousType(true);
+                $type = $this->findSomething('findType', $element->getSchema(), $node, ($node->lookupPrefix(self::XSD_NS).":anyType"));
+            }
+
             $element->setType($type);
         }
     }
@@ -653,6 +666,7 @@ class SchemaReader
             }
 
             $globalSchemas[self::XSD_NS]->addType(new SimpleType($globalSchemas[self::XSD_NS], "anySimpleType"));
+            $globalSchemas[self::XSD_NS]->addType(new SimpleType($globalSchemas[self::XSD_NS], "anyType"));
 
             $globalSchemas[self::XML_NS]->addSchema($globalSchemas[self::XSD_NS], self::XSD_NS);
             $globalSchemas[self::XSD_NS]->addSchema($globalSchemas[self::XML_NS], self::XML_NS);
