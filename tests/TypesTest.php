@@ -24,6 +24,24 @@ class TypesTest extends BaseTest
         $this->assertEquals('required', $attrs[0]->getUse());
     }
 
+    public function testSequenceAll()
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xs:complexType name="complexType">
+                    <xs:all>
+                        <xs:element name="el1" nillable="true" type="xs:string" form="qualified"></xs:element>
+                        <xs:element name="el2" nillable="true" type="xs:string" form="qualified"></xs:element>
+                    </xs:all>
+                </xs:complexType>
+            </xs:schema>');
+
+        $complex = $schema->findType('complexType', 'http://www.example.com');
+        $elements = $complex->getElements();
+        $this->assertCount(2, $elements);
+    }
+
     public function testElementAttr()
     {
         $schema = $this->reader->readString(

@@ -269,6 +269,7 @@ class SchemaReader
             switch ($childNode->localName) {
                 case 'choice':
                 case 'sequence':
+                case 'all':
                     $this->loadSequence($elementContainer, $childNode);
                     break;
                 case 'element':
@@ -310,6 +311,7 @@ class SchemaReader
                 switch ($childNode->localName) {
                     case 'sequence':
                     case 'choice':
+                    case 'all':
                         $this->loadSequence($group, $childNode);
                         break;
                 }
@@ -344,6 +346,7 @@ class SchemaReader
                 switch ($childNode->localName) {
                     case 'sequence':
                     case 'choice':
+                    case 'all':
                         $this->loadSequence($type, $childNode);
                         break;
                     case 'attribute':
@@ -454,6 +457,7 @@ class SchemaReader
             switch ($childNode->localName) {
                 case 'sequence':
                 case 'choice':
+                case 'all':
                     $this->loadSequence($type, $childNode);
                     break;
                 case 'attribute':
