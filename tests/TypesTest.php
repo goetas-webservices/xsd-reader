@@ -3,6 +3,32 @@ namespace Goetas\XML\XSDReader\Tests;
 
 class TypesTest extends BaseTest
 {
+    public function getXsdBaseTypes()
+    {
+        return [['xs:dateTime'], ['xs:date'], ['xs:int']];
+    }
+    /**
+     * @dataProvider getXsdBaseTypes
+     */
+    public function testPrimitiveTypes($type)
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xs:complexType name="complexType">
+                    <xs:sequence>
+                        <xs:element name="el1" type="'.$type.'"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:schema>');
+
+
+        $complex = $schema->findType('complexType', 'http://www.example.com');
+
+        $elements = $complex->getElements();
+        $this->assertFalse($elements[0]->isAnonymousType());
+        $this->assertEquals($type, "xs:".$elements[0]->getType()->getName());
+    }
 
     public function testAnonymousTypes()
     {
@@ -20,7 +46,7 @@ class TypesTest extends BaseTest
 
         $complex = $schema->findType('complexType', 'http://www.example.com');
         $attrs = $complex->getAttributes();
-        $elements = $complex->getAttributes();
+        $elements = $complex->getElements();
 
         $this->assertTrue($attrs[0]->isAnonymousType());
         $this->assertTrue($attrs[0]->getType()->getName()=="anyType");
