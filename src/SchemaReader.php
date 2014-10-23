@@ -624,14 +624,9 @@ class SchemaReader
             $this->loadedFiles[$file] = $newSchema = new Schema();
         }
 
-
-
-        foreach ($this->globalSchemas as $globaSchemaNS => $globaSchema) {
-            $newSchema->addSchema($globaSchema, $globaSchemaNS);
-        }
+        $newSchema->addSchema($this->getGlobalSchema());
 
         $xml = $this->getDOM(isset($this->knowLocationSchemas[$file])?$this->knowLocationSchemas[$file]:$file);
-
 
         $callbacks = $this->schemaNode($newSchema, $xml->documentElement, $schema);
 
