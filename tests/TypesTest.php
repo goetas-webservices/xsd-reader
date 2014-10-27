@@ -26,7 +26,7 @@ class TypesTest extends BaseTest
         $complex = $schema->findType('complexType', 'http://www.example.com');
 
         $elements = $complex->getElements();
-        $this->assertFalse($elements[0]->isAnonymousType());
+        $this->assertNotNull($elements[0]->getType()->getName());
         $this->assertEquals($type, "xs:".$elements[0]->getType()->getName());
     }
 
@@ -48,11 +48,8 @@ class TypesTest extends BaseTest
         $attrs = $complex->getAttributes();
         $elements = $complex->getElements();
 
-        $this->assertTrue($attrs[0]->isAnonymousType());
-        $this->assertTrue($attrs[0]->getType()->getName()=="anyType");
-
-        $this->assertTrue($elements[0]->isAnonymousType());
-        $this->assertTrue($elements[0]->getType()->getName()=="anyType");
+        $this->assertEquals("anyType", $attrs[0]->getType()->getName());
+        $this->assertEquals("anyType", $elements[0]->getType()->getName());
 
     }
 
@@ -218,8 +215,7 @@ class TypesTest extends BaseTest
         $this->assertEquals('el3', $elements[2]->getName());
         $this->assertEquals('g1', $elements[3]->getName());
 
-        $this->assertTrue($elements[1]->isAnonymousType());
-
+        $this->assertEquals("anyType", $elements[1]->getType()->getName());
 
         $attributes = $complex->getAttributes();
         $this->assertCount(4, $attributes);
@@ -234,7 +230,7 @@ class TypesTest extends BaseTest
         $this->assertEquals('att', $attributes[2]->getName());
         $this->assertEquals('attGroup', $attributes[3]->getName());
 
-        $this->assertTrue($attributes[1]->isAnonymousType());
+        $this->assertEquals("anyType", $attributes[1]->getType()->getName());
 
     }
     public function testSimple()
@@ -300,7 +296,7 @@ class TypesTest extends BaseTest
         $this->assertEquals('att', $attributes[2]->getName());
         $this->assertEquals('attGroup', $attributes[3]->getName());
 
-        $this->assertTrue($attributes[1]->isAnonymousType());
+        $this->assertEquals("anyType", $attributes[1]->getType()->getName());
 
     }
 }

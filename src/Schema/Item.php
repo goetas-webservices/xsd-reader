@@ -16,8 +16,6 @@ abstract class Item implements SchemaItem
 
     protected $type;
 
-    protected $isAnonymousType = false;
-
     public function __construct(Schema $schema, $name)
     {
         $this->schema = $schema;
@@ -46,17 +44,6 @@ abstract class Item implements SchemaItem
     public function setType(Type $type)
     {
         $this->type = $type;
-        return $this;
-    }
-
-    public function isAnonymousType()
-    {
-        return $this->isAnonymousType;
-    }
-
-    public function setIsAnonymousType($isAnonymousType)
-    {
-        $this->isAnonymousType = (boolean) $isAnonymousType;
         return $this;
     }
 

@@ -8,8 +8,6 @@ class AttributesTest extends BaseTest
     public function testBase()
     {
 
-
-
         $schema = $this->reader->readString(
             '
             <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
@@ -31,7 +29,8 @@ class AttributesTest extends BaseTest
         $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\AttributeDef', $myAttribute);
         //$this->assertEquals('http://www.example.com', $myAttribute->getSchema()->getTargetNamespace());
         $this->assertEquals('myAttribute', $myAttribute->getName());
-        $this->assertFalse($myAttribute->isAnonymousType());
+        $this->assertEquals("string", $myAttribute->getType()->getName());
+
 
         $base1 = $myAttribute->getType();
         $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\SimpleType', $base1);
@@ -55,7 +54,7 @@ class AttributesTest extends BaseTest
         $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\AttributeDef', $myAttribute);
         //$this->assertEquals('http://www.example.com', $myAttribute->getSchema()->getTargetNamespace());
         $this->assertEquals('myAttributeOptions', $myAttribute->getName());
-        $this->assertFalse($myAttribute->isAnonymousType());
+        $this->assertEquals("string", $myAttribute->getType()->getName());
 
     }
     public function testAnonym()
@@ -77,7 +76,7 @@ class AttributesTest extends BaseTest
         $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\AttributeDef', $myAttributeAnon);
         //$this->assertEquals('http://www.example.com', $myAttribute->getSchema()->getTargetNamespace());
         $this->assertEquals('myAttributeAnonType', $myAttributeAnon->getName());
-        $this->assertTrue($myAttributeAnon->isAnonymousType());
+        $this->assertNull($myAttributeAnon->getType()->getName());
 
         $base2 = $myAttributeAnon->getType();
         $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\SimpleType', $base2);

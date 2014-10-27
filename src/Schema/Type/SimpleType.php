@@ -19,6 +19,12 @@ class SimpleType extends Type
 
     /**
      *
+     * @var SimpleType
+     */
+    protected $list;
+
+    /**
+     *
      * @return Restriction
      */
     public function getRestriction()
@@ -43,4 +49,18 @@ class SimpleType extends Type
         return $this->unions;
     }
 
+    /**
+     *
+     * @return SimpleType
+     */
+    public function getList()
+    {
+        return $this->list;
+    }
+
+    public function setList(SimpleType $list)
+    {
+        $this->list = $list;
+        return $this;
+    }
 }

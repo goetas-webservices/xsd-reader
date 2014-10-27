@@ -29,7 +29,7 @@ abstract class Type implements SchemaItem
 
     public function __construct(Schema $schema, $name = null)
     {
-        $this->name = $name;
+        $this->name = $name?:null;
         $this->schema = $schema;
     }
 

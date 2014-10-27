@@ -22,11 +22,6 @@ class ElementRef extends Item implements ElementSingle
         $this->wrapped = $element;
     }
 
-    public function isAnonymousType()
-    {
-        return $this->wrapped->isAnonymousType();
-    }
-
     public function getType()
     {
         return $this->wrapped->getType();

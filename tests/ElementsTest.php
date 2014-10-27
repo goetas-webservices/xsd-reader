@@ -34,7 +34,7 @@ class ElementsTest extends BaseTest
         $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\ElementDef', $myElement);
         //$this->assertEquals('http://www.example.com', $myElement->getSchema()->getTargetNamespace());
         $this->assertEquals('myElement', $myElement->getName());
-        $this->assertFalse($myElement->isAnonymousType());
+        $this->assertEquals("string", $myElement->getType()->getName());
 
         $myGroup = $schema->findGroup('myGroup', 'http://www.example.com');
         $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\Group', $myGroup);
@@ -68,7 +68,7 @@ class ElementsTest extends BaseTest
         $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\ElementDef', $myElementAnon);
         //$this->assertEquals('http://www.example.com', $myElement->getSchema()->getTargetNamespace());
         $this->assertEquals('myElementAnonType', $myElementAnon->getName());
-        $this->assertTrue($myElementAnon->isAnonymousType());
+        $this->assertNull($myElementAnon->getType()->getName());
 
         $base2 = $myElementAnon->getType();
         $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\SimpleType', $base2);

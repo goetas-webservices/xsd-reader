@@ -24,11 +24,6 @@ class AttributeRef extends Item implements AttributeSingle
         $this->wrapped = $att;
     }
 
-    public function isAnonymousType()
-    {
-        return $this->wrapped->isAnonymousType();
-    }
-
     public function getType()
     {
         return $this->wrapped->getType();

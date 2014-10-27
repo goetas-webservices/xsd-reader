@@ -37,8 +37,6 @@ class SchemaReader
 
     private $loadedFiles = array();
 
-    private $globalSchemas = array();
-
     private $knowLocationSchemas = array();
 
     private static $globalSchemaInfo = array(
@@ -132,7 +130,7 @@ class SchemaReader
                 }
             }
         }
-        return $doc;
+        return trim($doc);
     }
 
     /**
@@ -389,6 +387,9 @@ class SchemaReader
                     case 'union':
                         $this->loadUnion($type, $childNode);
                         break;
+                    case 'list':
+                        $this->loadList($type, $childNode);
+                        break;
                 }
             }
 
@@ -396,6 +397,26 @@ class SchemaReader
                 call_user_func($callback, $type);
             }
         };
+    }
+
+    private function loadList(SimpleType $type, DOMElement $node)
+    {
+        if ($node->hasAttribute("itemType")) {
+            $type->setList($this->findSomething('findType', $type->getSchema(), $node, $node->getAttribute("itemType")));
+        }else{
+            $addCallback = function ($list) use($type)
+            {
+                $type->setList($list);
+            };
+
+            foreach ($node->childNodes as $childNode) {
+                switch ($childNode->localName) {
+                    case 'simpleType':
+                        call_user_func($this->loadSimpleType($type->getSchema(), $childNode, $addCallback));
+                        break;
+                }
+            }
+        }
     }
 
     private function loadUnion(SimpleType $type, DOMElement $node)
@@ -569,27 +590,26 @@ class SchemaReader
 
     private function fillItem(Item $element, DOMElement $node)
     {
-        $anonymous = null;
+        $localType = null;
         foreach ($node->childNodes as $childNode) {
             switch ($childNode->localName) {
                 case 'complexType':
                 case 'simpleType':
-                    $anonymous = $childNode;
+                    $localType = $childNode;
                     break 2;
             }
         }
 
-        if ($anonymous) {
-            $element->setIsAnonymousType(true);
+        if ($localType) {
             $addCallback = function ($type) use($element) {
                 $element->setType($type);
             };
-            switch ($anonymous->localName) {
+            switch ($localType->localName) {
                 case 'complexType':
-                    call_user_func($this->loadComplexType($element->getSchema(), $anonymous, $addCallback));
+                    call_user_func($this->loadComplexType($element->getSchema(), $localType, $addCallback));
                     break;
                 case 'simpleType':
-                    call_user_func($this->loadSimpleType($element->getSchema(), $anonymous, $addCallback));
+                    call_user_func($this->loadSimpleType($element->getSchema(), $localType, $addCallback));
                     break;
             }
         } else {
@@ -597,7 +617,6 @@ class SchemaReader
             if ($node->getAttribute("type")) {
                 $type = $this->findSomething('findType', $element->getSchema(), $node, $node->getAttribute("type"));
             } else {
-                $element->setIsAnonymousType(true);
                 $type = $this->findSomething('findType', $element->getSchema(), $node, ($node->lookupPrefix(self::XSD_NS).":anyType"));
             }
 
@@ -643,7 +662,7 @@ class SchemaReader
         };
     }
 
-    protected $globalSchema;
+    private $globalSchema;
 
     /**
      *
