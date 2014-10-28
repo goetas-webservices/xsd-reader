@@ -547,8 +547,9 @@ class SchemaReader
         $name = $typeName;
         if (strpos($typeName, ':') !== false) {
             list ($prefix, $name) = explode(':', $typeName);
-            $namespace = $node->lookupNamespaceURI($prefix);
         }
+
+        $namespace = $node->lookupNamespaceURI($prefix);
         return array(
             $name,
             $namespace,
@@ -568,6 +569,14 @@ class SchemaReader
     private function findSomething($finder, Schema $schema, DOMElement $node, $typeName)
     {
         list ($name, $namespace) = self::splitParts($node, $typeName);
+
+
+        if($name=="string" && !$namespace){
+            var_dump(array($name, $namespace));
+            die();
+        }
+
+
 
         $namespace = $namespace ?: $schema->getTargetNamespace();
 
