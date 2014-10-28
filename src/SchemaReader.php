@@ -570,14 +570,6 @@ class SchemaReader
     {
         list ($name, $namespace) = self::splitParts($node, $typeName);
 
-
-        if($name=="string" && !$namespace){
-            var_dump(array($name, $namespace));
-            die();
-        }
-
-
-
         $namespace = $namespace ?: $schema->getTargetNamespace();
 
         try {
