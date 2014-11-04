@@ -130,6 +130,7 @@ class SchemaReader
                 }
             }
         }
+        $doc = preg_replace('/[\t ]+/', ' ', $doc);
         return trim($doc);
     }
 
