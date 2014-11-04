@@ -260,15 +260,17 @@ class SchemaReader
         return $attribute;
     }
 
-    private function loadSequence(ElementContainer $elementContainer, DOMElement $node)
+    private function loadSequence(ElementContainer $elementContainer, DOMElement $node, $max = null)
     {
+        $max = $max || $node->getAttribute("maxOccurs")=="unbounded" || $node->getAttribute("maxOccurs")>1 ? 2 :null;
+
         foreach ($node->childNodes as $childNode) {
 
             switch ($childNode->localName) {
                 case 'choice':
                 case 'sequence':
                 case 'all':
-                    $this->loadSequence($elementContainer, $childNode);
+                    $this->loadSequence($elementContainer, $childNode, $max);
                     break;
                 case 'element':
                     if ($childNode->hasAttribute("ref")) {
@@ -276,6 +278,9 @@ class SchemaReader
                         $element = $this->loadElementRef($referencedElement, $childNode);
                     } else {
                         $element = $this->loadElement($elementContainer->getSchema(), $childNode);
+                    }
+                    if ($max) {
+                        $element->setMax($max);
                     }
                     $elementContainer->addElement($element);
                     break;
