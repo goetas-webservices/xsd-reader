@@ -223,8 +223,9 @@ class Schema
      * @throws TypeNotFoundException
      * @return \Goetas\XML\XSDReader\Schema\SchemaItem
      */
-    protected function findSomething($getter, $name, $namespace = null)
+    protected function findSomething($getter, $name, $namespace = null, &$calling = array())
     {
+        $calling[spl_object_hash($this)] = true;
         $cid = "$getter, $name, $namespace";
 
         if (isset($this->typeCache[$cid])) {
@@ -237,9 +238,9 @@ class Schema
             }
         }
         foreach ($this->getSchemas() as $childSchema) {
-            if ($childSchema->getTargetNamespace() === $namespace) {
+            if ($childSchema->getTargetNamespace() === $namespace && !isset($calling[spl_object_hash($childSchema)])) {
                 try {
-                    return $this->typeCache[$cid] = $childSchema->findSomething($getter, $name, $namespace);
+                    return $this->typeCache[$cid] = $childSchema->findSomething($getter, $name, $namespace, $calling);
                 } catch (TypeNotFoundException $e) {
                 }
             }
