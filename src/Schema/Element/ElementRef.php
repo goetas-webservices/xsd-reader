@@ -22,6 +22,15 @@ class ElementRef extends Item implements ElementSingle
         $this->wrapped = $element;
     }
 
+    /**
+     *
+     * @return ElementDef
+     */
+    public function getReferencedElement()
+    {
+        return $this->wrapped;
+    }
+
     public function getType()
     {
         return $this->wrapped->getType();

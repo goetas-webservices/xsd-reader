@@ -23,6 +23,14 @@ class AttributeRef extends Item implements AttributeSingle
         parent::__construct($att->getSchema(), $att->getName());
         $this->wrapped = $att;
     }
+    /**
+     *
+     * @return AttributeDef
+     */
+    public function getReferencedAttribute()
+    {
+        return $this->wrapped;
+    }
 
     public function getType()
     {
