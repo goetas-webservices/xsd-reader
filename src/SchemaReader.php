@@ -634,7 +634,13 @@ class SchemaReader
     private function loadImport(Schema $schema, DOMElement $node)
     {
         $file = UrlUtils::resolveRelativeUrl($node->ownerDocument->documentURI, $node->getAttribute("schemaLocation"));
-        if ($node->hasAttribute("namespace") && in_array($node->getAttribute("namespace"), array_keys(self::$globalSchemaInfo), true)){
+        if ($node->hasAttribute("namespace")
+            && isset(self::$globalSchemaInfo[$node->getAttribute("namespace")])
+            && isset($this->loadedFiles[self::$globalSchemaInfo[$node->getAttribute("namespace")]])
+            ){
+
+            $schema->addSchema($this->loadedFiles[self::$globalSchemaInfo[$node->getAttribute("namespace")]]);
+
             return function ()
             {
             };
@@ -648,9 +654,8 @@ class SchemaReader
             $this->loadedFiles[$file] = $newSchema = $schema;
         }else{
             $this->loadedFiles[$file] = $newSchema = new Schema();
+            $newSchema->addSchema($this->getGlobalSchema());
         }
-
-        $newSchema->addSchema($this->getGlobalSchema());
 
         $xml = $this->getDOM(isset($this->knowLocationSchemas[$file])?$this->knowLocationSchemas[$file]:$file);
 
@@ -681,7 +686,10 @@ class SchemaReader
             $callbacks = array();
             $globalSchemas = array();
             foreach (self::$globalSchemaInfo as $namespace => $uri) {
-                $globalSchemas [$namespace] = $schema = new Schema();
+                $this->loadedFiles[$uri] = $globalSchemas [$namespace] = $schema = new Schema();
+                if($namespace === self::XSD_NS){
+                    $this->globalSchema = $schema;
+                }
                 $xml = $this->getDOM($this->knowLocationSchemas[$uri]);
                 $callbacks = array_merge($callbacks, $this->schemaNode($schema, $xml->documentElement));
             }
@@ -695,7 +703,6 @@ class SchemaReader
             foreach ($callbacks as $callback) {
                 $callback();
             }
-            $this->globalSchema = $globalSchemas[self::XSD_NS];
         }
         return $this->globalSchema;
     }
