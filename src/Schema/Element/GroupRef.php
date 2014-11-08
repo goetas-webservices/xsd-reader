@@ -52,27 +52,14 @@ class GroupRef extends Group
 
     public function getElements()
     {
-
         $elements = $this->wrapped->getElements();
-
-        if($this->getMax()>0 || $this->getMax()===-1)
-        foreach ($elements as $k => $element) {
-            if ($element instanceof ElementRef) {
+        if($this->getMax()>0 || $this->getMax()===-1){
+            foreach ($elements as $k => $element) {
                 $e = clone $element;
                 $e->setMax($this->getMax());
-            } elseif($element instanceof GroupRef) {
-                $e = clone $element;
-                $e->setMax($this->getMax());
-            } else {
-                $e = new ElementRef($element);
-                $e->setMax($this->getMax());
-                $e->setMin($this->getMin());
-                $e->setQualified($element->isQualified());
-                $e->setNil($element->isNil());
+                $elements[$k] = $e;
             }
-            $elements[$k] = $e;
         }
-
         return $elements;
     }
 

@@ -1,7 +1,9 @@
 <?php
 namespace Goetas\XML\XSDReader\Schema\Element;
 
-class Element extends ElementDef implements ElementSingle
+use Goetas\XML\XSDReader\Schema\Item;
+
+class Element extends Item implements ElementItem, ElementSingle
 {
 
     protected $min = 1;
