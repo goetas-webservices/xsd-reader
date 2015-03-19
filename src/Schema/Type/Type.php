@@ -1,10 +1,10 @@
 <?php
-namespace Goetas\XML\XSDReader\Schema\Type;
+namespace GoetasWebservices\XML\XSDReader\Schema\Type;
 
-use Goetas\XML\XSDReader\Schema\Schema;
-use Goetas\XML\XSDReader\Schema\SchemaItem;
-use Goetas\XML\XSDReader\Schema\Inheritance\Extension;
-use Goetas\XML\XSDReader\Schema\Inheritance\Restriction;
+use GoetasWebservices\XML\XSDReader\Schema\Schema;
+use GoetasWebservices\XML\XSDReader\Schema\SchemaItem;
+use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Extension;
+use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction;
 abstract class Type implements SchemaItem
 {
     protected $schema;
@@ -80,7 +80,7 @@ abstract class Type implements SchemaItem
 
     /**
      *
-     * @return \Goetas\XML\XSDReader\Schema\Inheritance\Base
+     * @return \GoetasWebservices\XML\XSDReader\Schema\Inheritance\Base
     */
     public function getParent()
     {

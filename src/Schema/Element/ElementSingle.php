@@ -1,11 +1,11 @@
 <?php
-namespace Goetas\XML\XSDReader\Schema\Element;
+namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
 interface ElementSingle extends ElementItem
 {
 
     /**
-     * @return \Goetas\XML\XSDReader\Schema\Type\Type
+     * @return \GoetasWebservices\XML\XSDReader\Schema\Type\Type
      */
     public function getType();
 

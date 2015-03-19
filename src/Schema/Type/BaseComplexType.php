@@ -1,10 +1,10 @@
 <?php
-namespace Goetas\XML\XSDReader\Schema\Type;
+namespace GoetasWebservices\XML\XSDReader\Schema\Type;
 
-use Goetas\XML\XSDReader\Schema\Inheritance\Extension;
-use Goetas\XML\XSDReader\Schema\Inheritance\Restriction;
-use Goetas\XML\XSDReader\Schema\Attribute\AttributeItem;
-use Goetas\XML\XSDReader\Schema\Attribute\AttributeContainer;
+use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Extension;
+use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction;
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItem;
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeContainer;
 
 abstract class BaseComplexType extends Type implements AttributeContainer
 {

@@ -1,5 +1,5 @@
 <?php
-namespace Goetas\XML\XSDReader\Tests;
+namespace GoetasWebservices\XML\XSDReader\Tests;
 
 class TypesTest extends BaseTest
 {
@@ -198,17 +198,17 @@ class TypesTest extends BaseTest
             </xs:schema>');
 
         $complex = $schema->findType('complexType', 'http://www.example.com');
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\ComplexType', $complex);
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType', $complex);
         $this->assertEquals('http://www.example.com', $complex->getSchema()->getTargetNamespace());
         $this->assertEquals('complexType', $complex->getName());
 
         $elements = $complex->getElements();
         $this->assertCount(4, $elements);
 
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\Element', $elements[0]);
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\Element', $elements[1]);
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\ElementItem', $elements[2]);
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\Group', $elements[3]);
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\Element', $elements[0]);
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\Element', $elements[1]);
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\ElementItem', $elements[2]);
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\Group', $elements[3]);
 
         $this->assertEquals('el1', $elements[0]->getName());
         $this->assertEquals('el2', $elements[1]->getName());
@@ -220,10 +220,10 @@ class TypesTest extends BaseTest
         $attributes = $complex->getAttributes();
         $this->assertCount(4, $attributes);
 
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\Attribute', $attributes[0]);
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\Attribute', $attributes[1]);
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\AttributeItem', $attributes[2]);
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\Group', $attributes[3]);
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Attribute\Attribute', $attributes[0]);
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Attribute\Attribute', $attributes[1]);
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItem', $attributes[2]);
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Attribute\Group', $attributes[3]);
 
         $this->assertEquals('att1', $attributes[0]->getName());
         $this->assertEquals('att2', $attributes[1]->getName());
@@ -244,7 +244,7 @@ class TypesTest extends BaseTest
             </xs:schema>');
 
         $simple = $schema->findType('simpleType', 'http://www.example.com');
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\SimpleType', $simple);
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType', $simple);
         $this->assertEquals('http://www.example.com', $simple->getSchema()->getTargetNamespace());
         $this->assertEquals('simpleType', $simple->getName());
 
@@ -272,13 +272,13 @@ class TypesTest extends BaseTest
             </xs:schema>');
 
         $complex = $schema->findType('complexType', 'http://www.example.com');
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\ComplexTypeSimpleContent', $complex);
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Type\ComplexTypeSimpleContent', $complex);
         $this->assertEquals('http://www.example.com', $complex->getSchema()->getTargetNamespace());
         $this->assertEquals('complexType', $complex->getName());
 
         $extension = $complex->getExtension();
         $base1 = $extension->getBase();
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\SimpleType', $base1);
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType', $base1);
         $this->assertEquals('http://www.w3.org/2001/XMLSchema', $base1->getSchema()->getTargetNamespace());
         $this->assertEquals('string', $base1->getName());
 
@@ -286,10 +286,10 @@ class TypesTest extends BaseTest
         $attributes = $complex->getAttributes();
         $this->assertCount(4, $attributes);
 
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\Attribute', $attributes[0]);
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\Attribute', $attributes[1]);
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\AttributeItem', $attributes[2]);
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\Group', $attributes[3]);
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Attribute\Attribute', $attributes[0]);
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Attribute\Attribute', $attributes[1]);
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItem', $attributes[2]);
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Attribute\Group', $attributes[3]);
 
         $this->assertEquals('att1', $attributes[0]->getName());
         $this->assertEquals('att2', $attributes[1]->getName());

@@ -1,5 +1,5 @@
 <?php
-namespace Goetas\XML\XSDReader\Tests;
+namespace GoetasWebservices\XML\XSDReader\Tests;
 
 class SchemaTest extends BaseTest
 {
@@ -7,7 +7,7 @@ class SchemaTest extends BaseTest
     {
         $schema = $this->reader->readString('<xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema"/>');
 
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Schema', $schema);
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Schema', $schema);
         $this->assertEquals('http://www.example.com', $schema->getTargetNamespace());
 
         $schemas =  $schema->getSchemas();
@@ -31,7 +31,7 @@ class SchemaTest extends BaseTest
     {
         $schema = $this->reader->readString('<xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema"/>');
 
-        $this->setExpectedException('Goetas\XML\XSDReader\Schema\Exception\TypeNotFoundException');
+        $this->setExpectedException('GoetasWebservices\XML\XSDReader\Schema\Exception\TypeNotFoundException');
         $schema->$find('foo');
     }
 
@@ -50,21 +50,21 @@ class SchemaTest extends BaseTest
             </xs:schema>');
 
         $this->assertCount(1, $schema->getTypes());
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\ComplexType', $schema->findType('myType', 'http://www.example.com'));
-        //$this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\ComplexType', $schema->findType('myType'));
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType', $schema->findType('myType', 'http://www.example.com'));
+        //$this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType', $schema->findType('myType'));
 
 
         $this->assertCount(1, $schema->getElements());
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\ElementDef', $schema->findElement('myElement', 'http://www.example.com'));
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef', $schema->findElement('myElement', 'http://www.example.com'));
 
         $this->assertCount(1, $schema->getGroups());
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\Group', $schema->findGroup('myGroup', 'http://www.example.com'));
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\Group', $schema->findGroup('myGroup', 'http://www.example.com'));
 
         $this->assertCount(1, $schema->getAttributeGroups());
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\Group', $schema->findAttributeGroup('myAttributeGroup', 'http://www.example.com'));
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Attribute\Group', $schema->findAttributeGroup('myAttributeGroup', 'http://www.example.com'));
 
         $this->assertCount(1, $schema->getAttributes());
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Attribute\AttributeDef', $schema->findAttribute('myAttribute', 'http://www.example.com'));
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef', $schema->findAttribute('myAttribute', 'http://www.example.com'));
 
     }
 }

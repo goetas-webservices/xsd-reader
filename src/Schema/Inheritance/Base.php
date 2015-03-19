@@ -1,7 +1,7 @@
 <?php
-namespace Goetas\XML\XSDReader\Schema\Inheritance;
+namespace GoetasWebservices\XML\XSDReader\Schema\Inheritance;
 
-use Goetas\XML\XSDReader\Schema\Type\Type;
+use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
 
 abstract class Base
 {

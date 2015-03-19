@@ -1,9 +1,9 @@
 <?php
-namespace Goetas\XML\XSDReader\Schema;
+namespace GoetasWebservices\XML\XSDReader\Schema;
 
-use Goetas\XML\XSDReader\Schema\Type\Type;
-use Goetas\XML\XSDReader\Schema\Schema;
-use Goetas\XML\XSDReader\Schema\SchemaItem;
+use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
+use GoetasWebservices\XML\XSDReader\Schema\Schema;
+use GoetasWebservices\XML\XSDReader\Schema\SchemaItem;
 
 abstract class Item implements SchemaItem
 {

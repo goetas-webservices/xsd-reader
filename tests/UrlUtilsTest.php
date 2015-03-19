@@ -1,6 +1,6 @@
-<?php namespace Goetas\XML\XSDReader\Tests;
+<?php namespace GoetasWebservices\XML\XSDReader\Tests;
 
-use Goetas\XML\XSDReader\Utils\UrlUtils;
+use GoetasWebservices\XML\XSDReader\Utils\UrlUtils;
 
 class UrlUtilsTest extends BaseTest {
 

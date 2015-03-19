@@ -1,5 +1,5 @@
 <?php
-namespace Goetas\XML\XSDReader\Tests;
+namespace GoetasWebservices\XML\XSDReader\Tests;
 
 class ElementsTest extends BaseTest
 {
@@ -31,21 +31,21 @@ class ElementsTest extends BaseTest
             </xs:schema>');
 
         $myElement = $schema->findElement('myElement', 'http://www.example.com');
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\ElementDef', $myElement);
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef', $myElement);
         //$this->assertEquals('http://www.example.com', $myElement->getSchema()->getTargetNamespace());
         $this->assertEquals('myElement', $myElement->getName());
         $this->assertEquals("string", $myElement->getType()->getName());
 
         $myGroup = $schema->findGroup('myGroup', 'http://www.example.com');
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\Group', $myGroup);
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\Group', $myGroup);
         //$this->assertEquals('http://www.example.com', $myElement->getSchema()->getTargetNamespace());
         $this->assertEquals('myGroup', $myGroup->getName());
         $elementsInGroup = $myGroup->getElements();
         $this->assertCount(3, $elementsInGroup);
 
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\Element', $elementsInGroup[0]);
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\ElementItem', $elementsInGroup[1]);
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\Group', $elementsInGroup[2]);
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\Element', $elementsInGroup[0]);
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\ElementItem', $elementsInGroup[1]);
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\Group', $elementsInGroup[2]);
     }
 
     public function testAnonym()
@@ -65,20 +65,20 @@ class ElementsTest extends BaseTest
 
 
         $myElementAnon = $schema->findElement('myElementAnonType', 'http://www.example.com');
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Element\ElementDef', $myElementAnon);
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef', $myElementAnon);
         //$this->assertEquals('http://www.example.com', $myElement->getSchema()->getTargetNamespace());
         $this->assertEquals('myElementAnonType', $myElementAnon->getName());
         $this->assertNull($myElementAnon->getType()->getName());
 
         $base2 = $myElementAnon->getType();
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\SimpleType', $base2);
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType', $base2);
         $this->assertEquals('http://www.example.com', $base2->getSchema()->getTargetNamespace());
         $this->assertTrue(!$base2->getName());
 
 
         $restriction1 = $base2->getRestriction();
         $base3 = $restriction1->getBase();
-        $this->assertInstanceOf('Goetas\XML\XSDReader\Schema\Type\SimpleType', $base3);
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType', $base3);
         $this->assertEquals('http://www.w3.org/2001/XMLSchema', $base3->getSchema()->getTargetNamespace());
         $this->assertEquals('string', $base3->getName());
     }

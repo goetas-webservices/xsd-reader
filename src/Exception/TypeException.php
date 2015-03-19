@@ -1,5 +1,5 @@
 <?php
-namespace Goetas\XML\XSDReader\Exception;
+namespace GoetasWebservices\XML\XSDReader\Exception;
 
 class TypeException extends \Exception
 {

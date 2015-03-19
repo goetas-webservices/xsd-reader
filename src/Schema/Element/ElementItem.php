@@ -1,5 +1,5 @@
 <?php
-namespace Goetas\XML\XSDReader\Schema\Element;
+namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
 interface ElementItem
 {

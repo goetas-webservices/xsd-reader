@@ -1,15 +1,15 @@
 <?php
-namespace Goetas\XML\XSDReader\Schema;
+namespace GoetasWebservices\XML\XSDReader\Schema;
 
-use Goetas\XML\XSDReader\Schema\Type\Type;
-use Goetas\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
-use Goetas\XML\XSDReader\Schema\Element\Group;
-use Goetas\XML\XSDReader\Schema\Element\ElementDef;
-use Goetas\XML\XSDReader\Schema\Element\ElementItem;
-use Goetas\XML\XSDReader\Schema\Exception\TypeNotFoundException;
-use Goetas\XML\XSDReader\Schema\Exception\SchemaException;
-use Goetas\XML\XSDReader\Schema\Attribute\AttributeItem;
-use Goetas\XML\XSDReader\Schema\Attribute\AttributeDef;
+use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
+use GoetasWebservices\XML\XSDReader\Schema\Element\Group;
+use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
+use GoetasWebservices\XML\XSDReader\Schema\Element\ElementItem;
+use GoetasWebservices\XML\XSDReader\Schema\Exception\TypeNotFoundException;
+use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItem;
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
 
 class Schema
 {
@@ -221,7 +221,7 @@ class Schema
      * @param string $name
      * @param string $namespace
      * @throws TypeNotFoundException
-     * @return \Goetas\XML\XSDReader\Schema\SchemaItem
+     * @return \GoetasWebservices\XML\XSDReader\Schema\SchemaItem
      */
     protected function findSomething($getter, $name, $namespace = null, &$calling = array())
     {

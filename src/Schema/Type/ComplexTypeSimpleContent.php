@@ -1,5 +1,5 @@
 <?php
-namespace Goetas\XML\XSDReader\Schema\Type;
+namespace GoetasWebservices\XML\XSDReader\Schema\Type;
 
 class ComplexTypeSimpleContent extends BaseComplexType
 {

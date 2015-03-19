@@ -1,5 +1,5 @@
 <?php
-namespace Goetas\XML\XSDReader\Tests;
+namespace GoetasWebservices\XML\XSDReader\Tests;
 
 class ImportTest extends BaseTest
 {

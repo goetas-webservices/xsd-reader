@@ -1,5 +1,5 @@
 <?php
-namespace Goetas\XML\XSDReader\Schema;
+namespace GoetasWebservices\XML\XSDReader\Schema;
 
 interface SchemaItem
 {

@@ -1,7 +1,7 @@
 <?php
-namespace Goetas\XML\XSDReader\Schema\Attribute;
+namespace GoetasWebservices\XML\XSDReader\Schema\Attribute;
 
-use Goetas\XML\XSDReader\Schema\Item;
+use GoetasWebservices\XML\XSDReader\Schema\Item;
 
 class Attribute extends Item implements AttributeSingle
 {

@@ -1,7 +1,7 @@
 <?php
-namespace Goetas\XML\XSDReader\Schema\Type;
+namespace GoetasWebservices\XML\XSDReader\Schema\Type;
 
-use Goetas\XML\XSDReader\Schema\Inheritance\Restriction;
+use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction;
 class SimpleType extends Type
 {
 

@@ -1,7 +1,7 @@
 <?php
-namespace Goetas\XML\XSDReader\Tests;
+namespace GoetasWebservices\XML\XSDReader\Tests;
 
-use Goetas\XML\XSDReader\SchemaReader;
+use GoetasWebservices\XML\XSDReader\SchemaReader;
 abstract class BaseTest extends \PHPUnit_Framework_TestCase
 {
     /**

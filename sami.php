@@ -11,7 +11,7 @@ $iterator = Finder::create()
 
 return new Sami($iterator, array(
     'theme'                => 'enhanced',
-    'title'                => 'Goetas XSD Reader',
+    'title'                => 'GoetasWebservices XSD Reader',
     'build_dir'            => __DIR__.'/apidoc',
     'include_parent_data'  => true,
     'default_opened_level' => 4,

@@ -1,32 +1,32 @@
 <?php
-namespace Goetas\XML\XSDReader;
+namespace GoetasWebservices\XML\XSDReader;
 
 use DOMDocument;
 use DOMElement;
-use Goetas\XML\XSDReader\Utils\UrlUtils;
-use Goetas\XML\XSDReader\Schema\Schema;
-use Goetas\XML\XSDReader\Schema\Element\Element;
-use Goetas\XML\XSDReader\Schema\Attribute\Attribute;
-use Goetas\XML\XSDReader\Schema\Type\ComplexType;
-use Goetas\XML\XSDReader\Schema\Type\SimpleType;
-use Goetas\XML\XSDReader\Schema\Type\Type;
-use Goetas\XML\XSDReader\Schema\Type\BaseComplexType;
-use Goetas\XML\XSDReader\Schema\Item;
-use Goetas\XML\XSDReader\Exception\TypeException;
-use Goetas\XML\XSDReader\Exception\IOException;
-use Goetas\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
-use Goetas\XML\XSDReader\Schema\Element\Group;
-use Goetas\XML\XSDReader\Schema\Element\ElementContainer;
-use Goetas\XML\XSDReader\Schema\Type\ComplexTypeSimpleContent;
-use Goetas\XML\XSDReader\Schema\Element\ElementDef;
-use Goetas\XML\XSDReader\Schema\Inheritance\Restriction;
-use Goetas\XML\XSDReader\Schema\Inheritance\Extension;
-use Goetas\XML\XSDReader\Schema\Exception\TypeNotFoundException;
-use Goetas\XML\XSDReader\Schema\Element\ElementRef;
-use Goetas\XML\XSDReader\Schema\Attribute\AttributeRef;
-use Goetas\XML\XSDReader\Schema\Element\ElementItem;
-use Goetas\XML\XSDReader\Schema\Attribute\AttributeDef;
-use Goetas\XML\XSDReader\Schema\Element\GroupRef;
+use GoetasWebservices\XML\XSDReader\Utils\UrlUtils;
+use GoetasWebservices\XML\XSDReader\Schema\Schema;
+use GoetasWebservices\XML\XSDReader\Schema\Element\Element;
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\Attribute;
+use GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType;
+use GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType;
+use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
+use GoetasWebservices\XML\XSDReader\Schema\Type\BaseComplexType;
+use GoetasWebservices\XML\XSDReader\Schema\Item;
+use GoetasWebservices\XML\XSDReader\Exception\TypeException;
+use GoetasWebservices\XML\XSDReader\Exception\IOException;
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
+use GoetasWebservices\XML\XSDReader\Schema\Element\Group;
+use GoetasWebservices\XML\XSDReader\Schema\Element\ElementContainer;
+use GoetasWebservices\XML\XSDReader\Schema\Type\ComplexTypeSimpleContent;
+use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
+use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction;
+use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Extension;
+use GoetasWebservices\XML\XSDReader\Schema\Exception\TypeNotFoundException;
+use GoetasWebservices\XML\XSDReader\Schema\Element\ElementRef;
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeRef;
+use GoetasWebservices\XML\XSDReader\Schema\Element\ElementItem;
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
+use GoetasWebservices\XML\XSDReader\Schema\Element\GroupRef;
 
 class SchemaReader
 {
@@ -678,7 +678,7 @@ class SchemaReader
 
     /**
      *
-     * @return \Goetas\XML\XSDReader\Schema\Schema
+     * @return \GoetasWebservices\XML\XSDReader\Schema\Schema
      */
     public function getGlobalSchema()
     {
@@ -708,7 +708,7 @@ class SchemaReader
     }
 
     /**
-     * @return \Goetas\XML\XSDReader\Schema\Schema
+     * @return \GoetasWebservices\XML\XSDReader\Schema\Schema
      */
     public function readNode(\DOMNode $node, $file = 'schema.xsd')
     {
@@ -726,7 +726,7 @@ class SchemaReader
 
 
     /**
-     * @return \Goetas\XML\XSDReader\Schema\Schema
+     * @return \GoetasWebservices\XML\XSDReader\Schema\Schema
      */
     public function readString($content, $file = 'schema.xsd')
     {
@@ -739,7 +739,7 @@ class SchemaReader
         return $this->readNode($xml->documentElement, $file);
     }
     /**
-     * @return \Goetas\XML\XSDReader\Schema\Schema
+     * @return \GoetasWebservices\XML\XSDReader\Schema\Schema
      */
     public function readFile($file)
     {

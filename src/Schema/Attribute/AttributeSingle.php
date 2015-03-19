@@ -1,5 +1,5 @@
 <?php
-namespace Goetas\XML\XSDReader\Schema\Attribute;
+namespace GoetasWebservices\XML\XSDReader\Schema\Attribute;
 
 interface AttributeSingle extends AttributeItem
 {
@@ -12,7 +12,7 @@ interface AttributeSingle extends AttributeItem
 
     /**
      *
-     * @return \Goetas\XML\XSDReader\Schema\Type\Type
+     * @return \GoetasWebservices\XML\XSDReader\Schema\Type\Type
      */
     public function getType();
 

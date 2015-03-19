@@ -1,5 +1,5 @@
 <?php
-namespace Goetas\XML\XSDReader\Schema\Inheritance;
+namespace GoetasWebservices\XML\XSDReader\Schema\Inheritance;
 
 class Restriction extends Base
 {
