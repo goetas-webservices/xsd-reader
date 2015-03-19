@@ -1,5 +1,5 @@
 {
-	"name" : "goetas/xsd-reader",
+	"name" : "goetas-webservices/xsd-reader",
 	"description" : "Read any XML Schema (XSD) programmatically with PHP",
 	"keywords" : [
 		"xsd",
@@ -8,7 +8,6 @@
 		"parser",
 		"xmlschema"
 	],
-	"homepage" : "https://github.com/goetas/xsd-reader",
 	"license" : "MIT",
 	"authors" : [{
 			"name" : "Asmir Mustafic",
@@ -24,17 +23,17 @@
 	},
 	"autoload" : {
 		"psr-4" : {
-			"Goetas\\XML\\XSDReader\\" : "src/"
+			"GoetasWebservices\\XML\\XSDReader\\" : "src/"
 		}
 	},
 	"autoload-dev" : {
 		"psr-4" : {
-			"Goetas\\XML\\XSDReader\\Tests\\" : "tests/"
+			"GoetasWebservices\\XML\\XSDReader\\Tests\\" : "tests/"
 		}
 	},
 	"extra" : {
 		"branch-alias" : {
-			"dev-master" : "2.0-dev"
+			"dev-master" : "0.1-dev"
 		}
 	}
 }

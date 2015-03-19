@@ -17,7 +17,7 @@ There are two recommended ways to install the `xsd-reader` via [Composer](https:
 * using the ``composer require`` command:
 
 ```bash
-composer require 'goetas/xsd-reader:2.*'
+composer require 'goetas-webservices/xsd-reader'
 ```
 
 * adding the dependency to your ``composer.json`` file:
@@ -25,7 +25,7 @@ composer require 'goetas/xsd-reader:2.*'
 ```js
 "require": {
     ..
-    "goetas/xsd-reader" : "2.*",
+    "goetas-webservices/xsd-reader" : "0.*",
     ..
 }
 ```
