@@ -532,10 +532,10 @@ class SchemaReader
                     'length',
                     'minLength',
                     'maxLength',
-                    'minInclusve',
-                    'maxInclusve',
-                    'minExclusve',
-                    'maxEXclusve'
+                    'minInclusive',
+                    'maxInclusive',
+                    'minExclusive',
+                    'maxEXclusive'
                 ], true)) {
                 $restriction->addCheck($childNode->localName,
                     [
