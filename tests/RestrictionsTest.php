@@ -33,14 +33,14 @@ class RestrictionsTest extends BaseTest
 
         $expectedChecks = array(
             'enumeration' => array(
-                    array(
-                            'value' => 'foo',
-                            'doc' => '',
-                    ),
-                    array(
-                            'value' => 'bar',
-                            'doc' => '',
-                    ),
+                array(
+                    'value' => 'foo',
+                    'doc' => '',
+                ),
+                array(
+                    'value' => 'bar',
+                    'doc' => '',
+                ),
             ),
         );
         $this->assertEquals($expectedChecks, $restriction->getChecks());
@@ -72,10 +72,10 @@ class RestrictionsTest extends BaseTest
 
         $expectedChecks = array(
             'pattern' => array(
-                    array(
-                            'value' => '[a-zA-Z0-9]',
-                            'doc' => '',
-                    ),
+                array(
+                    'value' => '[a-zA-Z0-9]',
+                    'doc' => '',
+                ),
             ),
         );
         $this->assertEquals($expectedChecks, $restriction->getChecks());
@@ -107,10 +107,10 @@ class RestrictionsTest extends BaseTest
 
         $expectedChecks = array(
             'length' => array(
-                    array(
-                            'value' => '10',
-                            'doc' => '',
-                    ),
+                array(
+                    'value' => '10',
+                    'doc' => '',
+                ),
             ),
         );
         $this->assertEquals($expectedChecks, $restriction->getChecks());
@@ -143,16 +143,16 @@ class RestrictionsTest extends BaseTest
 
         $expectedChecks = array(
             'minLength' => array(
-                    array(
-                            'value' => '5',
-                            'doc' => '',
-                    ),
+                array(
+                    'value' => '5',
+                    'doc' => '',
+                ),
             ),
             'maxLength' => array(
-                    array(
-                            'value' => '8',
-                            'doc' => '',
-                    ),
+                array(
+                    'value' => '8',
+                    'doc' => '',
+                ),
             ),
         );
         $this->assertEquals($expectedChecks, $restriction->getChecks());
@@ -185,16 +185,16 @@ class RestrictionsTest extends BaseTest
 
         $expectedChecks = array(
             'minInclusive' => array(
-                    array(
-                            'value' => '1',
-                            'doc' => '',
-                    ),
+                array(
+                    'value' => '1',
+                    'doc' => '',
+                ),
             ),
             'maxInclusive' => array(
-                    array(
-                            'value' => '10',
-                            'doc' => '',
-                    ),
+                array(
+                    'value' => '10',
+                    'doc' => '',
+                ),
             ),
         );
         $this->assertEquals($expectedChecks, $restriction->getChecks());
@@ -227,16 +227,16 @@ class RestrictionsTest extends BaseTest
 
         $expectedChecks = array(
             'minExclusive' => array(
-                    array(
-                            'value' => '1',
-                            'doc' => '',
-                    ),
+                array(
+                    'value' => '1',
+                    'doc' => '',
+                ),
             ),
             'maxExclusive' => array(
-                    array(
-                            'value' => '10',
-                            'doc' => '',
-                    ),
+                array(
+                    'value' => '10',
+                    'doc' => '',
+                ),
             ),
         );
         $this->assertEquals($expectedChecks, $restriction->getChecks());

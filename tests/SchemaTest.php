@@ -10,10 +10,11 @@ class SchemaTest extends BaseTest
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Schema', $schema);
         $this->assertEquals('http://www.example.com', $schema->getTargetNamespace());
 
-        $schemas =  $schema->getSchemas();
+        $schemas = $schema->getSchemas();
 
         $this->assertFalse(empty($schemas));
     }
+
     public function getTypesToSearch()
     {
         return [
@@ -24,6 +25,7 @@ class SchemaTest extends BaseTest
             ['findGroup'],
         ];
     }
+
     /**
      * @dataProvider getTypesToSearch
      */

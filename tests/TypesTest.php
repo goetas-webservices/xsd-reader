@@ -7,6 +7,7 @@ class TypesTest extends BaseTest
     {
         return [['xs:dateTime'], ['xs:date'], ['xs:int']];
     }
+
     /**
      * @dataProvider getXsdBaseTypes
      */
@@ -17,7 +18,7 @@ class TypesTest extends BaseTest
             <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xs:complexType name="complexType">
                     <xs:sequence>
-                        <xs:element name="el1" type="'.$type.'"></xs:element>
+                        <xs:element name="el1" type="' . $type . '"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:schema>');
@@ -27,7 +28,7 @@ class TypesTest extends BaseTest
 
         $elements = $complex->getElements();
         $this->assertNotNull($elements[0]->getType()->getName());
-        $this->assertEquals($type, "xs:".$elements[0]->getType()->getName());
+        $this->assertEquals($type, "xs:" . $elements[0]->getType()->getName());
     }
 
     public function testAnonymousTypes()
@@ -118,6 +119,7 @@ class TypesTest extends BaseTest
             ['unbounded', -1],
         ];
     }
+
     /**
      * @dataProvider getMaxOccurences
      */
@@ -128,7 +130,7 @@ class TypesTest extends BaseTest
             <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xs:complexType name="complexType">
                     <xs:sequence>
-                        <xs:element name="el1" maxOccurs="'.$xml.'" type="xs:string"></xs:element>
+                        <xs:element name="el1" maxOccurs="' . $xml . '" type="xs:string"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:schema>');
@@ -137,13 +139,15 @@ class TypesTest extends BaseTest
         $elements = $complex->getElements();
         $this->assertEquals($expected, $elements[0]->getMax());
     }
+
     public function getMinOccurences()
     {
         return [
             ['1', 1],
             ['0', 0],
-            ];
+        ];
     }
+
     /**
      * @dataProvider getMinOccurences
      */
@@ -154,7 +158,7 @@ class TypesTest extends BaseTest
             <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xs:complexType name="complexType">
                     <xs:sequence>
-                        <xs:element name="el1" minOccurs="'.$xml.'" type="xs:string"></xs:element>
+                        <xs:element name="el1" minOccurs="' . $xml . '" type="xs:string"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:schema>');
@@ -233,6 +237,7 @@ class TypesTest extends BaseTest
         $this->assertEquals("anyType", $attributes[1]->getType()->getName());
 
     }
+
     public function testSimple()
     {
         $schema = $this->reader->readString(
@@ -249,6 +254,7 @@ class TypesTest extends BaseTest
         $this->assertEquals('simpleType', $simple->getName());
 
     }
+
     public function testComplexSimpleContent()
     {
         $schema = $this->reader->readString(

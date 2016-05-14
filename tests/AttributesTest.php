@@ -49,7 +49,6 @@ class AttributesTest extends BaseTest
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Attribute\Group', $attributesInGroup[2]);
 
 
-
         $myAttribute = $schema->findAttribute('myAttributeOptions', 'http://www.example.com');
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef', $myAttribute);
         //$this->assertEquals('http://www.example.com', $myAttribute->getSchema()->getTargetNamespace());
@@ -57,6 +56,7 @@ class AttributesTest extends BaseTest
         $this->assertEquals("string", $myAttribute->getType()->getName());
 
     }
+
     public function testAnonym()
     {
         $schema = $this->reader->readString(

@@ -41,6 +41,7 @@ class TypeInheritanceTest extends BaseTest
 
 
     }
+
     public function testBase()
     {
         $schema = $this->reader->readString('

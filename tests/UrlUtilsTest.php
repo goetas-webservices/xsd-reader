@@ -2,7 +2,8 @@
 
 use GoetasWebservices\XML\XSDReader\Utils\UrlUtils;
 
-class UrlUtilsTest extends BaseTest {
+class UrlUtilsTest extends BaseTest
+{
 
     public function testHttpWithout()
     {
@@ -58,7 +59,6 @@ class UrlUtilsTest extends BaseTest {
     }
 
 
-
     public function testFilePaths()
     {
         $this->assertEquals('file:///test', UrlUtils::resolveRelativeUrl('file:///', '/test'));
@@ -66,7 +66,6 @@ class UrlUtilsTest extends BaseTest {
         /* Assert that any filenames will be stripped from base */
         $this->assertEquals('file:///bar.xsd', UrlUtils::resolveRelativeUrl('file:///foo.xsd', 'bar.xsd'));
     }
-
 
 
     public function testRegularPaths()
