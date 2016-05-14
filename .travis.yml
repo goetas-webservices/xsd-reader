@@ -1,4 +1,5 @@
 language: php
+sudo: false
 
 php:
   - 5.4
@@ -6,12 +7,21 @@ php:
   - 5.6
   - hhvm
 
-before_script:
-  - travis_retry composer self-update
-  - travis_retry composer install --prefer-dist --no-interaction --dev
+cache:
+  directories:
+    - vendor
+    - $HOME/.composer/cache
 
-script: vendor/bin/phpunit --coverage-clover=coverage.clover
+before_script:
+  - echo "xdebug.max_nesting_level=1000" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - if [[ $TRAVIS_PHP_VERSION = '5.6' ]]; then PHPUNIT_FLAGS="--coverage-clover=coverage.clover"; else PHPUNIT_FLAGS=""; fi
+  - if [[ $TRAVIS_PHP_VERSION != '5.6' ]]; then phpenv config-rm xdebug.ini; fi
+  - travis_retry composer self-update
+  - travis_retry composer update $COMPOSER_FLAGS
+
+script: vendor/bin/phpunit $PHPUNIT_FLAGS
 
 after_script:
   - wget https://scrutinizer-ci.com/ocular.phar
-  - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
+  - if [[ $TRAVIS_PHP_VERSION = '5.6' ]] ; then php ocular.phar code-coverage:upload --format=php-clover coverage.clover; fi
+

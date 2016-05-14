@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/goetas/xsd-reader.svg?branch=master)](https://travis-ci.org/goetas/xsd-reader)
-[![Code Coverage](https://scrutinizer-ci.com/g/goetas/xsd-reader/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/goetas/xsd-reader/?branch=master)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/goetas/xsd-reader/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/goetas/xsd-reader/?branch=master)
+[![Build Status](https://travis-ci.org/goetas-webservices/xsd-reader.svg?branch=master)](https://travis-ci.org/goetas-webservices/xsd-reader)
+[![Code Coverage](https://scrutinizer-ci.com/g/goetas-webservices/xsd-reader/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/goetas-webservices/xsd-reader/?branch=master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/goetas-webservices/xsd-reader/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/goetas-webservices/xsd-reader/?branch=master)
 
 
 PHP XSD Reader
