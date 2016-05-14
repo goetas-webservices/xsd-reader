@@ -532,10 +532,10 @@ class SchemaReader
                     'length',
                     'minLength',
                     'maxLength',
-                    'minInclusve',
-                    'maxInclusve',
-                    'minExclusve',
-                    'maxEXclusve'
+                    'minInclusive',
+                    'maxInclusive',
+                    'minExclusive',
+                    'maxExclusive'
                 ], true)) {
                 $restriction->addCheck($childNode->localName,
                     [
@@ -555,7 +555,7 @@ class SchemaReader
             list ($prefix, $name) = explode(':', $typeName);
         }
 
-        $namespace = $node->lookupNamespaceURI($prefix);
+        $namespace = $node->lookupNamespaceURI($prefix ?: null);
         return array(
             $name,
             $namespace,
@@ -633,7 +633,8 @@ class SchemaReader
 
     private function loadImport(Schema $schema, DOMElement $node)
     {
-        $file = UrlUtils::resolveRelativeUrl($node->ownerDocument->documentURI, $node->getAttribute("schemaLocation"));
+        $base = urldecode($node->ownerDocument->documentURI);
+        $file = UrlUtils::resolveRelativeUrl($base, $node->getAttribute("schemaLocation"));
         if ($node->hasAttribute("namespace")
             && isset(self::$globalSchemaInfo[$node->getAttribute("namespace")])
             && isset($this->loadedFiles[self::$globalSchemaInfo[$node->getAttribute("namespace")]])

@@ -1,0 +1,10 @@
+<xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:complexType name="myType"></xs:complexType>
+	<xs:element name="myElement" type="myType"></xs:element>
+
+	<xs:group name="myGroup">
+		<xs:sequence></xs:sequence>
+	</xs:group>
+	<xs:attribute name="myAttribute" type="xs:string"></xs:attribute>
+	<xs:attributeGroup name="myAttributeGroup"></xs:attributeGroup>
+</xs:schema>

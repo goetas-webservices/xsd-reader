@@ -33,16 +33,16 @@ Getting started
 ---------------
 
 ```php
-use Goetas\XML\XSDReader\SchemaReader;
+use GoetasWebservices\XML\XSDReader\SchemaReader;
 
 $reader = new SchemaReader();
 $schema = $reader->readFile("http://www.example.com/exaple.xsd");
 
-// $schema is instance of Goetas\XML\XSDReader\Schema\Schema;
+// $schema is instance of GoetasWebservices\XML\XSDReader\Schema\Schema;
 
 // Now you can navigate the entire schema structure
 
-foreach ($schema->getSchema() as $innerSchema){
+foreach ($schema->getSchemas() as $innerSchema){
 
 }
 foreach ($schema->getTypes() as $type){
@@ -67,5 +67,5 @@ foreach ($schema->getAttributeGroups() as $attrGroup){
 Note
 ----
 
-I'm sorry for the *terrible* english fluency used inside the documentation, I'm trying to improve it. 
+I'm sorry for the *terrible* english fluency used inside the documentation, I'm trying to improve it.
 Pull Requests are welcome.
