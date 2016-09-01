@@ -60,12 +60,4 @@ foreach ($schema->getAttributes() as $attr){
 foreach ($schema->getAttributeGroups() as $attrGroup){
 
 }
-
-
 ```
-
-Note
-----
-
-I'm sorry for the *terrible* english fluency used inside the documentation, I'm trying to improve it.
-Pull Requests are welcome.

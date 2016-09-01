@@ -10,7 +10,7 @@ class Element extends Item implements ElementItem, ElementSingle
 
     protected $max = 1;
 
-    protected $qualified = true;
+    protected $qualified = false;
 
     protected $nil = false;
 

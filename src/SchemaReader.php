@@ -148,8 +148,8 @@ class SchemaReader
         } elseif ($parent) {
             $schema->setTargetNamespace($parent->getTargetNamespace());
         }
-        $schema->setElementsQualification(!$node->hasAttribute("elementFormDefault") || $node->getAttribute("elementFormDefault") == "qualified");
-        $schema->setAttributesQualification(!$node->hasAttribute("attributeFormDefault") || $node->getAttribute("attributeFormDefault") == "qualified");
+        $schema->setElementsQualification($node->getAttribute("elementFormDefault") == "qualified");
+        $schema->setAttributesQualification($node->getAttribute("attributeFormDefault") == "qualified");
         $schema->setDoc($this->getDocumentation($node));
         $functions = array();
 

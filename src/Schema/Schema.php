@@ -14,7 +14,7 @@ use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
 class Schema
 {
 
-    protected $elementsQualification = true;
+    protected $elementsQualification = false;
 
     protected $attributesQualification = false;
 
