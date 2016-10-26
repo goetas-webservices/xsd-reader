@@ -241,4 +241,151 @@ class RestrictionsTest extends BaseTest
         );
         $this->assertEquals($expectedChecks, $restriction->getChecks());
     }
+    
+    /**
+     * Test the correct detection a fractionDigits-restriction.
+     */
+    public function testRestriction_7()
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+                <xs:element name="fractionDigits">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:decimal">
+                            <xs:fractionDigits value="2"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+
+            </xs:schema>');
+
+        $element = $schema->findElement('fractionDigits', 'http://www.example.com');
+        $simpleType = $element->getType();
+        $restriction = $simpleType->getRestriction();
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction', $restriction);
+
+        $expectedChecks = array(
+            'fractionDigits' => array(
+                array(
+                    'value' => '2',
+                    'doc' => '',
+                ),
+            ),
+        );
+        $this->assertEquals($expectedChecks, $restriction->getChecks());
+    }
+    
+    /**
+     * Test the correct detection a totalDigits-restriction.
+     */
+    public function testRestriction_8()
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+                <xs:element name="totalDigits">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:decimal">
+                            <xs:totalDigits value="4"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+
+            </xs:schema>');
+
+        $element = $schema->findElement('totalDigits', 'http://www.example.com');
+        $simpleType = $element->getType();
+        $restriction = $simpleType->getRestriction();
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction', $restriction);
+
+        $expectedChecks = array(
+            'totalDigits' => array(
+                array(
+                    'value' => '4',
+                    'doc' => '',
+                ),
+            ),
+        );
+        $this->assertEquals($expectedChecks, $restriction->getChecks());
+    }
+    
+    /**
+     * Test the correct detection a totalDigits- and fractionDigits-restriction.
+     */
+    public function testRestriction_9()
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+                <xs:element name="totalFractionDigits">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:decimal">
+                            <xs:totalDigits value="4"/>
+                            <xs:fractionDigits value="2"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+
+            </xs:schema>');
+
+        $element = $schema->findElement('totalFractionDigits', 'http://www.example.com');
+        $simpleType = $element->getType();
+        $restriction = $simpleType->getRestriction();
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction', $restriction);
+
+        $expectedChecks = array(
+            'totalDigits' => array(
+                array(
+                    'value' => '4',
+                    'doc' => '',
+                ),
+            ),
+            'fractionDigits' => array(
+                array(
+                    'value' => '2',
+                    'doc' => '',
+                ),
+            ),
+        );
+        $this->assertEquals($expectedChecks, $restriction->getChecks());
+    }
+    
+    /**
+     * Test the correct detection a whiteSpace-restriction.
+     */
+    public function testRestriction_10()
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+                <xs:element name="whiteSpace">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:whiteSpace value="replace"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+
+            </xs:schema>');
+
+        $element = $schema->findElement('whiteSpace', 'http://www.example.com');
+        $simpleType = $element->getType();
+        $restriction = $simpleType->getRestriction();
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction', $restriction);
+
+        $expectedChecks = array(
+            'whiteSpace' => array(
+                array(
+                    'value' => 'replace',
+                    'doc' => '',
+                ),
+            ),
+        );
+        $this->assertEquals($expectedChecks, $restriction->getChecks());
+    }
 }
