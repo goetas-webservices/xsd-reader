@@ -537,7 +537,8 @@ class SchemaReader
                     'minExclusive',
                     'maxExclusive',
                     'fractionDigits',
-                    'totalDigits'
+                    'totalDigits',
+                    'whiteSpace'
                 ], true)) {
                 $restriction->addCheck($childNode->localName,
                     [
