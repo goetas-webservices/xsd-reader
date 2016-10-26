@@ -1,6 +1,8 @@
 <?php
 namespace GoetasWebservices\XML\XSDReader\Utils;
 
+use GoetasWebservices\XML\XSDReader\Exception\RestrictionException;
+
 class RestrictionUtils
 {
 
@@ -9,14 +11,18 @@ class RestrictionUtils
      *  
      * @param mixed $value
      * @param array $enumeration
-     * @throws \InvalidArgumentException
+     * @throws RestrictionException
      * @return mixed
      */
     public static function checkEnumeration($value, $enumeration)
     {
         if (!in_array($value, $enumeration)) {
             $values = implode(', ', $enumeration);
-            throw new \InvalidArgumentException("The restriction enumeration with '$values' is not true");
+            throw new RestrictionException(
+                    "The restriction enumeration with '$values' is not true", 
+                    RestrictionException::ERROR_CODE_ENUMARATION,
+                    $value,
+                    $enumeration);
         }   
         return $value;
     }
@@ -26,15 +32,38 @@ class RestrictionUtils
      * 
      * @param mixed $value
      * @param string $pattern
-     * @throws \InvalidArgumentException
+     * @throws RestrictionException
      * @return mixed
      */
     public static function checkPattern($value, $pattern)
     {
         if (!preg_match("/^{$pattern}$/", $value)) {
-            throw new \InvalidArgumentException("The restriction pattern with '$pattern' is not true");
+            throw new RestrictionException(
+                    "The restriction pattern with '$pattern' is not true", 
+                    RestrictionException::ERROR_CODE_PATTERN,
+                    $value,
+                    $pattern);
         }
         return $value;
+    }
+    
+    /**
+     * Check is numeric valid
+     * 
+     * @param mixed $value
+     * @return mixed
+     * @throws RestrictionException
+     */
+    private static function getNumeric($value) 
+    {
+        if (!is_numeric($value)) {
+            throw new RestrictionException(
+                    "The '$value' is not a valid numeric", 
+                    RestrictionException::ERROR_CODE_VALUE,
+                    $value,
+                    'is_numeric');
+        }
+        return $value + 0;
     }
     
     /**
@@ -42,25 +71,30 @@ class RestrictionUtils
      * 
      * @param float $value
      * @param int $fractionDigits
-     * @throws \InvalidArgumentException
+     * @throws RestrictionException
      * @return float
      */
     public static function checkFractionDigits($value, $fractionDigits) 
     {
-        if (!is_numeric($value)) {
-            throw new \InvalidArgumentException("The '$value' is not a valid numeric");
-        }
-        if ($value < 0) {
-            throw new \InvalidArgumentException("The '$value' must be equal to or greater than zero");
+        $numeric = static::getNumeric($value);
+        if ($numeric < 0) {
+            throw new RestrictionException(
+                    "The '$numeric' must be equal to or greater than zero", 
+                    RestrictionException::ERROR_CODE_GTE,
+                    $numeric);
         }
         $count = 0;
-        if ((int)$value != $value){
-            $count = strlen($value) - strrpos($value, '.') - 1;
+        if ((int)$numeric != $numeric){
+            $count = strlen($numeric) - strrpos($numeric, '.') - 1;
         }
         if ($count > $fractionDigits) {
-            throw new \InvalidArgumentException("The restriction fraction digits with '$fractionDigits' is not true");
+            throw new RestrictionException(
+                    "The restriction fraction digits with '$fractionDigits' is not true", 
+                    RestrictionException::ERROR_CODE_FRACTION_DIGITS,
+                    $value,
+                    $fractionDigits);
         }
-        return $value;
+        return $numeric;
     }
     
     /**
@@ -68,28 +102,33 @@ class RestrictionUtils
      * 
      * @param float $value
      * @param int $totalDigits
-     * @throws \InvalidArgumentException
+     * @throws RestrictionException
      * @return float
      */
     public static function checkTotalDigits($value, $totalDigits) 
     {
-        if (!is_numeric($value)) {
-            throw new \InvalidArgumentException("The '$value' is not a valid numeric");
-        }
-        if ($value < 0) {
-            throw new \InvalidArgumentException("The '$value' must be equal to or greater than zero");
+        $numeric = static::getNumeric($value);
+        if ($numeric < 0) {
+            throw new RestrictionException(
+                    "The '$numeric' must be equal to or greater than zero", 
+                    RestrictionException::ERROR_CODE_GTE,
+                    $numeric);
         }
         $count = 0;
-        if ($value === 0) {
+        if ($numeric === 0) {
             $count = 1;
         } else {
-            $count = floor(log10(floor($value))) + 1;
+            $count = floor(log10(floor($numeric))) + 1;
         }
         
         if ($count > $totalDigits) {
-            throw new \InvalidArgumentException("The restriction total digits with '$totalDigits' is not true");
+            throw new RestrictionException(
+                    "The restriction total digits with '$totalDigits' is not true", 
+                    RestrictionException::ERROR_CODE_TOTAL_DIGITS,
+                    $value,
+                    $totalDigits);
         }
-        return $value;
+        return $numeric;
     }
     
     /**
@@ -97,18 +136,20 @@ class RestrictionUtils
      * 
      * @param mixed $value
      * @param int $maxExclusive
-     * @throws \InvalidArgumentException
+     * @throws RestrictionException
      * @return mixed
      */
     public static function checkMaxExclusive($value, $maxExclusive) 
     {
-        if (!is_numeric($value)) {
-            throw new \InvalidArgumentException("The '$value' is not a valid numeric");
+        $numeric = static::getNumeric($value);
+        if ($numeric >= $maxExclusive) {
+            throw new RestrictionException(
+                    "The restriction max exclusive with '$maxExclusive' is not true", 
+                    RestrictionException::ERROR_CODE_MAX_EXCLUSIVE,
+                    $value,
+                    $maxExclusive);
         }
-        if ($value >= $maxExclusive) {
-            throw new \InvalidArgumentException("The restriction max exclusive with '$maxExclusive' is not true");
-        }
-        return $value;
+        return $numeric;
     }
     
     /**
@@ -116,41 +157,46 @@ class RestrictionUtils
      * 
      * @param mixed $value
      * @param int $maxInclusive
-     * @throws \InvalidArgumentException
+     * @throws RestrictionException
      * @return mixed
      */
     public static function checkMaxInclusive($value, $maxInclusive) 
     {
-        if (!is_numeric($value)) {
-            throw new \InvalidArgumentException("The '$value' is not a valid numeric");
+        $numeric = static::getNumeric($value);
+        if ($numeric > $maxInclusive) {
+            throw new RestrictionException(
+                    "The restriction max inclusive with '$maxInclusive' is not true", 
+                    RestrictionException::ERROR_CODE_MAX_INCLUSIVE,
+                    $value,
+                    $maxInclusive);
         }
-        if ($value > $maxInclusive) {
-            throw new \InvalidArgumentException("The restriction max inclusive with '$maxInclusive' is not true");
-        }
-        return $value;
+        return $numeric;
     }
     
     /**
      * Retrive the number of characters or list items allowed. 
      * 
      * @param mixed $value
-     * @throws \InvalidArgumentException
+     * @param string $nativeType
+     * @throws RestrictionException
      * @return int
      */
-    private static function getLength($value) 
+    private static function getLength($value, $nativeType=null) 
     {
         $valueLength = 0;
-        if (is_numeric($value)) {
-            if ($value < 0) {
-                throw new \InvalidArgumentException("The '$value' must be equal to or greater than zero");
-            }
-            $valueLength = $value;
+        if (in_array($nativeType, ['int','float','integer']) && is_numeric($value)) {
+            $valueLength = static::getNumeric($value);
         } else
         if (is_array($value)) {
             $valueLength = count($value);
-        } else
-        if (!is_numeric($value)) {
+        } else {
             $valueLength = strlen($value);
+        }
+        if ($valueLength < 0) {
+            throw new RestrictionException(
+                    "The '$value' must be equal to or greater than zero", 
+                    RestrictionException::ERROR_CODE_GTE,
+                    $value);
         }
         return $valueLength;
     }    
@@ -160,13 +206,18 @@ class RestrictionUtils
      * 
      * @param mixed $value
      * @param int $length
-     * @throws \InvalidArgumentException
+     * @param string $nativeType
+     * @throws RestrictionException
      * @return mixed
      */
-    public static function checkLength($value, $length) 
+    public static function checkLength($value, $length, $nativeType=null) 
     {
-        if (static::getLength($value) != $length) {
-            throw new \InvalidArgumentException("The restriction length with '$length' is not true");
+        if (static::getLength($value, $nativeType) != $length) {
+            throw new RestrictionException(
+                    "The restriction length with '$length' is not true", 
+                    RestrictionException::ERROR_CODE_LENGTH,
+                    $value,
+                    $length);
         }
         return $value;
     }    
@@ -176,13 +227,18 @@ class RestrictionUtils
      * 
      * @param mixed $value
      * @param int $maxLength
-     * @throws \InvalidArgumentException
+     * @param string $nativeType
+     * @throws RestrictionException
      * @return mixed
      */
-    public static function checkMaxLength($value, $maxLength) 
+    public static function checkMaxLength($value, $maxLength, $nativeType=null) 
     {
-        if (static::getLength($value) > $maxLength) {
-            throw new \InvalidArgumentException("The restriction max length with '$maxLength' is not true");
+        if (static::getLength($value, $nativeType) > $maxLength) {
+            throw new RestrictionException(
+                    "The restriction max length with '$maxLength' is not true", 
+                    RestrictionException::ERROR_CODE_MAX_LENGTH,
+                    $value,
+                    $maxLength);
         }
         return $value;
     }
@@ -192,13 +248,18 @@ class RestrictionUtils
      * 
      * @param mixed $value
      * @param int $minLength
-     * @throws \InvalidArgumentException
+     * @param string $nativeType
+     * @throws RestrictionException
      * @return mixed
      */
-    public static function checkMinLength($value, $minLength) 
+    public static function checkMinLength($value, $minLength, $nativeType=null) 
     {
-        if (static::getLength($value) < $minLength) {
-            throw new \InvalidArgumentException("The restriction min length with '$minLength' is not true");
+        if (static::getLength($value, $nativeType) < $minLength) {
+            throw new RestrictionException(
+                    "The restriction min length with '$minLength' is not true", 
+                    RestrictionException::ERROR_CODE_MIN_LENGTH,
+                    $value,
+                    $minLength);
         }
         return $value;
     }
@@ -208,18 +269,20 @@ class RestrictionUtils
      * 
      * @param mixed $value
      * @param int $minExclusive
-     * @throws \InvalidArgumentException
+     * @throws RestrictionException
      * @return mixed
      */
     public static function checkMinExclusive($value, $minExclusive) 
     {
-        if (!is_numeric($value)) {
-            throw new \InvalidArgumentException("The '$value' is not a valid numeric");
+        $numeric = static::getNumeric($value);
+        if ($numeric <= $minExclusive) {
+            throw new RestrictionException(
+                    "The restriction min exclusive with '$minExclusive' is not true", 
+                    RestrictionException::ERROR_CODE_MIN_EXCLUSIVE,
+                    $value,
+                    $minExclusive);
         }
-        if ($value <= $minExclusive) {
-            throw new \InvalidArgumentException("The restriction min exclusive with '$minExclusive' is not true");
-        }
-        return $value;
+        return $numeric;
     }
     
     /**
@@ -227,18 +290,20 @@ class RestrictionUtils
      * 
      * @param mixed $value
      * @param int $minInclusive
-     * @throws \InvalidArgumentException
+     * @throws RestrictionException
      * @return mixed
      */
     public static function checkMinInclusive($value, $minInclusive) 
     {
-        if (!is_numeric($value)) {
-            throw new \InvalidArgumentException("The '$value' is not a valid numeric");
+        $numeric = static::getNumeric($value);
+        if ($numeric < $minInclusive) {
+            throw new RestrictionException(
+                    "The restriction min inclusive with '$minInclusive' is not true", 
+                    RestrictionException::ERROR_CODE_MIN_INCLUSIVE,
+                    $value,
+                    $minInclusive);
         }
-        if ($value < $minInclusive) {
-            throw new \InvalidArgumentException("The restriction min inclusive with '$minInclusive' is not true");
-        }
-        return $value;
+        return $numeric;
     }
 
     /**
@@ -246,7 +311,6 @@ class RestrictionUtils
      * 
      * @param mixed $value
      * @param string $whiteSpace
-     * @throws \InvalidArgumentException
      * @return mixed
      */
     public static function checkWhiteSpace($value, $whiteSpace) 
