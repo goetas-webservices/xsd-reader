@@ -223,9 +223,8 @@ class Schema
      * @throws TypeNotFoundException
      * @return \GoetasWebservices\XML\XSDReader\Schema\SchemaItem
      */
-    protected function findSomething($getter, $name, $namespace = null, &$calling = array())
+    protected function findSomething($getter, $name, $namespace = null)
     {
-        $calling[spl_object_hash($this)] = true;
         $cid = "$getter, $name, $namespace";
 
         if (isset($this->typeCache[$cid])) {
@@ -237,15 +236,31 @@ class Schema
                 return $this->typeCache[$cid] = $item;
             }
         }
-        foreach ($this->getSchemas() as $childSchema) {
-            if ($childSchema->getTargetNamespace() === $namespace && !isset($calling[spl_object_hash($childSchema)])) {
-                try {
-                    return $this->typeCache[$cid] = $childSchema->findSomething($getter, $name, $namespace, $calling);
-                } catch (TypeNotFoundException $e) {
+
+        $targetSchema = $this->findSchemaByNamespace($namespace);
+        if ($targetSchema && $item = $targetSchema->$getter($name)) {
+            return $this->typeCache[$cid] = $item;
+        }
+
+        throw new TypeNotFoundException(sprintf("Can't find the %s named {%s}#%s.", substr($getter, 3), $namespace, $name));
+    }
+
+    protected function findSchemaByNamespace($namespace, &$calling = array())
+    {
+        $calling[spl_object_hash($this)] = true;
+        if ($this->getTargetNamespace() === $namespace) {
+            return $this;
+        } elseif ($this->hasChildren()) {
+            foreach($this->getSchemas() as $schema) {
+                if (isset($calling[spl_object_hash($schema)])) {
+                    continue;
+                }
+                if($found = $schema->findSchemaByNamespace($namespace, $calling)) {
+                    return $found;
                 }
             }
         }
-        throw new TypeNotFoundException(sprintf("Can't find the %s named {%s}#%s.", substr($getter, 3), $namespace, $name));
+        return null;
     }
 
     /**
@@ -301,5 +316,13 @@ class Schema
     public function findAttributeGroup($name, $namespace = null)
     {
         return $this->findSomething('getAttributeGroup', $name, $namespace);
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasChildren()
+    {
+        return count($this->getSchemas()) > 0;
     }
 }
