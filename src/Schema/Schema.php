@@ -245,17 +245,22 @@ class Schema
         throw new TypeNotFoundException(sprintf("Can't find the %s named {%s}#%s.", substr($getter, 3), $namespace, $name));
     }
 
+    /**
+     * @param string $namespace
+     * @param array $calling
+     * @return \GoetasWebservices\XML\XSDReader\Schema\Schema|null
+     */
     protected function findSchemaByNamespace($namespace, &$calling = array())
     {
         $calling[spl_object_hash($this)] = true;
         if ($this->getTargetNamespace() === $namespace) {
             return $this;
         } elseif ($this->hasChildren()) {
-            foreach($this->getSchemas() as $schema) {
+            foreach ($this->getSchemas() as $schema) {
                 if (isset($calling[spl_object_hash($schema)])) {
                     continue;
                 }
-                if($found = $schema->findSchemaByNamespace($namespace, $calling)) {
+                if ($found = $schema->findSchemaByNamespace($namespace, $calling)) {
                     return $found;
                 }
             }
