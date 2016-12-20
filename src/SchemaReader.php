@@ -48,6 +48,10 @@ class SchemaReader
     {
         $this->addKnownSchemaLocation('http://www.w3.org/2001/xml.xsd', __DIR__ . '/Resources/xml.xsd');
         $this->addKnownSchemaLocation('http://www.w3.org/2001/XMLSchema.xsd', __DIR__ . '/Resources/XMLSchema.xsd');
+        $this->addKnownSchemaLocation('http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd', __DIR__ . '/Resources/oasis-200401-wss-wssecurity-secext-1.0.xsd');
+        $this->addKnownSchemaLocation('http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd', __DIR__ . '/Resources/oasis-200401-wss-wssecurity-utility-1.0.xsd');
+        $this->addKnownSchemaLocation('https://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd', __DIR__ . '/Resources/xmldsig-core-schema.xsd');
+        $this->addKnownSchemaLocation('http://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd', __DIR__ . '/Resources/xmldsig-core-schema.xsd');
     }
 
     public function addKnownSchemaLocation($remote, $local)
