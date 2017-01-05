@@ -1,6 +1,8 @@
 <?php
 namespace GoetasWebservices\XML\XSDReader\Tests;
 
+use GoetasWebservices\XML\XSDReader\Schema\Schema;
+
 class SchemaTest extends BaseTest
 {
     public function testBaseEmpty()
@@ -35,6 +37,32 @@ class SchemaTest extends BaseTest
 
         $this->setExpectedException('GoetasWebservices\XML\XSDReader\Schema\Exception\TypeNotFoundException');
         $schema->$find('foo');
+    }
+
+    public function testFindElementInNestedSchemas()
+    {
+        $schemaRoot = new Schema();
+        $schema = new Schema();
+
+        $schema->addSchema($this->reader->readString('
+            <xs:schema xmlns:tns="http://www.my-company-domain.com/" 
+                    xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+                    version="1.0"
+                    targetNamespace="http://www.my-company-domain.com/">
+                <xs:element name="getCatalog" type="tns:getCatalog" />
+                <xs:complexType name="getCatalog">
+                    <xs:sequence>
+                    <xs:element name="arg0" type="xs:string" minOccurs="0" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:schema>'));
+
+        $schemaRoot->addSchema($schema);
+
+        $this->assertInstanceOf(
+            'GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef',
+            $schemaRoot->findElement('getCatalog', 'http://www.my-company-domain.com/')
+        );
     }
 
     public function testBase()
