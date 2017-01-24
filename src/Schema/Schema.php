@@ -238,7 +238,7 @@ class Schema
             }
         }
         foreach ($this->getSchemas() as $childSchema) {
-            if ($childSchema->getTargetNamespace() === $namespace && !isset($calling[spl_object_hash($childSchema)])) {
+            if (!isset($calling[spl_object_hash($childSchema)])) {
                 try {
                     return $this->typeCache[$cid] = $childSchema->findSomething($getter, $name, $namespace, $calling);
                 } catch (TypeNotFoundException $e) {
