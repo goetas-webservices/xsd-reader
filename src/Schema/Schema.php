@@ -212,7 +212,7 @@ class Schema
 
     public function __toString()
     {
-        return sprintf("Target namespaace %s", $this->getTargetNamespace());
+        return sprintf("Target namespace %s", $this->getTargetNamespace());
     }
 
     /**
