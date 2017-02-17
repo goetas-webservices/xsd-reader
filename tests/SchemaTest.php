@@ -69,4 +69,43 @@ class SchemaTest extends BaseTest
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef', $schema->findAttribute('myAttribute', 'http://www.example.com'));
 
     }
+
+    public function testMultipleSchemasInSameFile()
+    {
+        $file = 'schema.xsd';
+        $schema1 = $this->reader->readString('
+            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xs:complexType name="myType"></xs:complexType>
+                <xs:element name="myElement" type="myType"></xs:element>
+
+                <xs:group name="myGroup">
+                    <xs:sequence></xs:sequence>
+                </xs:group>
+                <xs:attribute name="myAttribute" type="xs:string"></xs:attribute>
+                <xs:attributeGroup name="myAttributeGroup"></xs:attributeGroup>
+            </xs:schema>',
+            $file
+        );
+
+        $this->assertCount(1, $schema1->getTypes());
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType', $schema1->findType('myType', 'http://www.example.com'));
+
+        $this->assertCount(1, $schema1->getElements());
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef', $schema1->findElement('myElement', 'http://www.example.com'));
+
+        //Now use a second schema which imports from the first one, and is in the SAME file
+        $schema2 = $this->reader->readString('
+            <xs:schema targetNamespace="http://www.example2.com" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ns1="http://www.example.com">
+                <xs:import namespace="http://www.example.com"/>
+                <xs:element name="myElement2" type="ns1:myType"></xs:element>
+            </xs:schema>',
+            $file
+        );
+
+        $this->assertCount(0, $schema2->getTypes());
+
+        $this->assertCount(1, $schema2->getElements());
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef', $schema2->findElement('myElement2', 'http://www.example2.com'));
+
+    }
 }

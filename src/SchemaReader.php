@@ -3,6 +3,7 @@ namespace GoetasWebservices\XML\XSDReader;
 
 use DOMDocument;
 use DOMElement;
+use DOMNode;
 use GoetasWebservices\XML\XSDReader\Exception\IOException;
 use GoetasWebservices\XML\XSDReader\Exception\TypeException;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Attribute;
@@ -651,6 +652,11 @@ class SchemaReader
 
             return function () {
             };
+        } elseif ($node->hasAttribute("namespace")
+            && isset($this->loadedFiles[$this->getNamespaceSpecificFileIndex($file, $node->getAttribute("namespace"))])) {
+            $schema->addSchema($this->loadedFiles[$this->getNamespaceSpecificFileIndex($file, $node->getAttribute("namespace"))]);
+            return function () {
+            };
         } elseif (isset($this->loadedFiles[$file])) {
             $schema->addSchema($this->loadedFiles[$file]);
             return function () {
@@ -684,7 +690,7 @@ class SchemaReader
 
     /**
      *
-     * @return \GoetasWebservices\XML\XSDReader\Schema\Schema
+     * @return Schema
      */
     public function getGlobalSchema()
     {
@@ -714,11 +720,15 @@ class SchemaReader
     }
 
     /**
-     * @return \GoetasWebservices\XML\XSDReader\Schema\Schema
+     * @param DOMNode $node
+     * @param string  $file
+     * 
+     * @return Schema
      */
-    public function readNode(\DOMNode $node, $file = 'schema.xsd')
+    public function readNode(DOMNode $node, $file = 'schema.xsd')
     {
-        $this->loadedFiles[$file] = $rootSchema = new Schema();
+        $fileKey = $node instanceof DOMElement && $node->hasAttribute('targetNamespace') ? $this->getNamespaceSpecificFileIndex($file, $node->getAttribute('targetNamespace')) : $file;
+        $this->loadedFiles[$fileKey] = $rootSchema = new Schema();
 
         $rootSchema->addSchema($this->getGlobalSchema());
         $callbacks = $this->schemaNode($rootSchema, $node);
@@ -730,9 +740,29 @@ class SchemaReader
         return $rootSchema;
     }
 
+    /**
+     * It is possible that a single file contains multiple <xsd:schema/> nodes, for instance in a WSDL file.
+     *
+     * Each of these  <xsd:schema/> nodes typically target a specific namespace. Append the target namespace to the
+     * file to distinguish between multiple schemas in a single file.
+     *
+     * @param string $file
+     * @param string $targetNamespace
+     *
+     * @return string
+     */
+    private function getNamespaceSpecificFileIndex($file, $targetNamespace)
+    {
+        return $file . '#' . $targetNamespace;
+    }
 
     /**
-     * @return \GoetasWebservices\XML\XSDReader\Schema\Schema
+     * @param string $content
+     * @param string $file
+     *
+     * @return Schema
+     *
+     * @throws IOException
      */
     public function readString($content, $file = 'schema.xsd')
     {
@@ -746,7 +776,9 @@ class SchemaReader
     }
 
     /**
-     * @return \GoetasWebservices\XML\XSDReader\Schema\Schema
+     * @param string $file
+     *
+     * @return Schema
      */
     public function readFile($file)
     {
@@ -756,8 +788,10 @@ class SchemaReader
 
     /**
      * @param string $file
+     *
+     * @return DOMDocument
+     *
      * @throws IOException
-     * @return \DOMDocument
      */
     private function getDOM($file)
     {
