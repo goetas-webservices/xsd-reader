@@ -37,7 +37,7 @@ class SchemaReader
 
     private $loadedFiles = array();
 
-    private $knowLocationSchemas = array();
+    private $knownLocationSchemas = array();
 
     private static $globalSchemaInfo = array(
         self::XML_NS => 'http://www.w3.org/2001/xml.xsd',
@@ -56,7 +56,7 @@ class SchemaReader
 
     public function addKnownSchemaLocation($remote, $local)
     {
-        $this->knowLocationSchemas[$remote] = $local;
+        $this->knownLocationSchemas[$remote] = $local;
     }
 
     private function loadAttributeGroup(Schema $schema, DOMElement $node)
@@ -664,7 +664,7 @@ class SchemaReader
             $newSchema->addSchema($this->getGlobalSchema());
         }
 
-        $xml = $this->getDOM(isset($this->knowLocationSchemas[$file]) ? $this->knowLocationSchemas[$file] : $file);
+        $xml = $this->getDOM(isset($this->knownLocationSchemas[$file]) ? $this->knownLocationSchemas[$file] : $file);
 
         $callbacks = $this->schemaNode($newSchema, $xml->documentElement, $schema);
 
@@ -696,7 +696,7 @@ class SchemaReader
                 if ($namespace === self::XSD_NS) {
                     $this->globalSchema = $schema;
                 }
-                $xml = $this->getDOM($this->knowLocationSchemas[$uri]);
+                $xml = $this->getDOM($this->knownLocationSchemas[$uri]);
                 $callbacks = array_merge($callbacks, $this->schemaNode($schema, $xml->documentElement));
             }
 
