@@ -1,6 +1,9 @@
 <?php
 namespace GoetasWebservices\XML\XSDReader\Tests;
 
+use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
+use GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType;
+
 class SchemaTest extends BaseTest
 {
     public function testBaseEmpty()
@@ -107,5 +110,41 @@ class SchemaTest extends BaseTest
         $this->assertCount(1, $schema2->getElements());
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef', $schema2->findElement('myElement2', 'http://www.example2.com'));
 
+    }
+
+    public function testGroupRefInType()
+    {
+        $schema1 = $this->reader->readString('
+        <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:element name="myElement">
+                <xs:complexType>
+                    <xs:group ref="myGroup"/>
+                </xs:complexType>
+            </xs:element>            
+            <xs:group name="myGroup">
+                <xs:choice>
+                    <xs:element name="groupElement" type="xs:string"/>
+                </xs:choice>
+            </xs:group>
+        </xs:schema>');
+
+        $this->assertCount(1, $schema1->getGroups());
+        $group = $schema1->findGroup('myGroup', 'http://www.example.com');
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\Group', $group);
+
+        $this->assertCount(1, $schema1->getElements());
+
+        /**
+         * @var $element ElementDef
+         * @var $type ComplexType
+         */
+        $element = $schema1->findElement('myElement', 'http://www.example.com');
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef', $element);
+
+        $type = $element->getType();
+        $this->assertCount(1, $type->getElements());
+
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\GroupRef', $type->getElements()[0]);
+        $this->assertEquals($group->getElements(), $type->getElements()[0]->getElements());
     }
 }

@@ -1,8 +1,6 @@
 <?php
 namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
-use GoetasWebservices\XML\XSDReader\Schema\Item;
-
 class GroupRef extends Group
 {
 

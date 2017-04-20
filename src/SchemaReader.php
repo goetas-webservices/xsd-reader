@@ -372,6 +372,11 @@ class SchemaReader
 
                         $type->addAttribute($attribute);
                         break;
+                    case 'group':
+                        $referencedGroup = $this->findSomething('findGroup', $schema, $node, $childNode->getAttribute("ref"));
+                        $group = $this->loadGroupRef($referencedGroup, $childNode);
+                        $type->addElement($group);
+                        break;
                     case 'attributeGroup':
                         $attribute = $this->findSomething('findAttributeGroup', $schema, $node, $childNode->getAttribute("ref"));
                         $type->addAttribute($attribute);
