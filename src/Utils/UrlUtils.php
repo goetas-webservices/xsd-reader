@@ -3,7 +3,12 @@ namespace GoetasWebservices\XML\XSDReader\Utils;
 
 class UrlUtils
 {
-
+    /**
+    * @param string $base
+    * @param string $rel
+    *
+    * @return string
+    */
     public static function resolveRelativeUrl($base, $rel)
     {
         $re = array(

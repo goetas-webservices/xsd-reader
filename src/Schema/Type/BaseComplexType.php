@@ -8,7 +8,9 @@ use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeContainer;
 
 abstract class BaseComplexType extends Type implements AttributeContainer
 {
-
+    /**
+    * @var AttributeItem[]
+    */
     protected $attributes = array();
 
     public function addAttribute(AttributeItem $attribute)
@@ -16,7 +18,9 @@ abstract class BaseComplexType extends Type implements AttributeContainer
         $this->attributes[] = $attribute;
     }
 
-
+    /**
+    * @return AttributeItem[]
+    */
     public function getAttributes()
     {
         return $this->attributes;

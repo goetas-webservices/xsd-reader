@@ -36,7 +36,7 @@ interface AttributeSingle extends AttributeItem
 
     /**
      *
-     * @param boolean $qualified
+     * @param boolean $nil
      */
     public function setNil($nil);
 

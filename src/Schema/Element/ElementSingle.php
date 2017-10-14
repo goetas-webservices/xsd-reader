@@ -17,7 +17,7 @@ interface ElementSingle extends ElementItem
 
     /**
      *
-     * @param int $qualified
+     * @param int $min
      */
     public function setMin($min);
 
@@ -29,7 +29,7 @@ interface ElementSingle extends ElementItem
 
     /**
      *
-     * @param int $qualified
+     * @param int $max
      */
     public function setMax($max);
 
@@ -53,7 +53,7 @@ interface ElementSingle extends ElementItem
 
     /**
      *
-     * @param boolean $qualified
+     * @param boolean $nil
      */
     public function setNil($nil);
 }

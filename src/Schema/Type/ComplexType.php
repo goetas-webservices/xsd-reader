@@ -6,8 +6,14 @@ use GoetasWebservices\XML\XSDReader\Schema\Element\ElementItem;
 
 class ComplexType extends BaseComplexType implements ElementContainer
 {
+    /**
+    * @var ElementItem[]
+    */
     protected $elements = array();
 
+    /**
+    * @return ElementItem[]
+    */
     public function getElements()
     {
         return $this->elements;

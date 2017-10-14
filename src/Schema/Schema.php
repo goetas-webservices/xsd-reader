@@ -13,90 +13,160 @@ use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
 
 class Schema
 {
-
+    /**
+    * @var bool
+    */
     protected $elementsQualification = false;
 
+    /**
+    * @var bool
+    */
     protected $attributesQualification = false;
 
+    /**
+    * @var string|null
+    */
     protected $targetNamespace;
 
+    /**
+    * @var Schema[]
+    */
     protected $schemas = array();
 
+    /**
+    * @var Type[]
+    */
     protected $types = array();
 
+    /**
+    * @var ElementDef[]
+    */
     protected $elements = array();
 
+    /**
+    * @var Group[]
+    */
     protected $groups = array();
 
+    /**
+    * @var AttributeGroup[]
+    */
     protected $attributeGroups = array();
 
+    /**
+    * @var AttributeDef[]
+    */
     protected $attributes = array();
 
+    /**
+    * @var string|null
+    */
     protected $doc;
 
+    /**
+    * @var \GoetasWebservices\XML\XSDReader\Schema\SchemaItem[]
+    */
     private $typeCache = array();
 
-
+    /**
+    * @return bool
+    */
     public function getElementsQualification()
     {
         return $this->elementsQualification;
     }
 
+    /**
+    * @param bool $elementsQualification
+    */
     public function setElementsQualification($elementsQualification)
     {
         $this->elementsQualification = $elementsQualification;
     }
 
+    /**
+    * @return bool
+    */
     public function getAttributesQualification()
     {
         return $this->attributesQualification;
     }
 
+    /**
+    * @param bool $attributesQualification
+    */
     public function setAttributesQualification($attributesQualification)
     {
         $this->attributesQualification = $attributesQualification;
     }
 
+    /**
+    * @return string|null
+    */
     public function getTargetNamespace()
     {
         return $this->targetNamespace;
     }
 
+    /**
+    * @param string|null $targetNamespace
+    */
     public function setTargetNamespace($targetNamespace)
     {
         $this->targetNamespace = $targetNamespace;
     }
 
+    /**
+    * @return Type[]
+    */
     public function getTypes()
     {
         return $this->types;
     }
 
+    /**
+    * @return ElementDef[]
+    */
     public function getElements()
     {
         return $this->elements;
     }
 
+    /**
+    * @return Schema[]
+    */
     public function getSchemas()
     {
         return $this->schemas;
     }
 
+    /**
+    * @return AttributeDef[]
+    */
     public function getAttributes()
     {
         return $this->attributes;
     }
 
+    /**
+    * @return Group[]
+    */
     public function getGroups()
     {
         return $this->groups;
     }
 
+    /**
+    * @return string|null
+    */
     public function getDoc()
     {
         return $this->doc;
     }
 
+    /**
+    * @param string $doc
+    */
     public function setDoc($doc)
     {
         $this->doc = $doc;
@@ -112,6 +182,9 @@ class Schema
         $this->elements[$element->getName()] = $element;
     }
 
+    /**
+    * @param string|null $namespace
+    */
     public function addSchema(Schema $schema, $namespace = null)
     {
         if ($namespace !== null && $schema->getTargetNamespace() !== $namespace) {
@@ -140,6 +213,9 @@ class Schema
         $this->attributeGroups[$group->getName()] = $group;
     }
 
+    /**
+    * @return AttributeGroup[]
+    */
     public function getAttributeGroups()
     {
         return $this->attributeGroups;
@@ -220,6 +296,8 @@ class Schema
      * @param string $getter
      * @param string $name
      * @param string $namespace
+     * @param bool[] $calling
+     *
      * @throws TypeNotFoundException
      * @return \GoetasWebservices\XML\XSDReader\Schema\SchemaItem
      */
@@ -233,14 +311,23 @@ class Schema
         }
 
         if (null === $namespace || $this->getTargetNamespace() === $namespace) {
-            if ($item = $this->$getter($name)) {
+            /**
+            * @var \GoetasWebservices\XML\XSDReader\Schema\SchemaItem|null $item
+            */
+            $item = $this->$getter($name);
+            if ($item instanceof SchemaItem) {
                 return $this->typeCache[$cid] = $item;
             }
         }
         foreach ($this->getSchemas() as $childSchema) {
             if (!isset($calling[spl_object_hash($childSchema)])) {
                 try {
-                    return $this->typeCache[$cid] = $childSchema->findSomething($getter, $name, $namespace, $calling);
+                    /**
+                    * @var \GoetasWebservices\XML\XSDReader\Schema\SchemaItem $in
+                    */
+                    $in = $childSchema->findSomething($getter, $name, $namespace, $calling);
+
+                    return $this->typeCache[$cid] = $in;
                 } catch (TypeNotFoundException $e) {
                 }
             }
