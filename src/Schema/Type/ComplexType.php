@@ -18,4 +18,3 @@ class ComplexType extends BaseComplexType implements ElementContainer
         $this->elements[] = $element;
     }
 }
-

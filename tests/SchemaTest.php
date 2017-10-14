@@ -120,7 +120,7 @@ class SchemaTest extends BaseTest
                 <xs:complexType>
                     <xs:group ref="myGroup"/>
                 </xs:complexType>
-            </xs:element>            
+            </xs:element>
             <xs:group name="myGroup">
                 <xs:choice>
                     <xs:element name="groupElement" type="xs:string"/>

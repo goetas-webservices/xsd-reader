@@ -25,7 +25,7 @@ class UrlUtils
         if ($rel[0] === '#' || $rel[0] === '?') {
             return $base.$rel;
         }
-        
+
         /* fix url file for Windows */
         $base = preg_replace('#^file:\/\/([^/])#', 'file:///\1', $base);
 

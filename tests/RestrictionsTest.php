@@ -241,7 +241,7 @@ class RestrictionsTest extends BaseTest
         );
         $this->assertEquals($expectedChecks, $restriction->getChecks());
     }
-    
+
     /**
      * Test the correct detection a fractionDigits-restriction.
      */
@@ -276,7 +276,7 @@ class RestrictionsTest extends BaseTest
         );
         $this->assertEquals($expectedChecks, $restriction->getChecks());
     }
-    
+
     /**
      * Test the correct detection a totalDigits-restriction.
      */
@@ -311,7 +311,7 @@ class RestrictionsTest extends BaseTest
         );
         $this->assertEquals($expectedChecks, $restriction->getChecks());
     }
-    
+
     /**
      * Test the correct detection a totalDigits- and fractionDigits-restriction.
      */
@@ -353,7 +353,7 @@ class RestrictionsTest extends BaseTest
         );
         $this->assertEquals($expectedChecks, $restriction->getChecks());
     }
-    
+
     /**
      * Test the correct detection a whiteSpace-restriction.
      */

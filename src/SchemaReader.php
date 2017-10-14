@@ -204,7 +204,7 @@ class SchemaReader
 
         $xp = new \DOMXPath($node->ownerDocument);
         $xp->registerNamespace('xs', 'http://www.w3.org/2001/XMLSchema');
-        
+
         if ($xp->query('ancestor::xs:choice', $node)->length) {
             $element->setMin(0);
         }
@@ -727,7 +727,7 @@ class SchemaReader
     /**
      * @param DOMNode $node
      * @param string  $file
-     * 
+     *
      * @return Schema
      */
     public function readNode(DOMNode $node, $file = 'schema.xsd')
