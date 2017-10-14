@@ -276,7 +276,7 @@ class SchemaReader
     private function loadElementRef(ElementDef $referenced, DOMElement $node)
     {
         $ref = new ElementRef($referenced);
-        $ref->setDoc($this->getDocumentation($node));
+        $this->setDoc($ref, $node);
 
         static::maybeSetMax($ref, $node);
         if ($node->hasAttribute("minOccurs")) {
@@ -290,6 +290,11 @@ class SchemaReader
         }
 
         return $ref;
+    }
+
+    private function setDoc(Item $ref, DOMElement $node)
+    {
+        $ref->setDoc($this->getDocumentation($node));
     }
 
     private static function maybeSetMax(InterfaceSetMinMax $ref, DOMElement $node)
@@ -307,7 +312,7 @@ class SchemaReader
     private function loadAttributeRef(AttributeDef $referencedAttribiute, DOMElement $node)
     {
         $attribute = new AttributeRef($referencedAttribiute);
-        $attribute->setDoc($this->getDocumentation($node));
+        $this->setDoc($attribute, $node);
 
         if ($node->hasAttribute("nillable")) {
             $attribute->setNil($node->getAttribute("nillable") == "true");
