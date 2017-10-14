@@ -22,7 +22,8 @@
 	},
 	"require-dev" : {
 		"phpstan/phpstan": "dev-master",
-		"phpunit/phpunit": "^4.8|^5.0"
+		"phpunit/phpunit": "^4.8|^5.0",
+		"vimeo/psalm": "dev-master"
 	},
 	"autoload" : {
 		"psr-4" : {
@@ -42,7 +43,8 @@
 	"scripts": {
 		"tests": [
 			"php ./vendor/phpunit/phpunit/phpunit -v",
-			"php ./vendor/phpstan/phpstan/bin/phpstan analyse -c ./phpstan.neon src"
+			"php ./vendor/phpstan/phpstan/bin/phpstan analyse -c ./phpstan.neon src",
+			"php ./vendor/vimeo/psalm/bin/psalm"
 		]
 	}
 }
