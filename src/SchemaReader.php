@@ -19,6 +19,7 @@ use GoetasWebservices\XML\XSDReader\Schema\Element\ElementItem;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementRef;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Group;
 use GoetasWebservices\XML\XSDReader\Schema\Element\GroupRef;
+use GoetasWebservices\XML\XSDReader\Schema\Element\InterfaceSetMinMax;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\TypeNotFoundException;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Extension;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction;
@@ -232,9 +233,7 @@ class SchemaReader
 
         $this->fillItem($element, $node);
 
-        if ($node->hasAttribute("maxOccurs")) {
-            $element->setMax($node->getAttribute("maxOccurs") == "unbounded" ? -1 : (int)$node->getAttribute("maxOccurs"));
-        }
+        static::maybeSetMax($element, $node);
         if ($node->hasAttribute("minOccurs")) {
             $element->setMin((int)$node->getAttribute("minOccurs"));
         }
@@ -263,9 +262,7 @@ class SchemaReader
         $ref = new GroupRef($referenced);
         $ref->setDoc($this->getDocumentation($node));
 
-        if ($node->hasAttribute("maxOccurs")) {
-            $ref->setMax($node->getAttribute("maxOccurs") == "unbounded" ? -1 : (int)$node->getAttribute("maxOccurs"));
-        }
+        static::maybeSetMax($ref, $node);
         if ($node->hasAttribute("minOccurs")) {
             $ref->setMin((int)$node->getAttribute("minOccurs"));
         }
@@ -281,9 +278,7 @@ class SchemaReader
         $ref = new ElementRef($referenced);
         $ref->setDoc($this->getDocumentation($node));
 
-        if ($node->hasAttribute("maxOccurs")) {
-            $ref->setMax($node->getAttribute("maxOccurs") == "unbounded" ? -1 : (int)$node->getAttribute("maxOccurs"));
-        }
+        static::maybeSetMax($ref, $node);
         if ($node->hasAttribute("minOccurs")) {
             $ref->setMin((int)$node->getAttribute("minOccurs"));
         }
@@ -295,6 +290,15 @@ class SchemaReader
         }
 
         return $ref;
+    }
+
+    private static function maybeSetMax(InterfaceSetMinMax $ref, DOMElement $node)
+    {
+        if (
+            $node->hasAttribute("maxOccurs")
+        ) {
+            $ref->setMax($node->getAttribute("maxOccurs") == "unbounded" ? -1 : (int)$node->getAttribute("maxOccurs"));
+        }
     }
 
     /**
@@ -369,8 +373,7 @@ class SchemaReader
         $group->setDoc($this->getDocumentation($node));
 
         if ($node->hasAttribute("maxOccurs")) {
-            $group = new GroupRef($group);
-            $group->setMax($node->getAttribute("maxOccurs") == "unbounded" ? -1 : (int)$node->getAttribute("maxOccurs"));
+            static::maybeSetMax(new GroupRef($group), $node);
         }
         if ($node->hasAttribute("minOccurs")) {
             $group = new GroupRef($group);

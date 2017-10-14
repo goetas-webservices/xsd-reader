@@ -3,7 +3,7 @@ namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
 use BadMethodCallException;
 
-class GroupRef extends Group
+class GroupRef extends Group implements InterfaceSetMinMax
 {
     /**
     * @var Group
