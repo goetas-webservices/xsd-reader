@@ -1,6 +1,8 @@
 <?php
 namespace GoetasWebservices\XML\XSDReader\Schema\Attribute;
 
+use DOMElement;
+use GoetasWebservices\XML\XSDReader\SchemaReader;
 use GoetasWebservices\XML\XSDReader\Schema\Schema;
 
 class Group implements AttributeItem, AttributeContainer
@@ -93,5 +95,22 @@ class Group implements AttributeItem, AttributeContainer
     public function getSchema()
     {
         return $this->schema;
+    }
+
+    /**
+    * @param string $attr
+    */
+    public static function findSomethingLikeThis(
+        SchemaReader $useThis,
+        Schema $schema,
+        DOMElement $node,
+        DOMElement $childNode,
+        AttributeContainer $addToThis
+    ) {
+        /**
+        * @var AttributeItem $attribute
+        */
+        $attribute = $useThis->findSomething('findAttributeGroup', $schema, $node, $childNode->getAttribute("ref"));
+        $addToThis->addAttribute($attribute);
     }
 }

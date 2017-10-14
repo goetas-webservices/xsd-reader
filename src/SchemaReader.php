@@ -103,11 +103,13 @@ class SchemaReader
                         $attGroup->addAttribute($attribute);
                         break;
                     case 'attributeGroup':
-                        /**
-                        * @var AttributeGroup $attribute
-                        */
-                        $attribute = $this->findSomething('findAttributeGroup', $schema, $node, $childNode->getAttribute("ref"));
-                        $attGroup->addAttribute($attribute);
+                        AttributeGroup::findSomethingLikeThis(
+                            $this,
+                            $schema,
+                            $node,
+                            $childNode,
+                            $attGroup
+                        );
                         break;
                 }
             }
@@ -469,11 +471,13 @@ class SchemaReader
                         $type->addElement($group);
                         break;
                     case 'attributeGroup':
-                        /**
-                        * @var AttributeGroup $attribute
-                        */
-                        $attribute = $this->findSomething('findAttributeGroup', $schema, $node, $childNode->getAttribute("ref"));
-                        $type->addAttribute($attribute);
+                        AttributeGroup::findSomethingLikeThis(
+                            $this,
+                            $schema,
+                            $node,
+                            $childNode,
+                            $type
+                        );
                         break;
                 }
             }
@@ -652,11 +656,13 @@ class SchemaReader
                     $type->addAttribute($attribute);
                     break;
                 case 'attributeGroup':
-                    /**
-                    * @var AttributeGroup $attribute
-                    */
-                    $attribute = $this->findSomething('findAttributeGroup', $type->getSchema(), $node, $childNode->getAttribute("ref"));
-                    $type->addAttribute($attribute);
+                    AttributeGroup::findSomethingLikeThis(
+                        $this,
+                        $type->getSchema(),
+                        $node,
+                        $childNode,
+                        $type
+                    );
                     break;
             }
         }
@@ -741,7 +747,7 @@ class SchemaReader
      * @throws TypeException
      * @return ElementItem|Group|AttributeItem|AttributeGroup|Type
      */
-    private function findSomething($finder, Schema $schema, DOMElement $node, $typeName)
+    public function findSomething($finder, Schema $schema, DOMElement $node, $typeName)
     {
         list ($name, $namespace) = self::splitParts($node, $typeName);
 
