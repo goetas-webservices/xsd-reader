@@ -8,6 +8,7 @@ use GoetasWebservices\XML\XSDReader\Exception\IOException;
 use GoetasWebservices\XML\XSDReader\Exception\TypeException;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Attribute;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItem;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeRef;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Element;
@@ -28,6 +29,7 @@ use GoetasWebservices\XML\XSDReader\Schema\Type\ComplexTypeSimpleContent;
 use GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType;
 use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
 use GoetasWebservices\XML\XSDReader\Utils\UrlUtils;
+use RuntimeException;
 
 class SchemaReader
 {
@@ -78,7 +80,9 @@ class SchemaReader
                         $attGroup->addAttribute($attribute);
                         break;
                     case 'attributeGroup':
-
+                        /**
+                        * @var AttributeGroup $attribute
+                        */
                         $attribute = $this->findSomething('findAttributeGroup', $schema, $node, $childNode->getAttribute("ref"));
                         $attGroup->addAttribute($attribute);
                         break;
@@ -112,7 +116,7 @@ class SchemaReader
 
         $schema->addAttribute($attribute);
 
-        return function () use ($attribute, $schema, $node) {
+        return function () use ($attribute, $node) {
             $this->fillItem($attribute, $node);
         };
     }
@@ -286,6 +290,9 @@ class SchemaReader
                     break;
                 case 'element':
                     if ($childNode->hasAttribute("ref")) {
+                        /**
+                        * @var ElementDef $referencedElement
+                        */
                         $referencedElement = $this->findSomething('findElement', $elementContainer->getSchema(), $node, $childNode->getAttribute("ref"));
                         $element = $this->loadElementRef($referencedElement, $childNode);
                     } else {
@@ -297,6 +304,9 @@ class SchemaReader
                     $elementContainer->addElement($element);
                     break;
                 case 'group':
+                    /**
+                    * @var Group $referencedGroup
+                    */
                     $referencedGroup = $this->findSomething('findGroup', $elementContainer->getSchema(), $node, $childNode->getAttribute("ref"));
 
                     $group = $this->loadGroupRef($referencedGroup, $childNode);
@@ -312,9 +322,11 @@ class SchemaReader
         $group->setDoc($this->getDocumentation($node));
 
         if ($node->hasAttribute("maxOccurs")) {
+            $group = new GroupRef($group);
             $group->setMax($node->getAttribute("maxOccurs") == "unbounded" ? -1 : (int)$node->getAttribute("maxOccurs"));
         }
         if ($node->hasAttribute("minOccurs")) {
+            $group = new GroupRef($group);
             $group->setMin((int)$node->getAttribute("minOccurs"));
         }
 
@@ -360,10 +372,24 @@ class SchemaReader
                     case 'sequence':
                     case 'choice':
                     case 'all':
+                        if (! ($type instanceof ElementContainer)) {
+                            throw new RuntimeException(
+                                '$type passed to ' .
+                                __FUNCTION__ .
+                                'expected to be an instance of ' .
+                                ElementContainer::class .
+                                ' when child node localName is "group", ' .
+                                get_class($type) .
+                                ' given.'
+                            );
+                        }
                         $this->loadSequence($type, $childNode);
                         break;
                     case 'attribute':
                         if ($childNode->hasAttribute("ref")) {
+                            /**
+                            * @var AttributeDef $referencedAttribute
+                            */
                             $referencedAttribute = $this->findSomething('findAttribute', $schema, $node, $childNode->getAttribute("ref"));
                             $attribute = $this->loadAttributeRef($referencedAttribute, $childNode);
                         } else {
@@ -373,11 +399,29 @@ class SchemaReader
                         $type->addAttribute($attribute);
                         break;
                     case 'group':
+                        if (! ($type instanceof ComplexType)) {
+                            throw new RuntimeException(
+                                '$type passed to ' .
+                                __FUNCTION__ .
+                                'expected to be an instance of ' .
+                                ComplexType::class .
+                                ' when child node localName is "group", ' .
+                                get_class($type) .
+                                ' given.'
+                            );
+                        }
+
+                        /**
+                        * @var Group $referencedGroup
+                        */
                         $referencedGroup = $this->findSomething('findGroup', $schema, $node, $childNode->getAttribute("ref"));
                         $group = $this->loadGroupRef($referencedGroup, $childNode);
                         $type->addElement($group);
                         break;
                     case 'attributeGroup':
+                        /**
+                        * @var AttributeGroup $attribute
+                        */
                         $attribute = $this->findSomething('findAttributeGroup', $schema, $node, $childNode->getAttribute("ref"));
                         $type->addAttribute($attribute);
                         break;
@@ -421,7 +465,11 @@ class SchemaReader
     private function loadList(SimpleType $type, DOMElement $node)
     {
         if ($node->hasAttribute("itemType")) {
-            $type->setList($this->findSomething('findType', $type->getSchema(), $node, $node->getAttribute("itemType")));
+            /**
+            * @var SimpleType $listType
+            */
+            $listType = $this->findSomething('findType', $type->getSchema(), $node, $node->getAttribute("itemType"));
+            $type->setList($listType);
         } else {
             $addCallback = function ($list) use ($type) {
                 $type->setList($list);
@@ -442,7 +490,11 @@ class SchemaReader
         if ($node->hasAttribute("memberTypes")) {
             $types = preg_split('/\s+/', $node->getAttribute("memberTypes"));
             foreach ($types as $typeName) {
-                $type->addUnion($this->findSomething('findType', $type->getSchema(), $node, $typeName));
+                /**
+                * @var SimpleType $unionType
+                */
+                $unionType = $this->findSomething('findType', $type->getSchema(), $node, $typeName);
+                $type->addUnion($unionType);
             }
         }
         $addCallback = function ($unType) use ($type) {
@@ -471,6 +523,19 @@ class SchemaReader
                     $this->loadRestriction($type, $childNode);
                     break;
                 case 'extension':
+                    if (! ($type instanceof BaseComplexType)) {
+                        throw new RuntimeException(
+                            'Argument 1 passed to ' .
+                            __METHOD__ .
+                            ' needs to be an instance of ' .
+                            BaseComplexType::class .
+                            ' when passed onto ' .
+                            static::class .
+                            '::loadExtension(), ' .
+                            get_class($type) .
+                            ' given.'
+                        );
+                    }
                     $this->loadExtension($type, $childNode);
                     break;
                 case 'simpleContent':
@@ -487,6 +552,9 @@ class SchemaReader
         $type->setExtension($extension);
 
         if ($node->hasAttribute("base")) {
+            /**
+            * @var Type $parent
+            */
             $parent = $this->findSomething('findType', $type->getSchema(), $node, $node->getAttribute("base"));
             $extension->setBase($parent);
         }
@@ -496,17 +564,39 @@ class SchemaReader
                 case 'sequence':
                 case 'choice':
                 case 'all':
+                    if (! ($type instanceof ElementContainer)) {
+                        throw new RuntimeException(
+                            'Argument 1 passed to ' .
+                            __METHOD__ .
+                            ' needs to be an instance of ' .
+                            ElementContainer::class .
+                            ' when passed onto ' .
+                            static::class .
+                            '::loadSequence(), ' .
+                            get_class($type) .
+                            ' given.'
+                        );
+                    }
                     $this->loadSequence($type, $childNode);
                     break;
                 case 'attribute':
                     if ($childNode->hasAttribute("ref")) {
+                        /**
+                        * @var AttributeItem $$attribute
+                        */
                         $attribute = $this->findSomething('findAttribute', $type->getSchema(), $node, $childNode->getAttribute("ref"));
                     } else {
+                        /**
+                        * @var Attribute $attribute
+                        */
                         $attribute = $this->loadAttribute($type->getSchema(), $childNode);
                     }
                     $type->addAttribute($attribute);
                     break;
                 case 'attributeGroup':
+                    /**
+                    * @var AttributeGroup $attribute
+                    */
                     $attribute = $this->findSomething('findAttributeGroup', $type->getSchema(), $node, $childNode->getAttribute("ref"));
                     $type->addAttribute($attribute);
                     break;
@@ -519,6 +609,9 @@ class SchemaReader
         $restriction = new Restriction();
         $type->setRestriction($restriction);
         if ($node->hasAttribute("base")) {
+            /**
+            * @var Type $restrictedType
+            */
             $restrictedType = $this->findSomething('findType', $type->getSchema(), $node, $node->getAttribute("base"));
             $restriction->setBase($restrictedType);
         } else {
@@ -568,7 +661,7 @@ class SchemaReader
             list ($prefix, $name) = explode(':', $typeName);
         }
 
-        $namespace = $node->lookupNamespaceURI($prefix ?: null);
+        $namespace = $node->lookupNamespaceUri($prefix ?: null);
         return array(
             $name,
             $namespace,
@@ -583,7 +676,7 @@ class SchemaReader
      * @param DOMElement $node
      * @param string $typeName
      * @throws TypeException
-     * @return ElementItem|Group|AttributeItem|AttribiuteGroup|Type
+     * @return ElementItem|Group|AttributeItem|AttributeGroup|Type
      */
     private function findSomething($finder, Schema $schema, DOMElement $node, $typeName)
     {
@@ -635,8 +728,14 @@ class SchemaReader
         } else {
 
             if ($node->getAttribute("type")) {
+                /**
+                * @var Type $type
+                */
                 $type = $this->findSomething('findType', $element->getSchema(), $node, $node->getAttribute("type"));
             } else {
+                /**
+                * @var Type $type
+                */
                 $type = $this->findSomething('findType', $element->getSchema(), $node, ($node->lookupPrefix(self::XSD_NS) . ":anyType"));
             }
 
@@ -725,14 +824,14 @@ class SchemaReader
     }
 
     /**
-     * @param DOMNode $node
+     * @param DOMElement $node
      * @param string  $file
      *
      * @return Schema
      */
-    public function readNode(DOMNode $node, $file = 'schema.xsd')
+    public function readNode(DOMElement $node, $file = 'schema.xsd')
     {
-        $fileKey = $node instanceof DOMElement && $node->hasAttribute('targetNamespace') ? $this->getNamespaceSpecificFileIndex($file, $node->getAttribute('targetNamespace')) : $file;
+        $fileKey = $node->hasAttribute('targetNamespace') ? $this->getNamespaceSpecificFileIndex($file, $node->getAttribute('targetNamespace')) : $file;
         $this->loadedFiles[$fileKey] = $rootSchema = new Schema();
 
         $rootSchema->addSchema($this->getGlobalSchema());

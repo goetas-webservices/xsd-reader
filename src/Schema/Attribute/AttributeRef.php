@@ -14,7 +14,7 @@ class AttributeRef extends Item implements AttributeSingle
 
     /**
      *
-     * @var Attribute
+     * @var AttributeDef
      */
     protected $wrapped;
 

@@ -256,7 +256,12 @@ class Schema
      */
     public function findType($name, $namespace = null)
     {
-        return $this->findSomething('getType', $name, $namespace);
+        /**
+        * @var Type $out
+        */
+        $out = $this->findSomething('getType', $name, $namespace);
+
+        return $out;
     }
 
     /**
@@ -267,7 +272,12 @@ class Schema
      */
     public function findGroup($name, $namespace = null)
     {
-        return $this->findSomething('getGroup', $name, $namespace);
+        /**
+        * @var Group $out
+        */
+        $out = $this->findSomething('getGroup', $name, $namespace);
+
+        return $out;
     }
 
     /**
@@ -278,18 +288,28 @@ class Schema
      */
     public function findElement($name, $namespace = null)
     {
-        return $this->findSomething('getElement', $name, $namespace);
+        /**
+        * @var ElementDef $out
+        */
+        $out = $this->findSomething('getElement', $name, $namespace);
+
+        return $out;
     }
 
     /**
      *
      * @param string $name
      * @param string $namespace
-     * @return AttributeReal
+     * @return AttributeItem
      */
     public function findAttribute($name, $namespace = null)
     {
-        return $this->findSomething('getAttribute', $name, $namespace);
+        /**
+        * @var AttributeItem $out
+        */
+        $out = $this->findSomething('getAttribute', $name, $namespace);
+
+        return $out;
     }
 
     /**
@@ -300,6 +320,11 @@ class Schema
      */
     public function findAttributeGroup($name, $namespace = null)
     {
-        return $this->findSomething('getAttributeGroup', $name, $namespace);
+        /**
+        * @var AttributeGroup
+        */
+        $out = $this->findSomething('getAttributeGroup', $name, $namespace);
+
+        return $out;
     }
 }
