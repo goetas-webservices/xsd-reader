@@ -563,7 +563,7 @@ class SchemaReader
 
         return function () use ($type, $node, $schema, $callback) {
 
-            $this->fillTypeNode($type, $node);
+            $this->fillTypeNode($type, $node, true);
 
             foreach ($node->childNodes as $childNode) {
                 if ($childNode instanceof DOMElement) {
@@ -645,7 +645,7 @@ class SchemaReader
         }
 
         return function () use ($type, $node, $callback) {
-            $this->fillTypeNode($type, $node);
+            $this->fillTypeNode($type, $node, true);
 
             foreach ($node->childNodes as $childNode) {
                 switch ($childNode->localName) {
@@ -788,28 +788,25 @@ class SchemaReader
     /**
     * @param bool $checkAbstract
     */
-    private function fillTypeNode(Type $type, DOMElement $node, $checkAbstract = true)
+    private function fillTypeNode(Type $type, DOMElement $node, $checkAbstract = false)
     {
 
         if ($checkAbstract) {
             $type->setAbstract($node->getAttribute("abstract") === "true" || $node->getAttribute("abstract") === "1");
         }
 
+        static $methods = [
+            'restriction' => 'loadRestriction',
+            'extension' => 'maybeLoadExtensionFromBaseComplexType',
+            'simpleContent' => 'fillTypeNode',
+            'complexContent' => 'fillTypeNode',
+        ];
+
         foreach ($node->childNodes as $childNode) {
-            switch ($childNode->localName) {
-                case 'restriction':
-                    $this->loadRestriction($type, $childNode);
-                    break;
-                case 'extension':
-                    $this->maybeLoadExtensionFromBaseComplexType(
-                        $type,
-                        $childNode
-                    );
-                    break;
-                case 'simpleContent':
-                case 'complexContent':
-                    $this->fillTypeNode($type, $childNode, false);
-                    break;
+            if (isset($methods[$childNode->localName])) {
+                $method = $methods[$childNode->localName];
+
+                $this->$method($type, $childNode);
             }
         }
     }
