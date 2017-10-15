@@ -716,21 +716,14 @@ class SchemaReader
         if (! ($childNode instanceof DOMElement)) {
             return;
         }
-        switch ($childNode->localName) {
-            case 'complexType':
-                call_user_func(
-                    $this->loadComplexType(
-                        $schema,
-                        $childNode,
-                        $callback
-                    )
-                );
-                break;
-            case 'simpleType':
-                call_user_func(
-                    $this->loadSimpleType($schema, $childNode, $callback)
-                );
-                break;
+        $methods = [
+            'complexType' => 'loadComplexType',
+            'simpleType' => 'loadSimpleType',
+        ];
+
+        if (isset($methods[$childNode->localName])) {
+            $method = $methods[$childNode->localName];
+            call_user_func($this->$method($schema, $childNode, $callback));
         }
     }
 
