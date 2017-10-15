@@ -534,20 +534,21 @@ class SchemaReader
 
         $schema->addGroup($group);
 
-        return function () use ($group, $node) {
+        static $methods = [
+            'sequence' => 'loadSequence',
+            'choice' => 'loadSequence',
+            'all' => 'loadSequence',
+        ];
+
+        return function () use ($group, $node, $methods) {
             foreach ($node->childNodes as $childNode) {
-                if (
-                    in_array(
-                        $childNode->localName,
-                        [
-                            'sequence',
-                            'choice',
-                            'all',
-                        ]
-                    )
-                ) {
-                    $this->loadSequence($group, $childNode);
-                }
+                $this->maybeCallMethod(
+                    $methods,
+                    (string) $childNode->localName,
+                    $childNode,
+                    $group,
+                    $childNode
+                );
             }
         };
     }
@@ -658,18 +659,22 @@ class SchemaReader
             $schema->addType($type);
         }
 
-        return function () use ($type, $node, $callback) {
+        static $methods = [
+            'union' => 'loadUnion',
+            'list' => 'loadList',
+        ];
+
+        return function () use ($type, $node, $callback, $methods) {
             $this->fillTypeNode($type, $node, true);
 
             foreach ($node->childNodes as $childNode) {
-                switch ($childNode->localName) {
-                    case 'union':
-                        $this->loadUnion($type, $childNode);
-                        break;
-                    case 'list':
-                        $this->loadList($type, $childNode);
-                        break;
-                }
+                $this->maybeCallMethod(
+                    $methods,
+                    (string) $childNode->localName,
+                    $childNode,
+                    $type,
+                    $childNode
+                );
             }
 
             if ($callback) {
