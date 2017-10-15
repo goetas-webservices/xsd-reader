@@ -225,34 +225,6 @@ class SchemaReader
         $schema->setDoc($this->getDocumentation($node));
     }
 
-    private function getClosuresFromChildNode(
-        Schema $schema,
-        DOMElement $childNode,
-        array & $functions
-    ) {
-        static $methods = [
-            'include' => 'loadImport',
-            'import' => 'loadImport',
-            'element' => 'loadElementDef',
-            'attribute' => 'loadAttributeDef',
-            'attributeGroup' => 'loadAttributeGroup',
-            'group' => 'loadGroup',
-            'complexType' => 'loadComplexType',
-            'simpleType' => 'loadSimpleType',
-        ];
-
-        $append = $this->maybeCallMethod(
-            $methods,
-            $childNode->localName,
-            $childNode,
-            $schema
-        );
-
-        if (! is_null($append)) {
-            $functions[] = $append;
-        }
-    }
-
     /**
     * @param mixed $schema
     *
@@ -267,7 +239,11 @@ class SchemaReader
         if ($childNode instanceof DOMElement && isset($methods[$key])) {
             $method = $methods[$key];
 
-            return $this->$method($schema, $childNode);
+            $append = $this->$method($schema, $childNode);
+
+            if ($append instanceof Closure) {
+                return $append;
+            }
         }
     }
 
@@ -276,20 +252,34 @@ class SchemaReader
      * @param Schema $schema
      * @param DOMElement $node
      * @param Schema $parent
-     * @return array
+     * @return Closure[]
      */
     private function schemaNode(Schema $schema, DOMElement $node, Schema $parent = null)
     {
         $this->setSchemaThingsFromNode($schema, $node, $parent);
         $functions = array();
 
+        static $methods = [
+            'include' => 'loadImport',
+            'import' => 'loadImport',
+            'element' => 'loadElementDef',
+            'attribute' => 'loadAttributeDef',
+            'attributeGroup' => 'loadAttributeGroup',
+            'group' => 'loadGroup',
+            'complexType' => 'loadComplexType',
+            'simpleType' => 'loadSimpleType',
+        ];
+
         foreach ($node->childNodes as $childNode) {
-            if ($childNode instanceof DOMElement) {
-                $this->getClosuresFromChildNode(
-                    $schema,
-                    $childNode,
-                    $functions
-                );
+            $callback = $this->maybeCallMethod(
+                $methods,
+                (string) $childNode->localName,
+                $childNode,
+                $schema
+            );
+
+            if ($callback instanceof Closure) {
+                $functions[] = $callback;
             }
         }
 
