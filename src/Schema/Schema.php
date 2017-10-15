@@ -329,6 +329,7 @@ class Schema
 
                     return $this->typeCache[$cid] = $in;
                 } catch (TypeNotFoundException $e) {
+                    // exception appears to be blindly supressed to allow discovery via Schema::getSchemas()[]->findSomething()
                 }
             }
         }
