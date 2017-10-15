@@ -213,30 +213,30 @@ class SchemaReader
         DOMElement $childNode,
         array & $functions
     ) {
-            switch ($childNode->localName) {
-                case 'include':
-                case 'import':
-                    $functions[] = $this->loadImport($schema, $childNode);
-                    break;
-                case 'element':
-                    $functions[] = $this->loadElementDef($schema, $childNode);
-                    break;
-                case 'attribute':
-                    $functions[] = $this->loadAttributeDef($schema, $childNode);
-                    break;
-                case 'attributeGroup':
-                    $functions[] = $this->loadAttributeGroup($schema, $childNode);
-                    break;
-                case 'group':
-                    $functions[] = $this->loadGroup($schema, $childNode);
-                    break;
-                case 'complexType':
-                    $functions[] = $this->loadComplexType($schema, $childNode);
-                    break;
-                case 'simpleType':
-                    $functions[] = $this->loadSimpleType($schema, $childNode);
-                    break;
-            }
+        switch ($childNode->localName) {
+            case 'include':
+            case 'import':
+                $functions[] = $this->loadImport($schema, $childNode);
+                break;
+            case 'element':
+                $functions[] = $this->loadElementDef($schema, $childNode);
+                break;
+            case 'attribute':
+                $functions[] = $this->loadAttributeDef($schema, $childNode);
+                break;
+            case 'attributeGroup':
+                $functions[] = $this->loadAttributeGroup($schema, $childNode);
+                break;
+            case 'group':
+                $functions[] = $this->loadGroup($schema, $childNode);
+                break;
+            case 'complexType':
+                $functions[] = $this->loadComplexType($schema, $childNode);
+                break;
+            case 'simpleType':
+                $functions[] = $this->loadSimpleType($schema, $childNode);
+                break;
+        }
     }
 
     /**
