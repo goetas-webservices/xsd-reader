@@ -369,6 +369,24 @@ class SchemaReader
         }
     }
 
+    private function maybeLoadSequenceFromElementContainer(
+        BaseComplexType $type,
+        DOMElement $childNode
+    ) {
+        if (! ($type instanceof ElementContainer)) {
+            throw new RuntimeException(
+                '$type passed to ' .
+                __FUNCTION__ .
+                'expected to be an instance of ' .
+                ElementContainer::class .
+                ' when child node localName is "group", ' .
+                get_class($type) .
+                ' given.'
+            );
+        }
+        $this->loadSequence($type, $childNode);
+    }
+
     /**
     * @return Closure
     */
@@ -432,18 +450,10 @@ class SchemaReader
                     case 'sequence':
                     case 'choice':
                     case 'all':
-                        if (! ($type instanceof ElementContainer)) {
-                            throw new RuntimeException(
-                                '$type passed to ' .
-                                __FUNCTION__ .
-                                'expected to be an instance of ' .
-                                ElementContainer::class .
-                                ' when child node localName is "group", ' .
-                                get_class($type) .
-                                ' given.'
-                            );
-                        }
-                        $this->loadSequence($type, $childNode);
+                        $this->maybeLoadSequenceFromElementContainer(
+                            $type,
+                            $childNode
+                        );
                         break;
                     case 'attribute':
                         if ($childNode->hasAttribute("ref")) {
@@ -634,20 +644,10 @@ class SchemaReader
                 case 'sequence':
                 case 'choice':
                 case 'all':
-                    if (! ($type instanceof ElementContainer)) {
-                        throw new RuntimeException(
-                            'Argument 1 passed to ' .
-                            __METHOD__ .
-                            ' needs to be an instance of ' .
-                            ElementContainer::class .
-                            ' when passed onto ' .
-                            static::class .
-                            '::loadSequence(), ' .
-                            get_class($type) .
-                            ' given.'
-                        );
-                    }
-                    $this->loadSequence($type, $childNode);
+                    $this->maybeLoadSequenceFromElementContainer(
+                        $type,
+                        $childNode
+                    );
                     break;
                 case 'attribute':
                     if ($childNode->hasAttribute("ref")) {
