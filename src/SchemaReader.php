@@ -208,19 +208,11 @@ class SchemaReader
         $schema->setDoc($this->getDocumentation($node));
     }
 
-    /**
-     *
-     * @param Schema $schema
-     * @param DOMElement $node
-     * @param Schema $parent
-     * @return array
-     */
-    private function schemaNode(Schema $schema, DOMElement $node, Schema $parent = null)
-    {
-        $this->setSchemaThingsFromNode($schema, $node, $parent);
-        $functions = array();
-
-        foreach ($node->childNodes as $childNode) {
+    private function getClosuresFromChildNode(
+        Schema $schema,
+        DOMElement $childNode,
+        array & $functions
+    ) {
             switch ($childNode->localName) {
                 case 'include':
                 case 'import':
@@ -244,6 +236,28 @@ class SchemaReader
                 case 'simpleType':
                     $functions[] = $this->loadSimpleType($schema, $childNode);
                     break;
+            }
+    }
+
+    /**
+     *
+     * @param Schema $schema
+     * @param DOMElement $node
+     * @param Schema $parent
+     * @return array
+     */
+    private function schemaNode(Schema $schema, DOMElement $node, Schema $parent = null)
+    {
+        $this->setSchemaThingsFromNode($schema, $node, $parent);
+        $functions = array();
+
+        foreach ($node->childNodes as $childNode) {
+            if ($childNode instanceof DOMElement) {
+                $this->getClosuresFromChildNode(
+                    $schema,
+                    $childNode,
+                    $functions
+                );
             }
         }
 
