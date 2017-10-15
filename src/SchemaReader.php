@@ -25,6 +25,7 @@ use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Extension;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction;
 use GoetasWebservices\XML\XSDReader\Schema\Item;
 use GoetasWebservices\XML\XSDReader\Schema\Schema;
+use GoetasWebservices\XML\XSDReader\Schema\SchemaItem;
 use GoetasWebservices\XML\XSDReader\Schema\Type\BaseComplexType;
 use GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType;
 use GoetasWebservices\XML\XSDReader\Schema\Type\ComplexTypeSimpleContent;
@@ -558,7 +559,7 @@ class SchemaReader
             /**
             * @var SimpleType $listType
             */
-            $listType = $this->findSomething('findType', $type->getSchema(), $node, $node->getAttribute("itemType"));
+            $listType = $this->findSomeType($type, $node, 'itemType');
             $type->setList($listType);
         } else {
             $addCallback = function (SimpleType $list) use ($type) {
@@ -575,6 +576,42 @@ class SchemaReader
         }
     }
 
+    /**
+    * @return SchemaItem
+    */
+    private function findSomeType(
+        SchemaItem $fromThis,
+        DOMElement $node,
+        string $attributeName
+    ) {
+        return $this->findSomeTypeFromAttribute(
+            $fromThis,
+            $node,
+            $node->getAttribute($attributeName)
+        );
+    }
+
+    /**
+    * @return SchemaItem
+    */
+    private function findSomeTypeFromAttribute(
+        SchemaItem $fromThis,
+        DOMElement $node,
+        string $attributeName
+    ) {
+        /**
+        * @var SchemaItem $out
+        */
+        $out = $this->findSomething(
+            'findType',
+            $fromThis->getSchema(),
+            $node,
+            $attributeName
+        );
+
+        return $out;
+    }
+
     private function loadUnion(SimpleType $type, DOMElement $node)
     {
         if ($node->hasAttribute("memberTypes")) {
@@ -583,7 +620,11 @@ class SchemaReader
                 /**
                 * @var SimpleType $unionType
                 */
-                $unionType = $this->findSomething('findType', $type->getSchema(), $node, $typeName);
+                $unionType = $this->findSomeTypeFromAttribute(
+                    $type,
+                    $node,
+                    $typeName
+                );
                 $type->addUnion($unionType);
             }
         }
@@ -638,7 +679,7 @@ class SchemaReader
             /**
             * @var Type $parent
             */
-            $parent = $this->findSomething('findType', $type->getSchema(), $node, $node->getAttribute("base"));
+            $parent = $this->findSomeType($type, $node, 'base');
             $extension->setBase($parent);
         }
 
@@ -701,7 +742,7 @@ class SchemaReader
             /**
             * @var Type $restrictedType
             */
-            $restrictedType = $this->findSomething('findType', $type->getSchema(), $node, $node->getAttribute("base"));
+            $restrictedType = $this->findSomeType($type, $node, 'base');
             $restriction->setBase($restrictedType);
         } else {
             $addCallback = function (Type $restType) use ($restriction) {
@@ -828,12 +869,16 @@ class SchemaReader
                 /**
                 * @var Type $type
                 */
-                $type = $this->findSomething('findType', $element->getSchema(), $node, $node->getAttribute("type"));
+                $type = $this->findSomeType($element, $node, 'type');
             } else {
                 /**
                 * @var Type $type
                 */
-                $type = $this->findSomething('findType', $element->getSchema(), $node, ($node->lookupPrefix(self::XSD_NS) . ":anyType"));
+                $type = $this->findSomeTypeFromAttribute(
+                    $element,
+                    $node,
+                    ($node->lookupPrefix(self::XSD_NS) . ':anyType')
+                );
             }
 
             $element->setType($type);
