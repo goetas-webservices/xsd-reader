@@ -478,12 +478,17 @@ class SchemaReader
 
         return function () use ($group, $node) {
             foreach ($node->childNodes as $childNode) {
-                switch ($childNode->localName) {
-                    case 'sequence':
-                    case 'choice':
-                    case 'all':
+                if (
+                    in_array(
+                        $childNode->localName,
+                        [
+                            'sequence',
+                            'choice',
+                            'all',
+                        ]
+                    )
+                ) {
                         $this->loadSequence($group, $childNode);
-                        break;
                 }
             }
         };
