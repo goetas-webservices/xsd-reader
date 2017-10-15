@@ -390,16 +390,30 @@ class SchemaReader
                     $elementContainer->addElement($element);
                     break;
                 case 'group':
-                    /**
-                    * @var Group $referencedGroup
-                    */
-                    $referencedGroup = $this->findSomething('findGroup', $elementContainer->getSchema(), $node, $childNode->getAttribute("ref"));
-
-                    $group = $this->loadGroupRef($referencedGroup, $childNode);
-                    $elementContainer->addElement($group);
+                    $this->addGroupAsElement(
+                        $elementContainer->getSchema(),
+                        $node,
+                        $childNode,
+                        $elementContainer
+                    );
                     break;
             }
         }
+    }
+
+    private function addGroupAsElement(
+        Schema $schema,
+        DOMElement $node,
+        DOMElement $childNode,
+        ElementContainer $elementContainer
+    ) {
+                    /**
+                    * @var Group $referencedGroup
+                    */
+                    $referencedGroup = $this->findSomething('findGroup', $schema, $node, $childNode->getAttribute("ref"));
+
+                    $group = $this->loadGroupRef($referencedGroup, $childNode);
+                    $elementContainer->addElement($group);
     }
 
     private function maybeLoadSequenceFromElementContainer(
@@ -510,12 +524,12 @@ class SchemaReader
                             );
                         }
 
-                        /**
-                        * @var Group $referencedGroup
-                        */
-                        $referencedGroup = $this->findSomething('findGroup', $schema, $node, $childNode->getAttribute("ref"));
-                        $group = $this->loadGroupRef($referencedGroup, $childNode);
-                        $type->addElement($group);
+                        $this->addGroupAsElement(
+                            $schema,
+                            $node,
+                            $childNode,
+                            $type
+                        );
                         break;
                     case 'attributeGroup':
                         AttributeGroup::findSomethingLikeThis(
