@@ -384,14 +384,18 @@ class SchemaReader
             : null;
 
         foreach ($node->childNodes as $childNode) {
-
-            switch ($childNode->localName) {
-                case 'choice':
-                case 'sequence':
-                case 'all':
+            if (
+                in_array(
+                    $childNode->localName,
+                    [
+                        'choice',
+                        'sequence',
+                        'all',
+                    ]
+                )
+            ) {
                     $this->loadSequence($elementContainer, $childNode, $max);
-                    break;
-                case 'element':
+            } elseif ($childNode->localName === 'element') {
                     if ($childNode->hasAttribute("ref")) {
                         /**
                         * @var ElementDef $referencedElement
@@ -405,15 +409,13 @@ class SchemaReader
                         $element->setMax($max);
                     }
                     $elementContainer->addElement($element);
-                    break;
-                case 'group':
+            } elseif ($childNode->localName === 'group') {
                     $this->addGroupAsElement(
                         $elementContainer->getSchema(),
                         $node,
                         $childNode,
                         $elementContainer
                     );
-                    break;
             }
         }
     }
