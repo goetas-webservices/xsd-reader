@@ -401,6 +401,26 @@ class SchemaReader
             : null;
 
         foreach ($node->childNodes as $childNode) {
+            if ($childNode instanceof DOMElement) {
+                $this->loadSequenceChildNode(
+                    $elementContainer,
+                    $node,
+                    $childNode,
+                    $max
+                );
+            }
+        }
+    }
+
+    /**
+    * @param int|null $max
+    */
+    private function loadSequenceChildNode(
+        ElementContainer $elementContainer,
+        DOMElement $node,
+        DOMElement $childNode,
+        $max
+    ) {
             if (
                 in_array(
                     $childNode->localName,
@@ -434,7 +454,6 @@ class SchemaReader
                     $elementContainer
                 );
             }
-        }
     }
 
     private function addGroupAsElement(
