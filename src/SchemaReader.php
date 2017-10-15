@@ -375,7 +375,13 @@ class SchemaReader
     */
     private function loadSequence(ElementContainer $elementContainer, DOMElement $node, $max = null)
     {
-        $max = $max || $node->getAttribute("maxOccurs") == "unbounded" || $node->getAttribute("maxOccurs") > 1 ? 2 : null;
+        $max = (
+            (is_int($max) && (bool) $max) ||
+            $node->getAttribute("maxOccurs") == "unbounded" ||
+            $node->getAttribute("maxOccurs") > 1
+        )
+            ? 2
+            : null;
 
         foreach ($node->childNodes as $childNode) {
 
