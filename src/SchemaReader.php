@@ -532,36 +532,36 @@ class SchemaReader
                         ]
                     )
                 ) {
-                        $this->maybeLoadSequenceFromElementContainer(
-                            $type,
-                            $childNode
-                        );
+                    $this->maybeLoadSequenceFromElementContainer(
+                        $type,
+                        $childNode
+                    );
                 } elseif ($childNode->localName === 'attribute') {
-                        $attribute = $this->getAttributeFromAttributeOrRef(
-                            $childNode,
-                            $schema,
-                            $node
-                        );
+                    $attribute = $this->getAttributeFromAttributeOrRef(
+                        $childNode,
+                        $schema,
+                        $node
+                    );
 
-                        $type->addAttribute($attribute);
+                    $type->addAttribute($attribute);
                 } elseif (
                     $childNode->localName === 'group' &&
                     $type instanceof ComplexType
                 ) {
-                        $this->addGroupAsElement(
-                            $schema,
-                            $node,
-                            $childNode,
-                            $type
-                        );
+                    $this->addGroupAsElement(
+                        $schema,
+                        $node,
+                        $childNode,
+                        $type
+                    );
                 } elseif ($childNode->localName === 'attributeGroup') {
-                        AttributeGroup::findSomethingLikeThis(
-                            $this,
-                            $schema,
-                            $node,
-                            $childNode,
-                            $type
-                        );
+                    AttributeGroup::findSomethingLikeThis(
+                        $this,
+                        $schema,
+                        $node,
+                        $childNode,
+                        $type
+                    );
                 }
             }
 
