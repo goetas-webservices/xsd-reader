@@ -544,47 +544,47 @@ class SchemaReader
         DOMElement $childNode,
         Schema $schema
     ) {
-                if (
-                    in_array(
-                        $childNode->localName,
-                        [
-                            'sequence',
-                            'choice',
-                            'all',
-                        ]
-                    )
-                ) {
-                    $this->maybeLoadSequenceFromElementContainer(
-                        $type,
-                        $childNode
-                    );
-                } elseif ($childNode->localName === 'attribute') {
-                    $attribute = $this->getAttributeFromAttributeOrRef(
-                        $childNode,
-                        $schema,
-                        $node
-                    );
+        if (
+            in_array(
+                $childNode->localName,
+                [
+                    'sequence',
+                    'choice',
+                    'all',
+                ]
+            )
+        ) {
+            $this->maybeLoadSequenceFromElementContainer(
+                $type,
+                $childNode
+            );
+        } elseif ($childNode->localName === 'attribute') {
+            $attribute = $this->getAttributeFromAttributeOrRef(
+                $childNode,
+                $schema,
+                $node
+            );
 
-                    $type->addAttribute($attribute);
-                } elseif (
-                    $childNode->localName === 'group' &&
-                    $type instanceof ComplexType
-                ) {
-                    $this->addGroupAsElement(
-                        $schema,
-                        $node,
-                        $childNode,
-                        $type
-                    );
-                } elseif ($childNode->localName === 'attributeGroup') {
-                    AttributeGroup::findSomethingLikeThis(
-                        $this,
-                        $schema,
-                        $node,
-                        $childNode,
-                        $type
-                    );
-                }
+            $type->addAttribute($attribute);
+        } elseif (
+            $childNode->localName === 'group' &&
+            $type instanceof ComplexType
+        ) {
+            $this->addGroupAsElement(
+                $schema,
+                $node,
+                $childNode,
+                $type
+            );
+        } elseif ($childNode->localName === 'attributeGroup') {
+            AttributeGroup::findSomethingLikeThis(
+                $this,
+                $schema,
+                $node,
+                $childNode,
+                $type
+            );
+        }
     }
 
     /**
