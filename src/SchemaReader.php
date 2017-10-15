@@ -241,10 +241,33 @@ class SchemaReader
             'simpleType' => 'loadSimpleType',
         ];
 
-        if (isset($methods[$childNode->localName])) {
-            $method = $methods[$childNode->localName];
+        $append = $this->maybeCallMethod(
+            $methods,
+            $childNode->localName,
+            $childNode,
+            $schema
+        );
 
-            $functions[] = $this->$method($schema, $childNode);
+        if (! is_null($append)) {
+            $functions[] = $append;
+        }
+    }
+
+    /**
+    * @param mixed $schema
+    *
+    * @return Closure|null
+    */
+    private function maybeCallMethod(
+        array $methods,
+        string $key,
+        DOMNode $childNode,
+        $schema
+    ) {
+        if ($childNode instanceof DOMElement && isset($methods[$key])) {
+            $method = $methods[$key];
+
+            return $this->$method($schema, $childNode);
         }
     }
 
@@ -803,11 +826,12 @@ class SchemaReader
         ];
 
         foreach ($node->childNodes as $childNode) {
-            if (isset($methods[$childNode->localName])) {
-                $method = $methods[$childNode->localName];
-
-                $this->$method($type, $childNode);
-            }
+            $this->maybeCallMethod(
+                $methods,
+                (string) $childNode->localName,
+                $childNode,
+                $type
+            );
         }
     }
 
