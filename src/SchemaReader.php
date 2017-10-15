@@ -522,16 +522,21 @@ class SchemaReader
             $this->fillTypeNode($type, $node);
 
             foreach ($node->childNodes as $childNode) {
-                switch ($childNode->localName) {
-                    case 'sequence':
-                    case 'choice':
-                    case 'all':
+                if (
+                    in_array(
+                        $childNode->localName,
+                        [
+                            'sequence',
+                            'choice',
+                            'all',
+                        ]
+                    )
+                ) {
                         $this->maybeLoadSequenceFromElementContainer(
                             $type,
                             $childNode
                         );
-                        break;
-                    case 'attribute':
+                } elseif ($childNode->localName === 'attribute') {
                         $attribute = $this->getAttributeFromAttributeOrRef(
                             $childNode,
                             $schema,
@@ -539,28 +544,17 @@ class SchemaReader
                         );
 
                         $type->addAttribute($attribute);
-                        break;
-                    case 'group':
-                        if (! ($type instanceof ComplexType)) {
-                            throw new RuntimeException(
-                                '$type passed to ' .
-                                __FUNCTION__ .
-                                'expected to be an instance of ' .
-                                ComplexType::class .
-                                ' when child node localName is "group", ' .
-                                get_class($type) .
-                                ' given.'
-                            );
-                        }
-
+                } elseif (
+                    $childNode->localName === 'group' &&
+                    $type instanceof ComplexType
+                ) {
                         $this->addGroupAsElement(
                             $schema,
                             $node,
                             $childNode,
                             $type
                         );
-                        break;
-                    case 'attributeGroup':
+                } elseif ($childNode->localName === 'attributeGroup') {
                         AttributeGroup::findSomethingLikeThis(
                             $this,
                             $schema,
@@ -568,7 +562,6 @@ class SchemaReader
                             $childNode,
                             $type
                         );
-                        break;
                 }
             }
 
