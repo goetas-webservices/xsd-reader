@@ -580,9 +580,9 @@ class SchemaReader
         DOMNode $node,
         Closure $callback
     ) {
-            foreach ($node->childNodes as $childNode) {
-                $this->loadTypeWithCallback($schema, $childNode, $callback);
-            }
+        foreach ($node->childNodes as $childNode) {
+            $this->loadTypeWithCallback($schema, $childNode, $callback);
+        }
     }
 
     private function loadTypeWithCallback(
@@ -593,23 +593,23 @@ class SchemaReader
         if (! ($childNode instanceof DOMElement)) {
             return;
         }
-                switch ($childNode->localName) {
-                    case 'complexType':
-                        $childNode = $childNode;
-                        call_user_func(
-                            $this->loadComplexType(
-                                $schema,
-                                $childNode,
-                                $callback
-                            )
-                        );
-                        break;
-                    case 'simpleType':
-                        call_user_func(
-                            $this->loadSimpleType($schema, $childNode, $callback)
-                        );
-                        break;
-                }
+        switch ($childNode->localName) {
+            case 'complexType':
+                $childNode = $childNode;
+                call_user_func(
+                    $this->loadComplexType(
+                        $schema,
+                        $childNode,
+                        $callback
+                    )
+                );
+                break;
+            case 'simpleType':
+                call_user_func(
+                    $this->loadSimpleType($schema, $childNode, $callback)
+                );
+                break;
+        }
     }
 
     /**
