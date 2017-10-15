@@ -522,6 +522,28 @@ class SchemaReader
             $this->fillTypeNode($type, $node);
 
             foreach ($node->childNodes as $childNode) {
+                if ($childNode instanceof DOMElement) {
+                    $this->loadComplexTypeFromChildNode(
+                        $type,
+                        $node,
+                        $childNode,
+                        $schema
+                    );
+                }
+            }
+
+            if ($callback) {
+                call_user_func($callback, $type);
+            }
+        };
+    }
+
+    private function loadComplexTypeFromChildNode(
+        BaseComplexType $type,
+        DOMElement $node,
+        DOMElement $childNode,
+        Schema $schema
+    ) {
                 if (
                     in_array(
                         $childNode->localName,
@@ -563,12 +585,6 @@ class SchemaReader
                         $type
                     );
                 }
-            }
-
-            if ($callback) {
-                call_user_func($callback, $type);
-            }
-        };
     }
 
     /**
