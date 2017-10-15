@@ -61,7 +61,13 @@ class UrlUtils
 
         $abs .= $path."/".$rel;
 
-        /* replace '//' or '/./' or '/foo/../' with '/' */
+        /*
+        * replace superfluous slashes with a single slash.
+        * covers:
+        * //
+        * /./
+        * /foo/../
+        */
         $n = 1;
         do {
             $abs = preg_replace($re, '/', $abs, -1, $n);
