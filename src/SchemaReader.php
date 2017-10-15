@@ -603,20 +603,10 @@ class SchemaReader
                     $this->loadRestriction($type, $childNode);
                     break;
                 case 'extension':
-                    if (! ($type instanceof BaseComplexType)) {
-                        throw new RuntimeException(
-                            'Argument 1 passed to ' .
-                            __METHOD__ .
-                            ' needs to be an instance of ' .
-                            BaseComplexType::class .
-                            ' when passed onto ' .
-                            static::class .
-                            '::loadExtension(), ' .
-                            get_class($type) .
-                            ' given.'
-                        );
-                    }
-                    $this->loadExtension($type, $childNode);
+                    $this->maybeLoadExtensionFromBaseComplexType(
+                        $type,
+                        $childNode
+                    );
                     break;
                 case 'simpleContent':
                 case 'complexContent':
@@ -674,6 +664,26 @@ class SchemaReader
                     break;
             }
         }
+    }
+
+    private function maybeLoadExtensionFromBaseComplexType(
+        Type $type,
+        DOMElement $childNode
+    ) {
+        if (! ($type instanceof BaseComplexType)) {
+            throw new RuntimeException(
+                'Argument 1 passed to ' .
+                __METHOD__ .
+                ' needs to be an instance of ' .
+                BaseComplexType::class .
+                ' when passed onto ' .
+                static::class .
+                '::loadExtension(), ' .
+                get_class($type) .
+                ' given.'
+            );
+        }
+        $this->loadExtension($type, $childNode);
     }
 
     private function loadRestriction(Type $type, DOMElement $node)
