@@ -191,15 +191,11 @@ class SchemaReader
         return trim($doc);
     }
 
-    /**
-     *
-     * @param Schema $schema
-     * @param DOMElement $node
-     * @param Schema $parent
-     * @return array
-     */
-    private function schemaNode(Schema $schema, DOMElement $node, Schema $parent = null)
-    {
+    private function setSchemaThingsFromNode(
+        Schema $schema,
+        DOMElement $node,
+        Schema $parent = null
+    ) {
         $schema->setDoc($this->getDocumentation($node));
 
         if ($node->hasAttribute("targetNamespace")) {
@@ -210,6 +206,18 @@ class SchemaReader
         $schema->setElementsQualification($node->getAttribute("elementFormDefault") == "qualified");
         $schema->setAttributesQualification($node->getAttribute("attributeFormDefault") == "qualified");
         $schema->setDoc($this->getDocumentation($node));
+    }
+
+    /**
+     *
+     * @param Schema $schema
+     * @param DOMElement $node
+     * @param Schema $parent
+     * @return array
+     */
+    private function schemaNode(Schema $schema, DOMElement $node, Schema $parent = null)
+    {
+        $this->setSchemaThingsFromNode($schema, $node, $parent);
         $functions = array();
 
         foreach ($node->childNodes as $childNode) {
