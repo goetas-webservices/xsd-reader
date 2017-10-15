@@ -567,14 +567,49 @@ class SchemaReader
                 $type->setList($list);
             };
 
+            $this->loadTypeWithCallbackOnChildNodes(
+                $type->getSchema(),
+                $node,
+                $addCallback
+            );
+        }
+    }
+
+    private function loadTypeWithCallbackOnChildNodes(
+        Schema $schema,
+        DOMNode $node,
+        Closure $callback
+    ) {
             foreach ($node->childNodes as $childNode) {
+                $this->loadTypeWithCallback($schema, $childNode, $callback);
+            }
+    }
+
+    private function loadTypeWithCallback(
+        Schema $schema,
+        DOMNode $childNode,
+        Closure $callback
+    ) {
+        if (! ($childNode instanceof DOMElement)) {
+            return;
+        }
                 switch ($childNode->localName) {
+                    case 'complexType':
+                        $childNode = $childNode;
+                        call_user_func(
+                            $this->loadComplexType(
+                                $schema,
+                                $childNode,
+                                $callback
+                            )
+                        );
+                        break;
                     case 'simpleType':
-                        call_user_func($this->loadSimpleType($type->getSchema(), $childNode, $addCallback));
+                        call_user_func(
+                            $this->loadSimpleType($schema, $childNode, $callback)
+                        );
                         break;
                 }
-            }
-        }
     }
 
     /**
@@ -633,13 +668,11 @@ class SchemaReader
             $type->addUnion($unType);
         };
 
-        foreach ($node->childNodes as $childNode) {
-            switch ($childNode->localName) {
-                case 'simpleType':
-                    call_user_func($this->loadSimpleType($type->getSchema(), $childNode, $addCallback));
-                    break;
-            }
-        }
+        $this->loadTypeWithCallbackOnChildNodes(
+            $type->getSchema(),
+            $node,
+            $addCallback
+        );
     }
 
     /**
@@ -758,13 +791,11 @@ class SchemaReader
                 $restriction->setBase($restType);
             };
 
-            foreach ($node->childNodes as $childNode) {
-                switch ($childNode->localName) {
-                    case 'simpleType':
-                        call_user_func($this->loadSimpleType($type->getSchema(), $childNode, $addCallback));
-                        break;
-                }
-            }
+            $this->loadTypeWithCallbackOnChildNodes(
+                $type->getSchema(),
+                $node,
+                $addCallback
+            );
         }
         foreach ($node->childNodes as $childNode) {
             if (in_array($childNode->localName,
@@ -864,14 +895,11 @@ class SchemaReader
             $addCallback = function (Type $type) use ($element) {
                 $element->setType($type);
             };
-            switch ($localType->localName) {
-                case 'complexType':
-                    call_user_func($this->loadComplexType($element->getSchema(), $localType, $addCallback));
-                    break;
-                case 'simpleType':
-                    call_user_func($this->loadSimpleType($element->getSchema(), $localType, $addCallback));
-                    break;
-            }
+            $this->loadTypeWithCallback(
+                $element->getSchema(),
+                $localType,
+                $addCallback
+            );
         } else {
 
             if ($node->getAttribute("type")) {
