@@ -267,9 +267,7 @@ class SchemaReader
         $this->fillItem($element, $node);
 
         static::maybeSetMax($element, $node);
-        if ($node->hasAttribute("minOccurs")) {
-            $element->setMin((int)$node->getAttribute("minOccurs"));
-        }
+        static::maybeSetMin($element, $node);
 
         $xp = new \DOMXPath($node->ownerDocument);
         $xp->registerNamespace('xs', 'http://www.w3.org/2001/XMLSchema');
@@ -296,9 +294,7 @@ class SchemaReader
         $ref->setDoc($this->getDocumentation($node));
 
         static::maybeSetMax($ref, $node);
-        if ($node->hasAttribute("minOccurs")) {
-            $ref->setMin((int)$node->getAttribute("minOccurs"));
-        }
+        static::maybeSetMin($ref, $node);
 
         return $ref;
     }
@@ -312,9 +308,7 @@ class SchemaReader
         $this->setDoc($ref, $node);
 
         static::maybeSetMax($ref, $node);
-        if ($node->hasAttribute("minOccurs")) {
-            $ref->setMin((int)$node->getAttribute("minOccurs"));
-        }
+        static::maybeSetMin($ref, $node);
         if ($node->hasAttribute("nillable")) {
             $ref->setNil($node->getAttribute("nillable") == "true");
         }
@@ -330,6 +324,9 @@ class SchemaReader
         $ref->setDoc($this->getDocumentation($node));
     }
 
+    /**
+    * @return InterfaceSetMinMax
+    */
     private static function maybeSetMax(InterfaceSetMinMax $ref, DOMElement $node)
     {
         if (
@@ -337,6 +334,20 @@ class SchemaReader
         ) {
             $ref->setMax($node->getAttribute("maxOccurs") == "unbounded" ? -1 : (int)$node->getAttribute("maxOccurs"));
         }
+
+        return $ref;
+    }
+
+    /**
+    * @return InterfaceSetMinMax
+    */
+    private static function maybeSetMin(InterfaceSetMinMax $ref, DOMElement $node)
+    {
+        if ($node->hasAttribute("minOccurs")) {
+            $ref->setMin((int) $node->getAttribute("minOccurs"));
+        }
+
+        return $ref;
     }
 
     /**
@@ -448,11 +459,19 @@ class SchemaReader
         $group->setDoc($this->getDocumentation($node));
 
         if ($node->hasAttribute("maxOccurs")) {
-            static::maybeSetMax(new GroupRef($group), $node);
+            /**
+            * @var GroupRef $group
+            */
+            $group = static::maybeSetMax(new GroupRef($group), $node);
         }
         if ($node->hasAttribute("minOccurs")) {
-            $group = new GroupRef($group);
-            $group->setMin((int)$node->getAttribute("minOccurs"));
+            /**
+            * @var GroupRef $group
+            */
+            $group = static::maybeSetMin(
+                $group instanceof GroupRef ? $group : new GroupRef($group),
+                $node
+            );
         }
 
         $schema->addGroup($group);
