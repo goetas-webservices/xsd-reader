@@ -920,7 +920,6 @@ class SchemaReader
     */
     private static function splitParts(DOMElement $node, $typeName)
     {
-        $namespace = null;
         $prefix = null;
         $name = $typeName;
         if (strpos($typeName, ':') !== false) {
