@@ -407,13 +407,18 @@ class SchemaReader
         DOMElement $childNode,
         ElementContainer $elementContainer
     ) {
-                    /**
-                    * @var Group $referencedGroup
-                    */
-                    $referencedGroup = $this->findSomething('findGroup', $schema, $node, $childNode->getAttribute("ref"));
+        /**
+        * @var Group $referencedGroup
+        */
+        $referencedGroup = $this->findSomething(
+            'findGroup',
+            $schema,
+            $node,
+            $childNode->getAttribute("ref")
+        );
 
-                    $group = $this->loadGroupRef($referencedGroup, $childNode);
-                    $elementContainer->addElement($group);
+        $group = $this->loadGroupRef($referencedGroup, $childNode);
+        $elementContainer->addElement($group);
     }
 
     private function maybeLoadSequenceFromElementContainer(
