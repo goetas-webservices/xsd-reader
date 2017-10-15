@@ -718,7 +718,6 @@ class SchemaReader
         }
         switch ($childNode->localName) {
             case 'complexType':
-                $childNode = $childNode;
                 call_user_func(
                     $this->loadComplexType(
                         $schema,
