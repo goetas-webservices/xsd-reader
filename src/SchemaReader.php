@@ -413,12 +413,19 @@ class SchemaReader
             ) {
                 $this->loadSequence($elementContainer, $childNode, $max);
             } elseif ($childNode->localName === 'element') {
-                $this->addElementSingleToContainer(
-                    $elementContainer,
-                    $node,
-                    $childNode,
-                    $max
-                );
+                if ($childNode->hasAttribute("ref")) {
+                    /**
+                    * @var ElementDef $referencedElement
+                    */
+                    $referencedElement = $this->findSomething('findElement', $elementContainer->getSchema(), $node, $childNode->getAttribute("ref"));
+                    $element = $this->loadElementRef($referencedElement, $childNode);
+                } else {
+                    $element = $this->loadElement($elementContainer->getSchema(), $childNode);
+                }
+                if (is_int($max) && (bool) $max) {
+                    $element->setMax($max);
+                }
+                $elementContainer->addElement($element);
             } elseif ($childNode->localName === 'group') {
                 $this->addGroupAsElement(
                     $elementContainer->getSchema(),
@@ -428,30 +435,6 @@ class SchemaReader
                 );
             }
         }
-    }
-
-    /**
-    * @param int|null $max
-    */
-    private function addElementSingleToContainer(
-        ElementContainer $elementContainer,
-        DOMElement $node,
-        DOMElement $childNode,
-        $max = null
-    ) {
-        if ($childNode->hasAttribute("ref")) {
-            /**
-            * @var ElementDef $referencedElement
-            */
-            $referencedElement = $this->findSomething('findElement', $elementContainer->getSchema(), $node, $childNode->getAttribute("ref"));
-            $element = $this->loadElementRef($referencedElement, $childNode);
-        } else {
-            $element = $this->loadElement($elementContainer->getSchema(), $childNode);
-        }
-        if (is_int($max) && (bool) $max) {
-            $element->setMax($max);
-        }
-        $elementContainer->addElement($element);
     }
 
     private function addGroupAsElement(
