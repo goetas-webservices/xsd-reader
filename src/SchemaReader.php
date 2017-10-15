@@ -21,6 +21,7 @@ use GoetasWebservices\XML\XSDReader\Schema\Element\Group;
 use GoetasWebservices\XML\XSDReader\Schema\Element\GroupRef;
 use GoetasWebservices\XML\XSDReader\Schema\Element\InterfaceSetMinMax;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\TypeNotFoundException;
+use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Base;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Extension;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction;
 use GoetasWebservices\XML\XSDReader\Schema\Item;
@@ -676,11 +677,11 @@ class SchemaReader
         $type->setExtension($extension);
 
         if ($node->hasAttribute("base")) {
-            /**
-            * @var Type $parent
-            */
-            $parent = $this->findSomeType($type, $node, 'base');
-            $extension->setBase($parent);
+            $this->findAndSetSomeBase(
+                $type,
+                $extension,
+                $node
+            );
         }
 
         foreach ($node->childNodes as $childNode) {
@@ -714,6 +715,18 @@ class SchemaReader
         }
     }
 
+    private function findAndSetSomeBase(
+        Type $type,
+        Base $setBaseOnThis,
+        DOMElement $node
+    ) {
+        /**
+        * @var Type $parent
+        */
+        $parent = $this->findSomeType($type, $node, 'base');
+        $setBaseOnThis->setBase($parent);
+    }
+
     private function maybeLoadExtensionFromBaseComplexType(
         Type $type,
         DOMElement $childNode
@@ -739,11 +752,7 @@ class SchemaReader
         $restriction = new Restriction();
         $type->setRestriction($restriction);
         if ($node->hasAttribute("base")) {
-            /**
-            * @var Type $restrictedType
-            */
-            $restrictedType = $this->findSomeType($type, $node, 'base');
-            $restriction->setBase($restrictedType);
+            $this->findAndSetSomeBase($type, $restriction, $node);
         } else {
             $addCallback = function (Type $restType) use ($restriction) {
                 $restriction->setBase($restType);
