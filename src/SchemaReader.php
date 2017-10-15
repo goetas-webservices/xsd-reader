@@ -234,12 +234,12 @@ class SchemaReader
         array $methods,
         string $key,
         DOMNode $childNode,
-        $schema
+        ...$args
     ) {
         if ($childNode instanceof DOMElement && isset($methods[$key])) {
             $method = $methods[$key];
 
-            $append = $this->$method($schema, $childNode);
+            $append = $this->$method(...$args);
 
             if ($append instanceof Closure) {
                 return $append;
@@ -275,7 +275,8 @@ class SchemaReader
                 $methods,
                 (string) $childNode->localName,
                 $childNode,
-                $schema
+                $schema,
+                $childNode
             );
 
             if ($callback instanceof Closure) {
@@ -721,9 +722,17 @@ class SchemaReader
             'simpleType' => 'loadSimpleType',
         ];
 
-        if (isset($methods[$childNode->localName])) {
-            $method = $methods[$childNode->localName];
-            call_user_func($this->$method($schema, $childNode, $callback));
+        $func = $this->maybeCallMethod(
+            $methods,
+            $childNode->localName,
+            $childNode,
+            $schema,
+            $childNode,
+            $callback
+        );
+
+        if ($func instanceof Closure) {
+            call_user_func($func);
         }
     }
 
@@ -812,7 +821,8 @@ class SchemaReader
                 $methods,
                 (string) $childNode->localName,
                 $childNode,
-                $type
+                $type,
+                $childNode
             );
         }
     }
