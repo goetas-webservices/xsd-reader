@@ -160,15 +160,32 @@ class SchemaReader
     /**
     * @return Closure
     */
-    private function loadAttributeDef(Schema $schema, DOMElement $node)
-    {
-        $attribute = new AttributeDef($schema, $node->getAttribute("name"));
+    private function loadAttributeOrElementDef(
+        Schema $schema,
+        DOMElement $node,
+        bool $attributeDef
+    ) {
+        $name = $node->getAttribute('name');
+        if ($attributeDef) {
+            $attribute = new AttributeDef($schema, $name);
+            $schema->addAttribute($attribute);
+        } else {
+            $attribute = new ElementDef($schema, $name);
+            $schema->addElement($attribute);
+        }
 
-        $schema->addAttribute($attribute);
 
         return function () use ($attribute, $node) {
             $this->fillItem($attribute, $node);
         };
+    }
+
+    /**
+    * @return Closure
+    */
+    private function loadAttributeDef(Schema $schema, DOMElement $node)
+    {
+        return $this->loadAttributeOrElementDef($schema, $node, true);
     }
 
     /**
@@ -945,12 +962,7 @@ class SchemaReader
     */
     private function loadElementDef(Schema $schema, DOMElement $node)
     {
-        $element = new ElementDef($schema, $node->getAttribute("name"));
-        $schema->addElement($element);
-
-        return function () use ($element, $node) {
-            $this->fillItem($element, $node);
-        };
+        return $this->loadAttributeOrElementDef($schema, $node, false);
     }
 
     private function fillItem(Item $element, DOMElement $node)
