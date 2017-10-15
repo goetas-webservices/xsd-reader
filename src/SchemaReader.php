@@ -90,17 +90,11 @@ class SchemaReader
             foreach ($node->childNodes as $childNode) {
                 switch ($childNode->localName) {
                     case 'attribute':
-                        if ($childNode->hasAttribute("ref")) {
-                            /**
-                            * @var AttributeItem $attribute
-                            */
-                            $attribute = $this->findSomething('findAttribute', $schema, $node, $childNode->getAttribute("ref"));
-                        } else {
-                            /**
-                            * @var Attribute $attribute
-                            */
-                            $attribute = $this->loadAttribute($schema, $childNode);
-                        }
+                        $attribute = $this->getAttributeFromAttributeOrRef(
+                            $childNode,
+                            $schema,
+                            $node
+                        );
                         $attGroup->addAttribute($attribute);
                         break;
                     case 'attributeGroup':
@@ -115,6 +109,29 @@ class SchemaReader
                 }
             }
         };
+    }
+
+    /**
+    * @return AttributeItem
+    */
+    private function getAttributeFromAttributeOrRef(
+        DOMElement $childNode,
+        Schema $schema,
+        DOMElement $node
+    ) {
+        if ($childNode->hasAttribute("ref")) {
+            /**
+            * @var AttributeItem $attribute
+            */
+            $attribute = $this->findSomething('findAttribute', $schema, $node, $childNode->getAttribute("ref"));
+        } else {
+            /**
+            * @var Attribute $attribute
+            */
+            $attribute = $this->loadAttribute($schema, $childNode);
+        }
+
+        return $attribute;
     }
 
     /**
@@ -456,15 +473,11 @@ class SchemaReader
                         );
                         break;
                     case 'attribute':
-                        if ($childNode->hasAttribute("ref")) {
-                            /**
-                            * @var AttributeDef $referencedAttribute
-                            */
-                            $referencedAttribute = $this->findSomething('findAttribute', $schema, $node, $childNode->getAttribute("ref"));
-                            $attribute = $this->loadAttributeRef($referencedAttribute, $childNode);
-                        } else {
-                            $attribute = $this->loadAttribute($schema, $childNode);
-                        }
+                        $attribute = $this->getAttributeFromAttributeOrRef(
+                            $childNode,
+                            $schema,
+                            $node
+                        );
 
                         $type->addAttribute($attribute);
                         break;
@@ -640,17 +653,11 @@ class SchemaReader
                     );
                     break;
                 case 'attribute':
-                    if ($childNode->hasAttribute("ref")) {
-                        /**
-                        * @var AttributeItem $attribute
-                        */
-                        $attribute = $this->findSomething('findAttribute', $type->getSchema(), $node, $childNode->getAttribute("ref"));
-                    } else {
-                        /**
-                        * @var Attribute $attribute
-                        */
-                        $attribute = $this->loadAttribute($type->getSchema(), $childNode);
-                    }
+                    $attribute = $this->getAttributeFromAttributeOrRef(
+                        $childNode,
+                        $type->getSchema(),
+                        $node
+                    );
                     $type->addAttribute($attribute);
                     break;
                 case 'attributeGroup':
