@@ -545,7 +545,7 @@ class SchemaReader
                         ]
                     )
                 ) {
-                        $this->loadSequence($group, $childNode);
+                    $this->loadSequence($group, $childNode);
                 }
             }
         };
