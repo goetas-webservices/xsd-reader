@@ -422,7 +422,7 @@ class SchemaReader
                 } else {
                     $element = $this->loadElement($elementContainer->getSchema(), $childNode);
                 }
-                if ($max) {
+                if (is_int($max) && (bool) $max) {
                     $element->setMax($max);
                 }
                 $elementContainer->addElement($element);
