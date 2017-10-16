@@ -576,10 +576,9 @@ class SchemaReader
             $schema->addType($type);
         }
 
-        return function () use ($type, $node, $schema, $callback) {
-            $this->runCallbackAgainstDOMNodeList(
-                $type,
-                $node,
+        return $this->makeCallbackCallback(
+            $type,
+            $node,
                 function (
                     DOMElement $node,
                     DOMElement $childNode
@@ -594,6 +593,32 @@ class SchemaReader
                         $schema
                     );
                 },
+            $callback
+        );
+    }
+
+    /**
+    * @param Closure|null $callback
+    *
+    * @return Closure
+    */
+    private function makeCallbackCallback(
+        Type $type,
+        DOMElement $node,
+        Closure $callbackCallback,
+        $callback = null
+    ) {
+        return function (
+        ) use (
+            $type,
+            $node,
+            $callbackCallback,
+            $callback
+        ) {
+            $this->runCallbackAgainstDOMNodeList(
+                $type,
+                $node,
+                $callbackCallback,
                 $callback
             );
         };
@@ -691,10 +716,9 @@ class SchemaReader
             'list' => 'loadList',
         ];
 
-        return function () use ($type, $node, $callback, $methods) {
-            $this->runCallbackAgainstDOMNodeList(
-                $type,
-                $node,
+        return $this->makeCallbackCallback(
+            $type,
+            $node,
                 function (
                     DOMElement $node,
                     DOMElement $childNode
@@ -710,9 +734,8 @@ class SchemaReader
                         $childNode
                     );
                 },
-                $callback
-            );
-        };
+            $callback
+        );
     }
 
     private function loadList(SimpleType $type, DOMElement $node)
