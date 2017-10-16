@@ -577,16 +577,44 @@ class SchemaReader
         }
 
         return function () use ($type, $node, $schema, $callback) {
-
-            $this->fillTypeNode($type, $node, true);
-
-            foreach ($node->childNodes as $childNode) {
-                if ($childNode instanceof DOMElement) {
+            $this->runCallbackAgainstDOMNodeList(
+                $type,
+                $node,
+                function (
+                    DOMElement $node,
+                    DOMElement $childNode
+                ) use(
+                    $schema,
+                    $type
+                ) {
                     $this->loadComplexTypeFromChildNode(
                         $type,
                         $node,
                         $childNode,
                         $schema
+                    );
+                },
+                $callback
+            );
+        };
+    }
+
+    /**
+    * @param Closure|null $callback
+    */
+    private function runCallbackAgainstDOMNodeList(
+        Type $type,
+        DOMElement $node,
+        Closure $againstNodeList,
+        $callback = null
+    ) {
+            $this->fillTypeNode($type, $node, true);
+
+            foreach ($node->childNodes as $childNode) {
+                if ($childNode instanceof DOMElement) {
+                    $againstNodeList(
+                        $node,
+                        $childNode
                     );
                 }
             }
@@ -594,7 +622,6 @@ class SchemaReader
             if ($callback) {
                 call_user_func($callback, $type);
             }
-        };
     }
 
     private function loadComplexTypeFromChildNode(
@@ -665,21 +692,26 @@ class SchemaReader
         ];
 
         return function () use ($type, $node, $callback, $methods) {
-            $this->fillTypeNode($type, $node, true);
-
-            foreach ($node->childNodes as $childNode) {
+            $this->runCallbackAgainstDOMNodeList(
+                $type,
+                $node,
+                function (
+                    DOMElement $node,
+                    DOMElement $childNode
+                ) use (
+                    $methods,
+                    $type
+                ) {
                 $this->maybeCallMethod(
                     $methods,
-                    (string) $childNode->localName,
+                    $childNode->localName,
                     $childNode,
                     $type,
                     $childNode
                 );
-            }
-
-            if ($callback) {
-                call_user_func($callback, $type);
-            }
+                },
+                $callback
+            );
         };
     }
 
