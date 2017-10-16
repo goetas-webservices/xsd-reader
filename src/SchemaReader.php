@@ -702,13 +702,13 @@ class SchemaReader
                     $methods,
                     $type
                 ) {
-                $this->maybeCallMethod(
-                    $methods,
-                    $childNode->localName,
-                    $childNode,
-                    $type,
-                    $childNode
-                );
+                    $this->maybeCallMethod(
+                        $methods,
+                        $childNode->localName,
+                        $childNode,
+                        $type,
+                        $childNode
+                    );
                 },
                 $callback
             );
