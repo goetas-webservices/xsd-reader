@@ -324,22 +324,15 @@ class Schema
                 return $this->typeCache[$cid] = $item;
             }
         }
-        $in = null;
-
-        $schemas = $this->getSchemas();
-
-        while (is_null($in) && ($childSchema = current($schemas))) {
+        foreach ($this->getSchemas() as $childSchema) {
             if (!isset($calling[spl_object_hash($childSchema)])) {
                 $in = $childSchema->findSomethingNoThrow($getter, $name, $namespace, $calling);
-            }
-            next($schemas);
-        }
 
                 if ($in instanceof SchemaItem) {
                     return $this->typeCache[$cid] = $in;
                 }
-
-        return $in;
+            }
+        }
     }
 
     /**
