@@ -1136,7 +1136,7 @@ class SchemaReader
         $base = urldecode($node->ownerDocument->documentURI);
         $file = UrlUtils::resolveRelativeUrl($base, $node->getAttribute("schemaLocation"));
 
-        static $empty = function() {
+        $empty = function() {
         };
 
         if (
@@ -1192,7 +1192,7 @@ class SchemaReader
 
         return function () use ($callbacks) {
             foreach ($callbacks as $callback) {
-                call_user_func($callback);
+                $callback();
             }
         };
     }
