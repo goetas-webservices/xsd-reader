@@ -900,25 +900,36 @@ class SchemaReader
             );
         }
 
-        foreach ($node->childNodes as $childNode) {
-            switch ($childNode->localName) {
-                case 'sequence':
-                case 'choice':
-                case 'all':
+        $seqFromElement = function (DOMElement $childNode) use ($type) {
                     $this->maybeLoadSequenceFromElementContainer(
                         $type,
                         $childNode
                     );
-                    break;
-                case 'attribute':
-                    $attribute = $this->getAttributeFromAttributeOrRef(
-                        $childNode,
-                        $type->getSchema(),
-                        $node
-                    );
-                    $type->addAttribute($attribute);
-                    break;
-                case 'attributeGroup':
+        };
+
+        $methods = [
+            'sequence' => $seqFromElement,
+            'choice' => $seqFromElement,
+            'all' => $seqFromElement,
+            'attribute' => function (
+                DOMElement $childNode
+            ) use (
+                $node,
+                $type
+            ) {
+                $attribute = $this->getAttributeFromAttributeOrRef(
+                    $childNode,
+                    $type->getSchema(),
+                    $node
+                );
+                $type->addAttribute($attribute);
+            },
+            'attributeGroup' => function (
+                DOMElement $childNode
+            ) use (
+                $node,
+                $type
+            ) {
                     AttributeGroup::findSomethingLikeThis(
                         $this,
                         $type->getSchema(),
@@ -926,7 +937,13 @@ class SchemaReader
                         $childNode,
                         $type
                     );
-                    break;
+            },
+        ];
+
+        foreach ($node->childNodes as $childNode) {
+            if (isset($methods[$childNode->localName])) {
+                $method = $methods[$childNode->localName];
+                $method($childNode);
             }
         }
     }
