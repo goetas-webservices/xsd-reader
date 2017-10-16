@@ -1141,12 +1141,7 @@ class SchemaReader
 
         $namespace = $node->getAttribute("namespace");
 
-        $loadedFilesKey = null;
-
         if (
-            (
-                $node->hasAttribute("namespace") &&
-                (
                     isset(
                         self::$globalSchemaInfo[$namespace],
                         $this->loadedFiles[
@@ -1160,8 +1155,6 @@ class SchemaReader
                                 $namespace
                             )
                         ]
-                    )
-                )
             ) ||
             isset($this->loadedFiles[$loadedFilesKey = $file])
         ) {
