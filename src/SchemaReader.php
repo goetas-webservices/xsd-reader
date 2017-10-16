@@ -10,7 +10,6 @@ use GoetasWebservices\XML\XSDReader\Exception\TypeException;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Attribute;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItem;
-use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeRef;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Element;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementContainer;
@@ -377,26 +376,6 @@ class SchemaReader
         }
 
         return $ref;
-    }
-
-    /**
-    * @return AttributeRef
-    */
-    private function loadAttributeRef(AttributeDef $referencedAttribiute, DOMElement $node)
-    {
-        $attribute = new AttributeRef($referencedAttribiute);
-        $this->setDoc($attribute, $node);
-
-        if ($node->hasAttribute("nillable")) {
-            $attribute->setNil($node->getAttribute("nillable") == "true");
-        }
-        if ($node->hasAttribute("form")) {
-            $attribute->setQualified($node->getAttribute("form") == "qualified");
-        }
-        if ($node->hasAttribute("use")) {
-            $attribute->setUse($node->getAttribute("use"));
-        }
-        return $attribute;
     }
 
     /**
