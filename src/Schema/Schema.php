@@ -292,18 +292,22 @@ class Schema
     }
 
     /**
-     *
-     * @param string $getter
-     * @param string $name
-     * @param string $namespace
-     * @param bool[] $calling
-     * @param bool $throw
-     *
-     * @throws TypeNotFoundException
-     * @return SchemaItem|null
-     */
-    protected function findSomething($getter, $name, $namespace = null, &$calling = array(), $throw = true)
-    {
+    *
+    * @param string $getter
+    * @param string $name
+    * @param string $namespace
+    * @param bool[] $calling
+    * @param bool $throw
+    *
+    * @throws TypeNotFoundException
+    * @return SchemaItem|null
+    */
+    protected function findSomethingNoThrow(
+        $getter,
+        $name,
+        $namespace = null,
+        array & $calling = array()
+    ) {
         $calling[spl_object_hash($this)] = true;
         $cid = "$getter, $name, $namespace";
 
@@ -322,20 +326,40 @@ class Schema
         }
         foreach ($this->getSchemas() as $childSchema) {
             if (!isset($calling[spl_object_hash($childSchema)])) {
-                    /**
-                    * @var \GoetasWebservices\XML\XSDReader\Schema\SchemaItem $in
-                    */
-                    $in = $childSchema->findSomething($getter, $name, $namespace, $calling, false);
+                $in = $childSchema->findSomethingNoThrow($getter, $name, $namespace, $calling);
 
                 if ($in instanceof SchemaItem) {
                     return $this->typeCache[$cid] = $in;
                 }
             }
         }
+    }
 
-        if ($throw) {
-        throw new TypeNotFoundException(sprintf("Can't find the %s named {%s}#%s.", substr($getter, 3), $namespace, $name));
+    /**
+     *
+     * @param string $getter
+     * @param string $name
+     * @param string $namespace
+     * @param bool[] $calling
+     * @param bool $throw
+     *
+     * @throws TypeNotFoundException
+     * @return SchemaItem
+     */
+    protected function findSomething($getter, $name, $namespace = null, &$calling = array())
+    {
+        $in = $this->findSomethingNoThrow(
+            $getter,
+            $name,
+            $namespace,
+            $calling
+        );
+
+        if ($in instanceof SchemaItem) {
+            return $in;
         }
+
+        throw new TypeNotFoundException(sprintf("Can't find the %s named {%s}#%s.", substr($getter, 3), $namespace, $name));
     }
 
     /**
