@@ -901,10 +901,10 @@ class SchemaReader
         }
 
         $seqFromElement = function (DOMElement $childNode) use ($type) {
-                    $this->maybeLoadSequenceFromElementContainer(
-                        $type,
-                        $childNode
-                    );
+            $this->maybeLoadSequenceFromElementContainer(
+                $type,
+                $childNode
+            );
         };
 
         $methods = [
@@ -930,13 +930,13 @@ class SchemaReader
                 $node,
                 $type
             ) {
-                    AttributeGroup::findSomethingLikeThis(
-                        $this,
-                        $type->getSchema(),
-                        $node,
-                        $childNode,
-                        $type
-                    );
+                AttributeGroup::findSomethingLikeThis(
+                    $this,
+                    $type->getSchema(),
+                    $node,
+                    $childNode,
+                    $type
+                );
             },
         ];
 
