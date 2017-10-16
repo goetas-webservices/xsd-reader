@@ -1140,7 +1140,9 @@ class SchemaReader
         };
 
         if (
-            $node->hasAttribute("namespace") &&
+            $node->hasAttribute("namespace")
+        ) {
+            if (
             isset(
                 self::$globalSchemaInfo[
                     $namespace = $node->getAttribute("namespace")
@@ -1155,7 +1157,6 @@ class SchemaReader
 
             return $empty;
         } elseif (
-            $node->hasAttribute("namespace") &&
             isset(
                 $this->loadedFiles[
                     $nsfi = $this->getNamespaceSpecificFileIndex(
@@ -1168,7 +1169,10 @@ class SchemaReader
             $schema->addSchema($this->loadedFiles[$nsfi]);
 
             return $empty;
-        } elseif (isset($this->loadedFiles[$file])) {
+            }
+        }
+
+        if (isset($this->loadedFiles[$file])) {
             $schema->addSchema($this->loadedFiles[$file]);
 
             return $empty;
