@@ -1135,18 +1135,35 @@ class SchemaReader
     {
         $base = urldecode($node->ownerDocument->documentURI);
         $file = UrlUtils::resolveRelativeUrl($base, $node->getAttribute("schemaLocation"));
-        if ($node->hasAttribute("namespace")
-            && isset(self::$globalSchemaInfo[$node->getAttribute("namespace")])
-            && isset($this->loadedFiles[self::$globalSchemaInfo[$node->getAttribute("namespace")]])
+        if (
+            $node->hasAttribute("namespace") &&
+            isset(
+                self::$globalSchemaInfo[
+                    $namespace = $node->getAttribute("namespace")
+                ],
+                $this->loadedFiles[
+                    $globalSchemaInfo = self::$globalSchemaInfo[$namespace]
+                ]
+            )
         ) {
 
-            $schema->addSchema($this->loadedFiles[self::$globalSchemaInfo[$node->getAttribute("namespace")]]);
+            $schema->addSchema($this->loadedFiles[$globalSchemaInfo]);
 
             return function () {
             };
-        } elseif ($node->hasAttribute("namespace")
-            && isset($this->loadedFiles[$this->getNamespaceSpecificFileIndex($file, $node->getAttribute("namespace"))])) {
-            $schema->addSchema($this->loadedFiles[$this->getNamespaceSpecificFileIndex($file, $node->getAttribute("namespace"))]);
+        } elseif (
+            $node->hasAttribute("namespace") &&
+            isset(
+                $this->loadedFiles[
+                    $nsfi = $this->getNamespaceSpecificFileIndex(
+                        $file,
+                        $node->getAttribute("namespace")
+                    )
+                ]
+            )
+        ) {
+            $schema->addSchema($this->loadedFiles[$nsfi]);
+
             return function () {
             };
         } elseif (isset($this->loadedFiles[$file])) {
@@ -1155,7 +1172,7 @@ class SchemaReader
             };
         }
 
-        if (!$node->getAttribute("namespace")) {
+        if (! ($namespace = $node->getAttribute("namespace"))) {
             $this->loadedFiles[$file] = $newSchema = $schema;
         } else {
             $this->loadedFiles[$file] = $newSchema = new Schema();
@@ -1166,7 +1183,7 @@ class SchemaReader
 
         $callbacks = $this->schemaNode($newSchema, $xml->documentElement, $schema);
 
-        if ($node->getAttribute("namespace")) {
+        if ($namespace) {
             $schema->addSchema($newSchema);
         }
 
