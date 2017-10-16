@@ -312,7 +312,7 @@ class Schema
 
         if (null === $namespace || $this->getTargetNamespace() === $namespace) {
             /**
-            * @var \GoetasWebservices\XML\XSDReader\Schema\SchemaItem|null $item
+            * @var SchemaItem|null $item
             */
             $item = $this->$getter($name);
             if ($item instanceof SchemaItem) {
@@ -320,6 +320,39 @@ class Schema
             }
         }
         foreach ($this->getSchemas() as $childSchema) {
+            $out = $this->findSomethingOnChildSchema(
+                $cid,
+                $childSchema,
+                $getter,
+                $name,
+                $namespace,
+                $calling
+            );
+
+            if ($out instanceof SchemaItem) {
+                return $out;
+            }
+        }
+        throw new TypeNotFoundException(sprintf("Can't find the %s named {%s}#%s.", substr($getter, 3), $namespace, $name));
+    }
+
+    /**
+    * @param string $cid
+    * @param string $getter
+    * @param string $name
+    * @param string $namespace
+    * @param bool[] $calling
+    *
+    * @return \GoetasWebservices\XML\XSDReader\Schema\SchemaItem|null
+    */
+    protected function findSomethingOnChildSchema(
+        $cid,
+        Schema $childSchema,
+        $getter,
+        $name,
+        $namespace = null,
+        array & $calling = []
+    ) {
             if (!isset($calling[spl_object_hash($childSchema)])) {
                 try {
                     /**
@@ -332,8 +365,6 @@ class Schema
                     // exception appears to be blindly supressed to allow discovery via Schema::getSchemas()[]->findSomething()
                 }
             }
-        }
-        throw new TypeNotFoundException(sprintf("Can't find the %s named {%s}#%s.", substr($getter, 3), $namespace, $name));
     }
 
     /**
