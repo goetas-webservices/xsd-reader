@@ -633,20 +633,20 @@ class SchemaReader
         Closure $againstNodeList,
         $callback = null
     ) {
-            $this->fillTypeNode($type, $node, true);
+        $this->fillTypeNode($type, $node, true);
 
-            foreach ($node->childNodes as $childNode) {
-                if ($childNode instanceof DOMElement) {
-                    $againstNodeList(
-                        $node,
-                        $childNode
-                    );
-                }
+        foreach ($node->childNodes as $childNode) {
+            if ($childNode instanceof DOMElement) {
+                $againstNodeList(
+                    $node,
+                    $childNode
+                );
             }
+        }
 
-            if ($callback) {
-                call_user_func($callback, $type);
-            }
+        if ($callback) {
+            call_user_func($callback, $type);
+        }
     }
 
     private function loadComplexTypeFromChildNode(
