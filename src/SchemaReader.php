@@ -1161,6 +1161,18 @@ class SchemaReader
             };
         }
 
+        return $this->loadImportFresh($schema, $node, $file, $namespace);
+    }
+
+    /**
+    * @return Closure
+    */
+    private function loadImportFresh(
+        Schema $schema,
+        DOMElement $node,
+        string $file,
+        string $namespace
+    ) {
         if (! $namespace) {
             $this->loadedFiles[$file] = $newSchema = $schema;
         } else {
