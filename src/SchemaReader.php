@@ -435,18 +435,19 @@ class SchemaReader
         DOMElement $childNode,
         $max
     ) {
-        if (
-            in_array(
-                $childNode->localName,
-                [
-                    'choice',
-                    'sequence',
-                    'all',
-                ]
-            )
-        ) {
+        $loadSeq = function () use ($elementContainer, $childNode, $max) {
             $this->loadSequence($elementContainer, $childNode, $max);
-        } elseif ($childNode->localName === 'element') {
+        };
+        $methods = [
+            'choice' => $loadSeq,
+            'sequence' => $loadSeq,
+            'all' => $loadSeq,
+            'element' => function () use (
+                $elementContainer,
+                $node,
+                $childNode,
+                $max
+            ) {
             if ($childNode->hasAttribute("ref")) {
                 /**
                 * @var ElementDef $referencedElement
@@ -460,13 +461,24 @@ class SchemaReader
                 $element->setMax($max);
             }
             $elementContainer->addElement($element);
-        } elseif ($childNode->localName === 'group') {
+            },
+            'group' => function () use (
+                $elementContainer,
+                $node,
+                $childNode
+            ) {
             $this->addGroupAsElement(
                 $elementContainer->getSchema(),
                 $node,
                 $childNode,
                 $elementContainer
             );
+            },
+        ];
+
+        if (isset($methods[$childNode->localName])) {
+            $method = $methods[$childNode->localName];
+            $method();
         }
     }
 
