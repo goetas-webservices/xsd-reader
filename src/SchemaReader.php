@@ -1147,27 +1147,27 @@ class SchemaReader
             (
                 $node->hasAttribute("namespace") &&
                 (
-                isset(
-                    self::$globalSchemaInfo[$namespace],
-                    $this->loadedFiles[
-                        $loadedFilesKey = self::$globalSchemaInfo[$namespace]
-                    ]
-                ) ||
-                isset(
-                    $this->loadedFiles[
-                        $loadedFilesKey = $this->getNamespaceSpecificFileIndex(
-                            $file,
-                            $namespace
-                        )
-                    ]
-                )
+                    isset(
+                        self::$globalSchemaInfo[$namespace],
+                        $this->loadedFiles[
+                            $loadedFilesKey = self::$globalSchemaInfo[$namespace]
+                        ]
+                    ) ||
+                    isset(
+                        $this->loadedFiles[
+                            $loadedFilesKey = $this->getNamespaceSpecificFileIndex(
+                                $file,
+                                $namespace
+                            )
+                        ]
+                    )
                 )
             ) ||
             isset($this->loadedFiles[$loadedFilesKey = $file])
-            ) {
-                $schema->addSchema($this->loadedFiles[$loadedFilesKey]);
+        ) {
+            $schema->addSchema($this->loadedFiles[$loadedFilesKey]);
 
-                return $empty;
+            return $empty;
         }
 
         if (! $namespace) {
