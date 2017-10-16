@@ -11,12 +11,6 @@ class UrlUtils
     */
     public static function resolveRelativeUrl($base, $rel)
     {
-        $re = array(
-            '#(/\.?/)#',
-            '#/(?!\.\.)[^/]+/\.\./#'
-        );
-
-
         if (!$rel) {
             return $base;
         }
@@ -30,6 +24,22 @@ class UrlUtils
         if ($rel[0] === '#' || $rel[0] === '?') {
             return $base.$rel;
         }
+
+        return static::resolveRelativeUrlAfterEarlyChecks($base, $rel);
+    }
+
+    /**
+    * @param string $base
+    * @param string $rel
+    *
+    * @return string
+    */
+    protected static function resolveRelativeUrlAfterEarlyChecks($base, $rel)
+    {
+        $re = array(
+            '#(/\.?/)#',
+            '#/(?!\.\.)[^/]+/\.\./#'
+        );
 
         /* fix url file for Windows */
         $base = preg_replace('#^file:\/\/([^/])#', 'file:///\1', $base);
