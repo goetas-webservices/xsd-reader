@@ -297,12 +297,19 @@ class Schema
      * @param string $name
      * @param string $namespace
      * @param bool[] $calling
+     * @param bool $throw
      *
      * @throws TypeNotFoundException
-     * @return \GoetasWebservices\XML\XSDReader\Schema\SchemaItem
+     *
+     * @return SchemaItem|null
      */
-    protected function findSomething($getter, $name, $namespace = null, &$calling = array())
-    {
+    protected function findSomething(
+        $getter,
+        $name,
+        $namespace = null,
+        &$calling = array(),
+        $throw = true
+    ) {
         $calling[spl_object_hash($this)] = true;
         $cid = "$getter, $name, $namespace";
 
@@ -333,7 +340,10 @@ class Schema
                 return $out;
             }
         }
+
+        if ($throw) {
         throw new TypeNotFoundException(sprintf("Can't find the %s named {%s}#%s.", substr($getter, 3), $namespace, $name));
+        }
     }
 
     /**
@@ -343,7 +353,7 @@ class Schema
     * @param string $namespace
     * @param bool[] $calling
     *
-    * @return \GoetasWebservices\XML\XSDReader\Schema\SchemaItem|null
+    * @return SchemaItem|null
     */
     protected function findSomethingOnChildSchema(
         $cid,
@@ -354,16 +364,12 @@ class Schema
         array & $calling = []
     ) {
             if (!isset($calling[spl_object_hash($childSchema)])) {
-                try {
                     /**
                     * @var \GoetasWebservices\XML\XSDReader\Schema\SchemaItem $in
                     */
-                    $in = $childSchema->findSomething($getter, $name, $namespace, $calling);
+                    $in = $childSchema->findSomething($getter, $name, $namespace, $calling, false);
 
                     return $this->typeCache[$cid] = $in;
-                } catch (TypeNotFoundException $e) {
-                    // exception appears to be blindly supressed to allow discovery via Schema::getSchemas()[]->findSomething()
-                }
             }
     }
 
