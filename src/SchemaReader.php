@@ -197,11 +197,9 @@ class SchemaReader
         $doc = '';
         foreach ($node->childNodes as $childNode) {
             if ($childNode->localName == "annotation") {
-                foreach ($childNode->childNodes as $subChildNode) {
-                    if ($subChildNode->localName == "documentation") {
-                        $doc .= ($subChildNode->nodeValue);
-                    }
-                }
+                $doc .= $this->getDocumentation($childNode);
+            } elseif ($childNode->localName == 'documentation') {
+                        $doc .= ($childNode->nodeValue);
             }
         }
         $doc = preg_replace('/[\t ]+/', ' ', $doc);
