@@ -1170,10 +1170,10 @@ class SchemaReader
             return $empty;
         }
 
-        $newSchema =
-            $this->loadedFiles[$file] = $namespace ? new Schema() : $schema;
-
-        if ($namespace) {
+        if (! $namespace) {
+            $this->loadedFiles[$file] = $newSchema = $schema;
+        } else {
+            $this->loadedFiles[$file] = $newSchema = new Schema();
             $newSchema->addSchema($this->getGlobalSchema());
         }
 
