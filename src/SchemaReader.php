@@ -448,31 +448,31 @@ class SchemaReader
                 $childNode,
                 $max
             ) {
-            if ($childNode->hasAttribute("ref")) {
-                /**
-                * @var ElementDef $referencedElement
-                */
-                $referencedElement = $this->findSomething('findElement', $elementContainer->getSchema(), $node, $childNode->getAttribute("ref"));
-                $element = $this->loadElementRef($referencedElement, $childNode);
-            } else {
-                $element = $this->loadElement($elementContainer->getSchema(), $childNode);
-            }
-            if (is_int($max) && (bool) $max) {
-                $element->setMax($max);
-            }
-            $elementContainer->addElement($element);
+                if ($childNode->hasAttribute("ref")) {
+                    /**
+                    * @var ElementDef $referencedElement
+                    */
+                    $referencedElement = $this->findSomething('findElement', $elementContainer->getSchema(), $node, $childNode->getAttribute("ref"));
+                    $element = $this->loadElementRef($referencedElement, $childNode);
+                } else {
+                    $element = $this->loadElement($elementContainer->getSchema(), $childNode);
+                }
+                if (is_int($max) && (bool) $max) {
+                    $element->setMax($max);
+                }
+                $elementContainer->addElement($element);
             },
             'group' => function () use (
                 $elementContainer,
                 $node,
                 $childNode
             ) {
-            $this->addGroupAsElement(
-                $elementContainer->getSchema(),
-                $node,
-                $childNode,
-                $elementContainer
-            );
+                $this->addGroupAsElement(
+                    $elementContainer->getSchema(),
+                    $node,
+                    $childNode,
+                    $elementContainer
+                );
             },
         ];
 
