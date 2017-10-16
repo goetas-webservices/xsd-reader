@@ -1135,6 +1135,10 @@ class SchemaReader
     {
         $base = urldecode($node->ownerDocument->documentURI);
         $file = UrlUtils::resolveRelativeUrl($base, $node->getAttribute("schemaLocation"));
+
+        static $empty = function() {
+        };
+
         if (
             $node->hasAttribute("namespace") &&
             isset(
@@ -1149,8 +1153,7 @@ class SchemaReader
 
             $schema->addSchema($this->loadedFiles[$globalSchemaInfo]);
 
-            return function () {
-            };
+            return $empty;
         } elseif (
             $node->hasAttribute("namespace") &&
             isset(
@@ -1164,12 +1167,11 @@ class SchemaReader
         ) {
             $schema->addSchema($this->loadedFiles[$nsfi]);
 
-            return function () {
-            };
+            return $empty;
         } elseif (isset($this->loadedFiles[$file])) {
             $schema->addSchema($this->loadedFiles[$file]);
-            return function () {
-            };
+
+            return $empty;
         }
 
         if (! ($namespace = $node->getAttribute("namespace"))) {
