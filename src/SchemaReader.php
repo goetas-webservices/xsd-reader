@@ -1136,9 +1136,6 @@ class SchemaReader
         $base = urldecode($node->ownerDocument->documentURI);
         $file = UrlUtils::resolveRelativeUrl($base, $node->getAttribute("schemaLocation"));
 
-        $empty = function() {
-        };
-
         $namespace = $node->getAttribute("namespace");
 
         if (
@@ -1160,7 +1157,8 @@ class SchemaReader
         ) {
             $schema->addSchema($this->loadedFiles[$loadedFilesKey]);
 
-            return $empty;
+            return function() {
+            };
         }
 
         if (! $namespace) {
