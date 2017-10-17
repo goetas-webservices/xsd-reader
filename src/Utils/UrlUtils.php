@@ -74,8 +74,6 @@ class UrlUtils
         $path,
         array $parts
     ) {
-        $re = '#(?:(?:/\.?/)|(?!\.\.)[^/]+/\.\./)#';
-
         /* Build absolute URL */
         $abs = '';
 
@@ -99,7 +97,7 @@ class UrlUtils
         $n = 1;
         do {
             $abs = preg_replace(
-                $re,
+                '#(?:(?:/\.?/)|(?!\.\.)[^/]+/\.\./)#',
                 '/',
                 $abs,
                 -1,
