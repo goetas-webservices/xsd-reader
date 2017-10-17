@@ -1092,23 +1092,19 @@ class SchemaReader
                     ]
                 )
             ) {
-                $localType = $childNode;
-                break;
-            }
-        }
-
-        if ($localType) {
             $addCallback = function (Type $type) use ($element) {
                 $element->setType($type);
             };
             $this->loadTypeWithCallback(
                 $element->getSchema(),
-                $localType,
+                $childNode,
                 $addCallback
             );
-        } else {
-            $this->fillItemNonLocalType($element, $node);
+                return;
+            }
         }
+
+            $this->fillItemNonLocalType($element, $node);
     }
 
     private function fillItemNonLocalType(Item $element, DOMElement $node)
