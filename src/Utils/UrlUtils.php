@@ -36,11 +36,6 @@ class UrlUtils
     */
     protected static function resolveRelativeUrlAfterEarlyChecks($base, $rel)
     {
-        $re = array(
-            '#(/\.?/)#',
-            '#/(?!\.\.)[^/]+/\.\./#'
-        );
-
         /* fix url file for Windows */
         $base = preg_replace('#^file:\/\/([^/])#', 'file:///\1', $base);
 
@@ -50,13 +45,39 @@ class UrlUtils
          */
         $parts = parse_url($base);
 
-        /* remove non-directory element from path */
-        $path = isset($parts['path']) ? preg_replace('#/[^/]*$#', '', $parts["path"]) : '';
+        return static::resolveRelativeUrlToAbsoluteUrl(
+            $base,
+            $rel,
+            (
+                $rel[0] === '/'
+                    ? ''  // destroy path if relative url points to root
+                    : ( // remove non-directory element from path
+                        isset($parts['path'])
+                            ? preg_replace('#/[^/]*$#', '', $parts["path"])
+                            : ''
+                    )
+            ),
+            $parts
+        );
+    }
 
-        /* destroy path if relative url points to root */
-        if ($rel[0] === '/') {
-            $path = '';
-        }
+    /**
+    * @param string $base
+    * @param string $rel
+    * @param string $path
+    *
+    * @return string
+    */
+    protected static function resolveRelativeUrlToAbsoluteUrl(
+        $base,
+        $rel,
+        $path,
+        array $parts
+    ) {
+        $re = array(
+            '#(/\.?/)#',
+            '#/(?!\.\.)[^/]+/\.\./#'
+        );
 
         /* Build absolute URL */
         $abs = '';
