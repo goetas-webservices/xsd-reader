@@ -4,18 +4,11 @@ namespace GoetasWebservices\XML\XSDReader\Schema;
 use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
 use GoetasWebservices\XML\XSDReader\Schema\Schema;
 use GoetasWebservices\XML\XSDReader\Schema\SchemaItem;
+use GoetasWebservices\XML\XSDReader\Schema\SchemaItemTrait;
 
 abstract class Item implements SchemaItem
 {
-    /**
-    * @var string|null
-    */
-    protected $doc;
-
-    /**
-    * @var Schema
-    */
-    protected $schema;
+    use SchemaItemTrait;
 
     /**
     * @var string
@@ -71,32 +64,5 @@ abstract class Item implements SchemaItem
     {
         $this->type = $type;
         return $this;
-    }
-
-    /**
-    * @return string|null
-    */
-    public function getDoc()
-    {
-        return $this->doc;
-    }
-
-    /**
-    * @param string $doc
-    *
-    * @return $this
-    */
-    public function setDoc($doc)
-    {
-        $this->doc = $doc;
-        return $this;
-    }
-
-    /**
-    * @return Schema
-    */
-    public function getSchema()
-    {
-        return $this->schema;
     }
 }

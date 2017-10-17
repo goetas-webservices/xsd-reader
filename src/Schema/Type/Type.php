@@ -7,14 +7,12 @@ use DOMElement;
 use GoetasWebservices\XML\XSDReader\SchemaReader;
 use GoetasWebservices\XML\XSDReader\Schema\Schema;
 use GoetasWebservices\XML\XSDReader\Schema\SchemaItem;
+use GoetasWebservices\XML\XSDReader\Schema\SchemaItemTrait;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Extension;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction;
 abstract class Type implements SchemaItem
 {
-    /**
-    * @var Schema
-    */
-    protected $schema;
+    use SchemaItemTrait;
 
     /**
     * @var string|null
@@ -25,11 +23,6 @@ abstract class Type implements SchemaItem
     * @var bool
     */
     protected $abstract = false;
-
-    /**
-    * @var string|null
-    */
-    protected $doc;
 
     /**
      *
@@ -71,32 +64,6 @@ abstract class Type implements SchemaItem
         return $this;
     }
 
-    /**
-    * @return string|null
-    */
-    public function getDoc()
-    {
-        return $this->doc;
-    }
-
-    /**
-    * @param string $doc
-    *
-    * @return $this
-    */
-    public function setDoc($doc)
-    {
-        $this->doc = $doc;
-        return $this;
-    }
-    /**
-     *
-     * @return Schema
-     */
-    public function getSchema()
-    {
-        return $this->schema;
-    }
     public function __toString()
     {
         return strval($this->name);

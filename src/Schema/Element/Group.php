@@ -7,6 +7,7 @@ use GoetasWebservices\XML\XSDReader\SchemaReader;
 
 class Group implements ElementItem, ElementContainer
 {
+    use ElementContainerTrait;
 
     /**
      *
@@ -23,11 +24,6 @@ class Group implements ElementItem, ElementContainer
     * @var string
     */
     protected $name;
-
-    /**
-    * @var ElementItem[]
-    */
-    protected $elements = array();
 
     /**
     * @param string $name
@@ -55,19 +51,6 @@ class Group implements ElementItem, ElementContainer
     {
         $this->name = $name;
         return $this;
-    }
-
-    /**
-    * @return ElementItem[]
-    */
-    public function getElements()
-    {
-        return $this->elements;
-    }
-
-    public function addElement(ElementItem $element)
-    {
-        $this->elements[] = $element;
     }
 
     /**
