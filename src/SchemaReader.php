@@ -1081,7 +1081,6 @@ class SchemaReader
 
     private function fillItem(Item $element, DOMElement $node)
     {
-        $localType = null;
         foreach ($node->childNodes as $childNode) {
             if (
                 in_array(
