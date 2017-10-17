@@ -217,20 +217,6 @@ class SchemaReader
     }
 
     /**
-    * @return GroupRef
-    */
-    private function loadGroupRef(Group $referenced, DOMElement $node)
-    {
-        $ref = new GroupRef($referenced);
-        $ref->setDoc(static::getDocumentation($node));
-
-        static::maybeSetMax($ref, $node);
-        static::maybeSetMin($ref, $node);
-
-        return $ref;
-    }
-
-    /**
     * @return ElementRef
     */
     private function loadElementRef(ElementDef $referenced, DOMElement $node)
@@ -376,7 +362,7 @@ class SchemaReader
             $childNode->getAttribute("ref")
         );
 
-        $group = $this->loadGroupRef($referencedGroup, $childNode);
+        $group = GroupRef::loadGroupRef($referencedGroup, $childNode);
         $elementContainer->addElement($group);
     }
 
