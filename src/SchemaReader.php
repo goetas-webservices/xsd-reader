@@ -217,35 +217,6 @@ class SchemaReader
     }
 
     /**
-    * @return Element
-    */
-    private function loadElement(Schema $schema, DOMElement $node)
-    {
-        $element = new Element($schema, $node->getAttribute("name"));
-        $element->setDoc(static::getDocumentation($node));
-
-        $this->fillItem($element, $node);
-
-        static::maybeSetMax($element, $node);
-        static::maybeSetMin($element, $node);
-
-        $xp = new \DOMXPath($node->ownerDocument);
-        $xp->registerNamespace('xs', 'http://www.w3.org/2001/XMLSchema');
-
-        if ($xp->query('ancestor::xs:choice', $node)->length) {
-            $element->setMin(0);
-        }
-
-        if ($node->hasAttribute("nillable")) {
-            $element->setNil($node->getAttribute("nillable") == "true");
-        }
-        if ($node->hasAttribute("form")) {
-            $element->setQualified($node->getAttribute("form") == "qualified");
-        }
-        return $element;
-    }
-
-    /**
     * @return GroupRef
     */
     private function loadGroupRef(Group $referenced, DOMElement $node)
@@ -375,7 +346,11 @@ class SchemaReader
                     $referencedElement = $this->findSomething('findElement', $elementContainer->getSchema(), $node, $childNode->getAttribute("ref"));
                     $element = $this->loadElementRef($referencedElement, $childNode);
                 } else {
-                    $element = $this->loadElement($elementContainer->getSchema(), $childNode);
+                    $element = Element::loadElement(
+                        $this,
+                        $elementContainer->getSchema(),
+                        $childNode
+                    );
                 }
                 if (is_int($max) && (bool) $max) {
                     $element->setMax($max);
