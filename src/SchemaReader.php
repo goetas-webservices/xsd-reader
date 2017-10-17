@@ -380,16 +380,27 @@ class SchemaReader
 
     /**
     * @param int|null $max
+    *
+    * @return int|null
     */
-    private function loadSequence(ElementContainer $elementContainer, DOMElement $node, $max = null)
+    private static function loadSequenceNormaliseMax(DOMElement $node, $max)
     {
-        $max = (
+        return
+        (
             (is_int($max) && (bool) $max) ||
             $node->getAttribute("maxOccurs") == "unbounded" ||
             $node->getAttribute("maxOccurs") > 1
         )
             ? 2
             : null;
+    }
+
+    /**
+    * @param int|null $max
+    */
+    private function loadSequence(ElementContainer $elementContainer, DOMElement $node, $max = null)
+    {
+        $max = static::loadSequenceNormaliseMax($node, $max);
 
         foreach ($node->childNodes as $childNode) {
             if ($childNode instanceof DOMElement) {
