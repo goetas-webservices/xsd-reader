@@ -1083,11 +1083,17 @@ class SchemaReader
     {
         $localType = null;
         foreach ($node->childNodes as $childNode) {
-            switch ($childNode->localName) {
-                case 'complexType':
-                case 'simpleType':
+            if (
+                in_array(
+                    $childNode->localName,
+                    [
+                        'complexType',
+                        'simpleType',
+                    ]
+                )
+            ) {
                     $localType = $childNode;
-                    break 2;
+                break;
             }
         }
 
