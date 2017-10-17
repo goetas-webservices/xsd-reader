@@ -74,10 +74,7 @@ class UrlUtils
         $path,
         array $parts
     ) {
-        $re = array(
-            '#(/\.?/)#',
-            '#/(?!\.\.)[^/]+/\.\./#'
-        );
+        $re = '#(?:(?:/\.?/)|(?!\.\.)[^/]+/\.\./)#';
 
         /* Build absolute URL */
         $abs = '';
