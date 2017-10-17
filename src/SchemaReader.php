@@ -1092,13 +1092,12 @@ class SchemaReader
                     ]
                 )
             ) {
-                $addCallback = function (Type $type) use ($element) {
-                    $element->setType($type);
-                };
                 $this->loadTypeWithCallback(
                     $element->getSchema(),
                     $childNode,
-                    $addCallback
+                    function (Type $type) use ($element) {
+                        $element->setType($type);
+                    }
                 );
                 return;
             }
