@@ -129,30 +129,9 @@ class SchemaReader
             /**
             * @var Attribute $attribute
             */
-            $attribute = $this->loadAttribute($schema, $childNode);
+            $attribute = Attribute::loadAttribute($this, $schema, $childNode);
         }
 
-        return $attribute;
-    }
-
-    /**
-    * @return Attribute
-    */
-    public function loadAttribute(Schema $schema, DOMElement $node)
-    {
-        $attribute = new Attribute($schema, $node->getAttribute("name"));
-        $attribute->setDoc(static::getDocumentation($node));
-        $this->fillItem($attribute, $node);
-
-        if ($node->hasAttribute("nillable")) {
-            $attribute->setNil($node->getAttribute("nillable") == "true");
-        }
-        if ($node->hasAttribute("form")) {
-            $attribute->setQualified($node->getAttribute("form") == "qualified");
-        }
-        if ($node->hasAttribute("use")) {
-            $attribute->setUse($node->getAttribute("use"));
-        }
         return $attribute;
     }
 
@@ -193,7 +172,7 @@ class SchemaReader
      * @param DOMElement $node
      * @return string
      */
-    private static function getDocumentation(DOMElement $node)
+    public static function getDocumentation(DOMElement $node)
     {
         $doc = '';
         foreach ($node->childNodes as $childNode) {
@@ -1045,7 +1024,7 @@ class SchemaReader
         return $this->loadAttributeOrElementDef($schema, $node, false);
     }
 
-    private function fillItem(Item $element, DOMElement $node)
+    public function fillItem(Item $element, DOMElement $node)
     {
         foreach ($node->childNodes as $childNode) {
             if (

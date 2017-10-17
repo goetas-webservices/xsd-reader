@@ -1,7 +1,10 @@
 <?php
 namespace GoetasWebservices\XML\XSDReader\Schema\Attribute;
 
+use DOMElement;
 use GoetasWebservices\XML\XSDReader\Schema\Item;
+use GoetasWebservices\XML\XSDReader\Schema\Schema;
+use GoetasWebservices\XML\XSDReader\SchemaReader;
 
 class Attribute extends Item implements AttributeSingle
 {
@@ -123,5 +126,29 @@ class Attribute extends Item implements AttributeSingle
     {
         $this->use = $use;
         return $this;
+    }
+
+    /**
+    * @return Attribute
+    */
+    public static function loadAttribute(
+        SchemaReader $schemaReader,
+        Schema $schema,
+        DOMElement $node
+    ) {
+        $attribute = new Attribute($schema, $node->getAttribute("name"));
+        $attribute->setDoc(SchemaReader::getDocumentation($node));
+        $schemaReader->fillItem($attribute, $node);
+
+        if ($node->hasAttribute("nillable")) {
+            $attribute->setNil($node->getAttribute("nillable") == "true");
+        }
+        if ($node->hasAttribute("form")) {
+            $attribute->setQualified($node->getAttribute("form") == "qualified");
+        }
+        if ($node->hasAttribute("use")) {
+            $attribute->setUse($node->getAttribute("use"));
+        }
+        return $attribute;
     }
 }
