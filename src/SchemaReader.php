@@ -217,14 +217,6 @@ class SchemaReader
     }
 
     /**
-    * @return ElementRef
-    */
-    private function loadElementRef(ElementDef $referenced, DOMElement $node)
-    {
-        return ElementRef::loadElementRef($this, $referenced, $node);
-    }
-
-    /**
     * @return InterfaceSetMinMax
     */
     public static function maybeSetMax(InterfaceSetMinMax $ref, DOMElement $node)
@@ -313,7 +305,10 @@ class SchemaReader
                     * @var ElementDef $referencedElement
                     */
                     $referencedElement = $this->findSomething('findElement', $elementContainer->getSchema(), $node, $childNode->getAttribute("ref"));
-                    $element = $this->loadElementRef($referencedElement, $childNode);
+                    $element = ElementRef::loadElementRef(
+                        $referencedElement,
+                        $childNode
+                    );
                 } else {
                     $element = Element::loadElement(
                         $this,

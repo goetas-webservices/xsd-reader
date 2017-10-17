@@ -136,7 +136,6 @@ class ElementRef extends Item implements ElementSingle
     * @return ElementRef
     */
     public static function loadElementRef(
-        SchemaReader $reader,
         ElementDef $referenced,
         DOMElement $node
     ) {
