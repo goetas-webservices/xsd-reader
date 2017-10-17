@@ -157,12 +157,14 @@ class SchemaReader
     }
 
     /**
+    * @param bool $attributeDef
+    *
     * @return Closure
     */
     private function loadAttributeOrElementDef(
         Schema $schema,
         DOMElement $node,
-        bool $attributeDef
+        $attributeDef
     ) {
         $name = $node->getAttribute('name');
         if ($attributeDef) {
@@ -223,13 +225,13 @@ class SchemaReader
     }
 
     /**
-    * @param mixed $schema
+    * @param string $key
     *
     * @return Closure|null
     */
     private function maybeCallMethod(
         array $methods,
-        string $key,
+        $key,
         DOMNode $childNode,
         ...$args
     ) {
@@ -797,12 +799,14 @@ class SchemaReader
     }
 
     /**
+    * @param string $attributeName
+    *
     * @return SchemaItem
     */
     private function findSomeType(
         SchemaItem $fromThis,
         DOMElement $node,
-        string $attributeName
+        $attributeName
     ) {
         return $this->findSomeTypeFromAttribute(
             $fromThis,
@@ -812,12 +816,14 @@ class SchemaReader
     }
 
     /**
+    * @param string $attributeName
+    *
     * @return SchemaItem
     */
     private function findSomeTypeFromAttribute(
         SchemaItem $fromThis,
         DOMElement $node,
-        string $attributeName
+        $attributeName
     ) {
         /**
         * @var SchemaItem $out
@@ -1153,13 +1159,16 @@ class SchemaReader
     }
 
     /**
+    * @param string $file
+    * @param string $namespace
+    *
     * @return Closure
     */
     private function loadImportFresh(
         Schema $schema,
         DOMElement $node,
-        string $file,
-        string $namespace
+        $file,
+        $namespace
     ) {
         if (! $namespace) {
             $this->loadedFiles[$file] = $newSchema = $schema;
