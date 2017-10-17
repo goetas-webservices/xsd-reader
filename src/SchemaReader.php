@@ -758,7 +758,7 @@ class SchemaReader
         }
     }
 
-    private function findAndSetSomeBase(
+    public function findAndSetSomeBase(
         Type $type,
         Base $setBaseOnThis,
         DOMElement $node
@@ -792,45 +792,7 @@ class SchemaReader
 
     private function loadRestriction(Type $type, DOMElement $node)
     {
-        $restriction = new Restriction();
-        $type->setRestriction($restriction);
-        if ($node->hasAttribute("base")) {
-            $this->findAndSetSomeBase($type, $restriction, $node);
-        } else {
-            $addCallback = function (Type $restType) use ($restriction) {
-                $restriction->setBase($restType);
-            };
-
-            Type::loadTypeWithCallbackOnChildNodes(
-                $this,
-                $type->getSchema(),
-                $node,
-                $addCallback
-            );
-        }
-        foreach ($node->childNodes as $childNode) {
-            if (in_array($childNode->localName,
-                [
-                    'enumeration',
-                    'pattern',
-                    'length',
-                    'minLength',
-                    'maxLength',
-                    'minInclusive',
-                    'maxInclusive',
-                    'minExclusive',
-                    'maxExclusive',
-                    'fractionDigits',
-                    'totalDigits',
-                    'whiteSpace'
-                ], true)) {
-                $restriction->addCheck($childNode->localName,
-                    [
-                        'value' => $childNode->getAttribute("value"),
-                        'doc' => static::getDocumentation($childNode)
-                    ]);
-            }
-        }
+        Restriction::loadRestriction($this, $type, $node);
     }
 
     /**
