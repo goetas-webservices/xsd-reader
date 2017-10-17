@@ -41,7 +41,7 @@
 	"scripts": {
 		"tests": [
 			"php ./vendor/phpunit/phpunit/phpunit -v",
-			"phpstan analyse -c ./phpstan.neon src",
+			"phpstan analyse -l7 src",
 			"psalm"
 		]
 	}
