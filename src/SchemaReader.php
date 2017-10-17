@@ -1092,7 +1092,7 @@ class SchemaReader
                     ]
                 )
             ) {
-                    $localType = $childNode;
+                $localType = $childNode;
                 break;
             }
         }
@@ -1113,23 +1113,23 @@ class SchemaReader
 
     private function fillItemNonLocalType(Item $element, DOMElement $node)
     {
-            if ($node->getAttribute("type")) {
-                /**
-                * @var Type $type
-                */
-                $type = $this->findSomeType($element, $node, 'type');
-            } else {
-                /**
-                * @var Type $type
-                */
-                $type = $this->findSomeTypeFromAttribute(
-                    $element,
-                    $node,
-                    ($node->lookupPrefix(self::XSD_NS) . ':anyType')
-                );
-            }
+        if ($node->getAttribute("type")) {
+            /**
+            * @var Type $type
+            */
+            $type = $this->findSomeType($element, $node, 'type');
+        } else {
+            /**
+            * @var Type $type
+            */
+            $type = $this->findSomeTypeFromAttribute(
+                $element,
+                $node,
+                ($node->lookupPrefix(self::XSD_NS) . ':anyType')
+            );
+        }
 
-            $element->setType($type);
+        $element->setType($type);
     }
 
     /**
