@@ -1,5 +1,20 @@
 build:
     nodes:
+        php54:
+            environment:
+                php: 5.4
+        php55:
+            environment:
+                php: 5.5
+        php56:
+            environment:
+                php: 5.6
+        php70:
+            environment:
+                php: 7.0
+        php71:
+            environment:
+                php: 7.1
         analysis:
             project_setup:
                 override: true
@@ -15,6 +30,3 @@ checks:
     php:
         code_rating: true
         duplication: true
-filter:
-    paths:
-        - src/*
