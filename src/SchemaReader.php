@@ -1107,7 +1107,12 @@ class SchemaReader
                 $addCallback
             );
         } else {
+            $this->fillItemNonLocalType($element, $node);
+        }
+    }
 
+    private function fillItemNonLocalType(Item $element, DOMElement $node)
+    {
             if ($node->getAttribute("type")) {
                 /**
                 * @var Type $type
@@ -1125,7 +1130,6 @@ class SchemaReader
             }
 
             $element->setType($type);
-        }
     }
 
     /**
