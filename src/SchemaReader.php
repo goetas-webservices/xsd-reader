@@ -287,7 +287,7 @@ class SchemaReader
     /**
     * @return InterfaceSetMinMax
     */
-    private static function maybeSetMax(InterfaceSetMinMax $ref, DOMElement $node)
+    public static function maybeSetMax(InterfaceSetMinMax $ref, DOMElement $node)
     {
         if (
             $node->hasAttribute("maxOccurs")
@@ -301,7 +301,7 @@ class SchemaReader
     /**
     * @return InterfaceSetMinMax
     */
-    private static function maybeSetMin(InterfaceSetMinMax $ref, DOMElement $node)
+    public static function maybeSetMin(InterfaceSetMinMax $ref, DOMElement $node)
     {
         if ($node->hasAttribute("minOccurs")) {
             $ref->setMin((int) $node->getAttribute("minOccurs"));
@@ -445,44 +445,7 @@ class SchemaReader
     */
     private function loadGroup(Schema $schema, DOMElement $node)
     {
-        $group = new Group($schema, $node->getAttribute("name"));
-        $group->setDoc(static::getDocumentation($node));
-
-        if ($node->hasAttribute("maxOccurs")) {
-            /**
-            * @var GroupRef $group
-            */
-            $group = static::maybeSetMax(new GroupRef($group), $node);
-        }
-        if ($node->hasAttribute("minOccurs")) {
-            /**
-            * @var GroupRef $group
-            */
-            $group = static::maybeSetMin(
-                $group instanceof GroupRef ? $group : new GroupRef($group),
-                $node
-            );
-        }
-
-        $schema->addGroup($group);
-
-        static $methods = [
-            'sequence' => 'loadSequence',
-            'choice' => 'loadSequence',
-            'all' => 'loadSequence',
-        ];
-
-        return function () use ($group, $node, $methods) {
-            foreach ($node->childNodes as $childNode) {
-                $this->maybeCallMethod(
-                    $methods,
-                    (string) $childNode->localName,
-                    $childNode,
-                    $group,
-                    $childNode
-                );
-            }
-        };
+        return Group::loadGroup($this, $schema, $node);
     }
 
     /**
