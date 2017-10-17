@@ -1,7 +1,10 @@
 <?php
 namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
+use DOMElement;
 use GoetasWebservices\XML\XSDReader\Schema\Item;
+use GoetasWebservices\XML\XSDReader\Schema\Schema;
+use GoetasWebservices\XML\XSDReader\SchemaReader;
 
 class ElementRef extends Item implements ElementSingle
 {
@@ -127,5 +130,28 @@ class ElementRef extends Item implements ElementSingle
     {
         $this->nil = is_bool($nil) ? $nil : (boolean) $nil;
         return $this;
+    }
+
+    /**
+    * @return ElementRef
+    */
+    public static function loadElementRef(
+        SchemaReader $reader,
+        ElementDef $referenced,
+        DOMElement $node
+    ) {
+        $ref = new ElementRef($referenced);
+        $ref->setDoc(SchemaReader::getDocumentation($node));
+
+        SchemaReader::maybeSetMax($ref, $node);
+        SchemaReader::maybeSetMin($ref, $node);
+        if ($node->hasAttribute("nillable")) {
+            $ref->setNil($node->getAttribute("nillable") == "true");
+        }
+        if ($node->hasAttribute("form")) {
+            $ref->setQualified($node->getAttribute("form") == "qualified");
+        }
+
+        return $ref;
     }
 }

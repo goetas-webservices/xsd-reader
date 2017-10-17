@@ -235,24 +235,7 @@ class SchemaReader
     */
     private function loadElementRef(ElementDef $referenced, DOMElement $node)
     {
-        $ref = new ElementRef($referenced);
-        $this->setDoc($ref, $node);
-
-        static::maybeSetMax($ref, $node);
-        static::maybeSetMin($ref, $node);
-        if ($node->hasAttribute("nillable")) {
-            $ref->setNil($node->getAttribute("nillable") == "true");
-        }
-        if ($node->hasAttribute("form")) {
-            $ref->setQualified($node->getAttribute("form") == "qualified");
-        }
-
-        return $ref;
-    }
-
-    private function setDoc(Item $ref, DOMElement $node)
-    {
-        $ref->setDoc(static::getDocumentation($node));
+        return ElementRef::loadElementRef($this, $referenced, $node);
     }
 
     /**
