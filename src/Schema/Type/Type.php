@@ -1,6 +1,10 @@
 <?php
 namespace GoetasWebservices\XML\XSDReader\Schema\Type;
 
+use Closure;
+use DOMNode;
+use DOMElement;
+use GoetasWebservices\XML\XSDReader\SchemaReader;
 use GoetasWebservices\XML\XSDReader\Schema\Schema;
 use GoetasWebservices\XML\XSDReader\Schema\SchemaItem;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Extension;
@@ -158,5 +162,49 @@ abstract class Type implements SchemaItem
     {
         $this->extension = $extension;
         return $this;
+    }
+
+    public static function loadTypeWithCallbackOnChildNodes(
+        SchemaReader $schemaReader,
+        Schema $schema,
+        DOMNode $node,
+        Closure $callback
+    ) {
+        foreach ($node->childNodes as $childNode) {
+            static::loadTypeWithCallback(
+                $schemaReader,
+                $schema,
+                $childNode,
+                $callback
+            );
+        }
+    }
+
+    public static function loadTypeWithCallback(
+        SchemaReader $schemaReader,
+        Schema $schema,
+        DOMNode $childNode,
+        Closure $callback
+    ) {
+        if (! ($childNode instanceof DOMElement)) {
+            return;
+        }
+        $methods = [
+            'complexType' => 'loadComplexType',
+            'simpleType' => 'loadSimpleType',
+        ];
+
+        $func = $schemaReader->maybeCallMethod(
+            $methods,
+            $childNode->localName,
+            $childNode,
+            $schema,
+            $childNode,
+            $callback
+        );
+
+        if ($func instanceof Closure) {
+            call_user_func($func);
+        }
     }
 }
