@@ -98,7 +98,13 @@ class UrlUtils
         */
         $n = 1;
         do {
-            $abs = preg_replace($re, '/', $abs, -1, $n);
+            $abs = preg_replace(
+                $re,
+                '/',
+                $abs,
+                -1,
+                $n
+            );
         } while ($n > 0);
 
         if (isset($parts["scheme"])) {
