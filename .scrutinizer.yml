@@ -23,8 +23,9 @@ build:
     tests:
         override:
             -
+                command: 'vendor/bin/phpunit --coverage-clover=some-file'
                 coverage:
-                    file: './coverage.clover'
+                    file: 'some-file'
                     format: 'clover'
 checks:
     php:

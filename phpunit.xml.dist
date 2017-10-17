@@ -14,11 +14,6 @@
             target="phpunit"
             logIncompleteSkipped="true"
         />
-          <log
-              type="coverage-clover"
-              target="./coverage.clover"
-              logIncompleteSkipped="true"
-          />
         <log
             type="coverage-text"
             target="php://stdout"
