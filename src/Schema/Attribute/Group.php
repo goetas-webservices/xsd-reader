@@ -113,4 +113,42 @@ class Group implements AttributeItem, AttributeContainer
         $attribute = $useThis->findSomething('findAttributeGroup', $schema, $node, $childNode->getAttribute("ref"));
         $addToThis->addAttribute($attribute);
     }
+
+    /**
+    * @return \Closure
+    */
+    public static function loadAttributeGroup(
+        SchemaReader $schemaReader,
+        Schema $schema,
+        DOMElement $node
+    ) {
+        $attGroup = new self($schema, $node->getAttribute("name"));
+        $attGroup->setDoc(SchemaReader::getDocumentation($node));
+        $schema->addAttributeGroup($attGroup);
+
+        return function () use ($schemaReader, $schema, $node, $attGroup) {
+            foreach ($node->childNodes as $childNode) {
+                switch ($childNode->localName) {
+                    case 'attribute':
+                        $attribute = Attribute::getAttributeFromAttributeOrRef(
+                            $schemaReader,
+                            $childNode,
+                            $schema,
+                            $node
+                        );
+                        $attGroup->addAttribute($attribute);
+                        break;
+                    case 'attributeGroup':
+                        self::findSomethingLikeThis(
+                            $schemaReader,
+                            $schema,
+                            $node,
+                            $childNode,
+                            $attGroup
+                        );
+                        break;
+                }
+            }
+        };
+    }
 }

@@ -83,56 +83,7 @@ class SchemaReader
     */
     private function loadAttributeGroup(Schema $schema, DOMElement $node)
     {
-        $attGroup = new AttributeGroup($schema, $node->getAttribute("name"));
-        $attGroup->setDoc(static::getDocumentation($node));
-        $schema->addAttributeGroup($attGroup);
-
-        return function () use ($schema, $node, $attGroup) {
-            foreach ($node->childNodes as $childNode) {
-                switch ($childNode->localName) {
-                    case 'attribute':
-                        $attribute = $this->getAttributeFromAttributeOrRef(
-                            $childNode,
-                            $schema,
-                            $node
-                        );
-                        $attGroup->addAttribute($attribute);
-                        break;
-                    case 'attributeGroup':
-                        AttributeGroup::findSomethingLikeThis(
-                            $this,
-                            $schema,
-                            $node,
-                            $childNode,
-                            $attGroup
-                        );
-                        break;
-                }
-            }
-        };
-    }
-
-    /**
-    * @return AttributeItem
-    */
-    private function getAttributeFromAttributeOrRef(
-        DOMElement $childNode,
-        Schema $schema,
-        DOMElement $node
-    ) {
-        if ($childNode->hasAttribute("ref")) {
-            /**
-            * @var AttributeItem $attribute
-            */
-            $attribute = $this->findSomething('findAttribute', $schema, $node, $childNode->getAttribute("ref"));
-        } else {
-            /**
-            * @var Attribute $attribute
-            */
-            $attribute = Attribute::loadAttribute($this, $schema, $childNode);
-        }
-
-        return $attribute;
+        return AttributeGroup::loadAttributeGroup($this, $schema, $node);
     }
 
     /**
@@ -651,7 +602,8 @@ class SchemaReader
                 $childNode
             );
         } elseif ($childNode->localName === 'attribute') {
-            $attribute = $this->getAttributeFromAttributeOrRef(
+            $attribute = Attribute::getAttributeFromAttributeOrRef(
+                $this,
                 $childNode,
                 $schema,
                 $node
@@ -867,7 +819,8 @@ class SchemaReader
                 $node,
                 $type
             ) {
-                $attribute = $this->getAttributeFromAttributeOrRef(
+                $attribute = Attribute::getAttributeFromAttributeOrRef(
+                    $this,
                     $childNode,
                     $type->getSchema(),
                     $node

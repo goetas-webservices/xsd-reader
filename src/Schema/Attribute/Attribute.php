@@ -151,4 +151,28 @@ class Attribute extends Item implements AttributeSingle
         }
         return $attribute;
     }
+
+    /**
+    * @return AttributeItem
+    */
+    public static function getAttributeFromAttributeOrRef(
+        SchemaReader $schemaReader,
+        DOMElement $childNode,
+        Schema $schema,
+        DOMElement $node
+    ) {
+        if ($childNode->hasAttribute("ref")) {
+            /**
+            * @var AttributeItem $attribute
+            */
+            $attribute = $schemaReader->findSomething('findAttribute', $schema, $node, $childNode->getAttribute("ref"));
+        } else {
+            /**
+            * @var Attribute $attribute
+            */
+            $attribute = Attribute::loadAttribute($schemaReader, $schema, $childNode);
+        }
+
+        return $attribute;
+    }
 }
