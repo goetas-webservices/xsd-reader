@@ -13,15 +13,22 @@ class UrlUtils
     {
         if (!$rel) {
             return $base;
-        }
-
+        } elseif (
         /* return if already absolute URL */
-        if (parse_url($rel, PHP_URL_SCHEME) !== null || substr($rel, 0, 2) === '//') {
+            parse_url($rel, PHP_URL_SCHEME) !== null ||
+            substr($rel, 0, 2) === '//'
+        ) {
             return $rel;
-        }
-
+        } elseif (
         /* queries and anchors */
-        if ($rel[0] === '#' || $rel[0] === '?') {
+            in_array(
+                $rel[0],
+                [
+                    '#',
+                    '?'
+                ]
+            )
+        ) {
             return $base.$rel;
         }
 
