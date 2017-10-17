@@ -489,21 +489,22 @@ class SchemaReader
         DOMElement $childNode,
         Schema $schema
     ) {
-        if (
-            in_array(
-                $childNode->localName,
-                [
-                    'sequence',
-                    'choice',
-                    'all',
-                ]
-            )
-        ) {
+        $maybeLoadSeq = function () use ($type, $childNode) {
             $this->maybeLoadSequenceFromElementContainer(
                 $type,
                 $childNode
             );
-        } elseif ($childNode->localName === 'attribute') {
+        };
+        $methods = [
+            'sequence' => $maybeLoadSeq,
+            'choice' => $maybeLoadSeq,
+            'all' => $maybeLoadSeq,
+            'attribute' => function () use (
+                $childNode,
+                $schema,
+                $node,
+                $type
+            ) {
             $attribute = Attribute::getAttributeFromAttributeOrRef(
                 $this,
                 $childNode,
@@ -512,17 +513,13 @@ class SchemaReader
             );
 
             $type->addAttribute($attribute);
-        } elseif (
-            $childNode->localName === 'group' &&
-            $type instanceof ComplexType
-        ) {
-            $this->addGroupAsElement(
+            },
+            'attributeGroup' => function() use (
                 $schema,
                 $node,
                 $childNode,
                 $type
-            );
-        } elseif ($childNode->localName === 'attributeGroup') {
+            ) {
             AttributeGroup::findSomethingLikeThis(
                 $this,
                 $schema,
@@ -530,6 +527,29 @@ class SchemaReader
                 $childNode,
                 $type
             );
+            },
+        ];
+        if (
+            $type instanceof ComplexType
+        ) {
+            $methods['group'] = function() use (
+                $schema,
+                $node,
+                $childNode,
+                $type
+            ) {
+                $this->addGroupAsElement(
+                    $schema,
+                    $node,
+                    $childNode,
+                    $type
+                );
+            };
+        }
+
+        if (isset($methods[$childNode->localName])) {
+            $method = $methods[$childNode->localName];
+            $method();
         }
     }
 
