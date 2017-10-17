@@ -46,7 +46,6 @@ class UrlUtils
         $parts = parse_url($base);
 
         return static::resolveRelativeUrlToAbsoluteUrl(
-            $base,
             $rel,
             (
                 $rel[0] === '/'
@@ -62,14 +61,12 @@ class UrlUtils
     }
 
     /**
-    * @param string $base
     * @param string $rel
     * @param string $path
     *
     * @return string
     */
     protected static function resolveRelativeUrlToAbsoluteUrl(
-        $base,
         $rel,
         $path,
         array $parts
