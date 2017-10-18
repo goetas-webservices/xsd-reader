@@ -138,7 +138,7 @@ class SchemaReader
             if ($childNode->localName == "annotation") {
                 $doc .= static::getDocumentation($childNode);
             } elseif ($childNode->localName == 'documentation') {
-                        $doc .= ($childNode->nodeValue);
+                $doc .= ($childNode->nodeValue);
             }
         }
         $doc = preg_replace('/[\t ]+/', ' ', $doc);
