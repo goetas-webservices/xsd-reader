@@ -470,4 +470,41 @@ class Schema
 
         return $out;
     }
+
+    /**
+    * @var Schema[]
+    */
+    private static $loadedFiles = array();
+
+    /**
+    * @param string $key
+    *
+    * @return bool
+    */
+    public static function hasLoadedFile($key)
+    {
+        return isset(static::$loadedFiles[$key]);
+    }
+
+    /**
+    * @param string $key
+    *
+    * @return Schema
+    */
+    public static function getLoadedFile($key)
+    {
+        return static::$loadedFiles[$key];
+    }
+
+    /**
+    * @param string $key
+    *
+    * @return Schema
+    */
+    public static function setLoadedFile($key, Schema $schema)
+    {
+        static::$loadedFiles[$key] = $schema;
+
+        return $schema;
+    }
 }

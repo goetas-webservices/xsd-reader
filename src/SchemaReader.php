@@ -42,11 +42,6 @@ class SchemaReader
     const XML_NS = "http://www.w3.org/XML/1998/namespace";
 
     /**
-    * @var Schema[]
-    */
-    private $loadedFiles = array();
-
-    /**
     * @var string[]
     */
     private $knownLocationSchemas = array();
@@ -920,23 +915,21 @@ class SchemaReader
         $namespace = $node->getAttribute("namespace");
 
         if (
-            isset(
-                self::$globalSchemaInfo[$namespace],
-                $this->loadedFiles[
+            (
+                isset(self::$globalSchemaInfo[$namespace]) &&
+                Schema::hasLoadedFile(
                     $loadedFilesKey = self::$globalSchemaInfo[$namespace]
-                ]
+                )
             ) ||
-            isset(
-                $this->loadedFiles[
+            Schema::hasLoadedFile(
                     $loadedFilesKey = $this->getNamespaceSpecificFileIndex(
                         $file,
                         $namespace
                     )
-                ]
             ) ||
-            isset($this->loadedFiles[$loadedFilesKey = $file])
+            Schema::hasLoadedFile($loadedFilesKey = $file)
         ) {
-            $schema->addSchema($this->loadedFiles[$loadedFilesKey]);
+            $schema->addSchema(Schema::getLoadedFile($loadedFilesKey));
 
             return function() {
             };
@@ -958,9 +951,9 @@ class SchemaReader
         $namespace
     ) {
         if (! $namespace) {
-            $this->loadedFiles[$file] = $newSchema = $schema;
+            $newSchema = Schema::setLoadedFile($file, $schema);
         } else {
-            $this->loadedFiles[$file] = $newSchema = new Schema();
+            $newSchema = Schema::setLoadedFile($file, new Schema());
             $newSchema->addSchema($this->getGlobalSchema());
         }
 
@@ -995,7 +988,10 @@ class SchemaReader
             $callbacks = array();
             $globalSchemas = array();
             foreach (self::$globalSchemaInfo as $namespace => $uri) {
-                $this->loadedFiles[$uri] = $globalSchemas [$namespace] = $schema = new Schema();
+                Schema::setLoadedFile(
+                    $uri,
+                    $globalSchemas[$namespace] = $schema = new Schema()
+                );
                 if ($namespace === self::XSD_NS) {
                     $this->globalSchema = $schema;
                 }
@@ -1031,7 +1027,7 @@ class SchemaReader
     public function readNode(DOMElement $node, $file = 'schema.xsd')
     {
         $fileKey = $node->hasAttribute('targetNamespace') ? $this->getNamespaceSpecificFileIndex($file, $node->getAttribute('targetNamespace')) : $file;
-        $this->loadedFiles[$fileKey] = $rootSchema = new Schema();
+        Schema::setLoadedFile($fileKey, $rootSchema = new Schema());
 
         $rootSchema->addSchema($this->getGlobalSchema());
         $callbacks = $this->schemaNode($rootSchema, $node);
