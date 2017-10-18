@@ -483,7 +483,7 @@ class Schema
     */
     public static function hasLoadedFile($key)
     {
-        return isset(static::$loadedFiles[$key]);
+        return isset(self::$loadedFiles[$key]);
     }
 
     /**
@@ -493,7 +493,7 @@ class Schema
     */
     public static function getLoadedFile($key)
     {
-        return static::$loadedFiles[$key];
+        return self::$loadedFiles[$key];
     }
 
     /**
@@ -503,7 +503,7 @@ class Schema
     */
     public static function setLoadedFile($key, Schema $schema)
     {
-        static::$loadedFiles[$key] = $schema;
+        self::$loadedFiles[$key] = $schema;
 
         return $schema;
     }
