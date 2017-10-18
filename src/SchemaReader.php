@@ -916,16 +916,16 @@ class SchemaReader
 
         if (
             (
-                isset(self::$globalSchemaInfo[$namespace]) &&
-                Schema::hasLoadedFile(
-                    $loadedFilesKey = self::$globalSchemaInfo[$namespace]
-                )
+            isset(self::$globalSchemaInfo[$namespace]) &&
+            Schema::hasLoadedFile(
+                $loadedFilesKey = self::$globalSchemaInfo[$namespace]
+            )
             ) ||
             Schema::hasLoadedFile(
-                    $loadedFilesKey = $this->getNamespaceSpecificFileIndex(
-                        $file,
-                        $namespace
-                    )
+                $loadedFilesKey = $this->getNamespaceSpecificFileIndex(
+                    $file,
+                    $namespace
+                )
             ) ||
             Schema::hasLoadedFile($loadedFilesKey = $file)
         ) {
