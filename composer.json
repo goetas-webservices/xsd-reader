@@ -9,7 +9,8 @@
         "xmlschema"
     ],
     "license" : "MIT",
-    "authors" : [{
+    "authors" : [
+        {
             "name" : "Asmir Mustafic",
             "email" : "goetas@lignano.it"
         }
