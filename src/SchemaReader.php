@@ -513,14 +513,14 @@ class SchemaReader
                 $node,
                 $type
             ) {
-            $attribute = Attribute::getAttributeFromAttributeOrRef(
-                $this,
-                $childNode,
-                $schema,
-                $node
-            );
+                $attribute = Attribute::getAttributeFromAttributeOrRef(
+                    $this,
+                    $childNode,
+                    $schema,
+                    $node
+                );
 
-            $type->addAttribute($attribute);
+                $type->addAttribute($attribute);
             },
             'attributeGroup' => function() use (
                 $schema,
@@ -528,13 +528,13 @@ class SchemaReader
                 $childNode,
                 $type
             ) {
-            AttributeGroup::findSomethingLikeThis(
-                $this,
-                $schema,
-                $node,
-                $childNode,
-                $type
-            );
+                AttributeGroup::findSomethingLikeThis(
+                    $this,
+                    $schema,
+                    $node,
+                    $childNode,
+                    $type
+                );
             },
         ];
         if (
@@ -582,21 +582,21 @@ class SchemaReader
         return $this->makeCallbackCallback(
             $type,
             $node,
-                function (
-                    DOMElement $node,
-                    DOMElement $childNode
-                ) use (
+            function (
+                DOMElement $node,
+                DOMElement $childNode
+            ) use (
+                $methods,
+                $type
+            ) {
+                $this->maybeCallMethod(
                     $methods,
-                    $type
-                ) {
-                    $this->maybeCallMethod(
-                        $methods,
-                        $childNode->localName,
-                        $childNode,
-                        $type,
-                        $childNode
-                    );
-                },
+                    $childNode->localName,
+                    $childNode,
+                    $type,
+                    $childNode
+                );
+            },
             $callback
         );
     }
@@ -929,10 +929,10 @@ class SchemaReader
 
         if (
             (
-            isset(self::$globalSchemaInfo[$namespace]) &&
-            Schema::hasLoadedFile(
-                $loadedFilesKey = self::$globalSchemaInfo[$namespace]
-            )
+                isset(self::$globalSchemaInfo[$namespace]) &&
+                Schema::hasLoadedFile(
+                    $loadedFilesKey = self::$globalSchemaInfo[$namespace]
+                )
             ) ||
             Schema::hasLoadedFile(
                 $loadedFilesKey = $this->getNamespaceSpecificFileIndex(
