@@ -2,11 +2,13 @@
 namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
 use DOMElement;
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItemTrait;
 use GoetasWebservices\XML\XSDReader\Schema\Schema;
 use GoetasWebservices\XML\XSDReader\SchemaReader;
 
 class Group implements ElementItem, ElementContainer
 {
+    use AttributeItemTrait;
     use ElementContainerTrait;
 
     /**
@@ -21,36 +23,12 @@ class Group implements ElementItem, ElementContainer
     protected $doc;
 
     /**
-    * @var string
-    */
-    protected $name;
-
-    /**
     * @param string $name
     */
     public function __construct(Schema $schema, $name)
     {
         $this->schema = $schema;
         $this->name = $name;
-    }
-
-    /**
-    * @return string
-    */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-    * @param string $name
-    *
-    * @return $this
-    */
-    public function setName($name)
-    {
-        $this->name = $name;
-        return $this;
     }
 
     /**

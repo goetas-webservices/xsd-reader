@@ -7,6 +7,8 @@ use GoetasWebservices\XML\XSDReader\Schema\Schema;
 
 class Group implements AttributeItem, AttributeContainer
 {
+    use AttributeItemTrait;
+    use AttributeContainerTrait;
 
     /**
      *
@@ -20,54 +22,12 @@ class Group implements AttributeItem, AttributeContainer
     protected $doc;
 
     /**
-    * @var string
-    */
-    protected $name;
-
-    /**
-    * @var AttributeItem[]
-    */
-    protected $attributes = array();
-
-    /**
     * @param string $name
     */
     public function __construct(Schema $schema, $name)
     {
         $this->schema = $schema;
         $this->name = $name;
-    }
-
-    /**
-    * @return string
-    */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-    * @param string $name
-    *
-    * @return $this
-    */
-    public function setName($name)
-    {
-        $this->name = $name;
-        return $this;
-    }
-
-    public function addAttribute(AttributeItem $attribute)
-    {
-        $this->attributes[] = $attribute;
-    }
-
-    /**
-    * @return AttributeItem[]
-    */
-    public function getAttributes()
-    {
-        return $this->attributes;
     }
 
     /**
