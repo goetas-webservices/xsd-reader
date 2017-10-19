@@ -818,7 +818,7 @@ class SchemaReader
                     $node,
                     $childNode
                 );
-            $this->maybeCallCallableWithArgs($childNode, $methods);
+                $this->maybeCallCallableWithArgs($childNode, $methods);
             }
         }
     }
