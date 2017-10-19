@@ -754,10 +754,7 @@ class SchemaReader
         }
     }
 
-    /**
-    * @return mixed[][]
-    */
-    private function loadExtensionMakeMethods(
+    private function loadExtensionChildNodes(
         BaseComplexType $type,
         DOMElement $node,
         DOMElement $childNode
@@ -795,7 +792,7 @@ class SchemaReader
             ],
         ];
 
-        return $methods;
+        $this->maybeCallCallableWithArgs($childNode, $methods);
     }
 
     private function loadExtension(BaseComplexType $type, DOMElement $node)
@@ -813,12 +810,11 @@ class SchemaReader
 
         foreach ($node->childNodes as $childNode) {
             if ($childNode instanceof DOMElement) {
-                $methods = $this->loadExtensionMakeMethods(
+                $this->loadExtensionChildNodes(
                     $type,
                     $node,
                     $childNode
                 );
-                $this->maybeCallCallableWithArgs($childNode, $methods);
             }
         }
     }
