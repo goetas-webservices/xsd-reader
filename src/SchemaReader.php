@@ -5,6 +5,7 @@ use Closure;
 use DOMDocument;
 use DOMElement;
 use DOMNode;
+use DOMNodeList;
 use GoetasWebservices\XML\XSDReader\Exception\IOException;
 use GoetasWebservices\XML\XSDReader\Exception\TypeException;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Attribute;
@@ -754,7 +755,7 @@ class SchemaReader
         }
     }
 
-    private function loadExtensionChildNodes(
+    private function loadExtensionChildNode(
         BaseComplexType $type,
         DOMElement $node,
         DOMElement $childNode
@@ -808,9 +809,17 @@ class SchemaReader
             );
         }
 
-        foreach ($node->childNodes as $childNode) {
+        $this->loadExtensionChildNodes($type, $node->childNodes, $node);
+    }
+
+    private function loadExtensionChildNodes(
+        BaseComplexType $type,
+        DOMNodeList $childNodes,
+        DOMElement $node
+    ) {
+        foreach ($childNodes as $childNode) {
             if ($childNode instanceof DOMElement) {
-                $this->loadExtensionChildNodes(
+                $this->loadExtensionChildNode(
                     $type,
                     $node,
                     $childNode
