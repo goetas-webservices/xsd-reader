@@ -64,6 +64,19 @@ class Restriction extends Base
             );
         }
         foreach ($node->childNodes as $childNode) {
+            if ($childNode instanceof DOMElement) {
+                static::maybeLoadRestrictionOnChildNode(
+                    $restriction,
+                    $childNode
+                );
+            }
+        }
+    }
+
+    protected static function maybeLoadRestrictionOnChildNode(
+        Restriction $restriction,
+        DOMElement $childNode
+    ) {
             if (
                 in_array(
                     $childNode->localName,
@@ -92,6 +105,5 @@ class Restriction extends Base
                     ]
                 );
             }
-        }
     }
 }
