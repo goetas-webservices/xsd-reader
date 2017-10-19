@@ -754,23 +754,14 @@ class SchemaReader
         }
     }
 
-    private function loadExtension(BaseComplexType $type, DOMElement $node)
-    {
-        $extension = new Extension();
-        $type->setExtension($extension);
-
-        if ($node->hasAttribute("base")) {
-            $this->findAndSetSomeBase(
-                $type,
-                $extension,
-                $node
-            );
-        }
-
-        foreach ($node->childNodes as $childNode) {
-            if (! ($childNode instanceof DOMElement)) {
-                continue;
-            }
+    /**
+    * @return mixed[][]
+    */
+    private function loadExtensionMakeMethods(
+        BaseComplexType $type,
+        DOMElement $node,
+        DOMElement $childNode
+    ) {
         $seqFromElement = [
             [$this, 'maybeLoadSequenceFromElementContainer'],
             [
@@ -803,7 +794,32 @@ class SchemaReader
                 ]
             ],
         ];
+
+        return $methods;
+    }
+
+    private function loadExtension(BaseComplexType $type, DOMElement $node)
+    {
+        $extension = new Extension();
+        $type->setExtension($extension);
+
+        if ($node->hasAttribute("base")) {
+            $this->findAndSetSomeBase(
+                $type,
+                $extension,
+                $node
+            );
+        }
+
+        foreach ($node->childNodes as $childNode) {
+            if ($childNode instanceof DOMElement) {
+                $methods = $this->loadExtensionMakeMethods(
+                    $type,
+                    $node,
+                    $childNode
+                );
             $this->maybeCallCallableWithArgs($childNode, $methods);
+            }
         }
     }
 
