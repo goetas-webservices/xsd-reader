@@ -456,12 +456,12 @@ class SchemaReader
     }
 
     /**
-    * @param Closure|null $callback
-    *
-    * @return Closure
+    * @return BaseComplexType
     */
-    private function loadComplexType(Schema $schema, DOMElement $node, $callback = null)
-    {
+    private function loadComplexTypeBeforeCallbackCallback(
+        Schema $schema,
+        DOMElement $node
+    ) {
         $isSimple = false;
 
         foreach ($node->childNodes as $childNode) {
@@ -477,6 +477,18 @@ class SchemaReader
         if ($node->getAttribute("name")) {
             $schema->addType($type);
         }
+
+        return $type;
+    }
+
+    /**
+    * @param Closure|null $callback
+    *
+    * @return Closure
+    */
+    private function loadComplexType(Schema $schema, DOMElement $node, $callback = null)
+    {
+        $type = $this->loadComplexTypeBeforeCallbackCallback($schema, $node);
 
         return $this->makeCallbackCallback(
             $type,
