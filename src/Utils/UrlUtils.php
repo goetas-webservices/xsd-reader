@@ -90,14 +90,27 @@ class UrlUtils
         }
 
         $abs .= $path."/".$rel;
+        $abs = static::replaceSuperfluousSlashes($abs);
 
-        /*
+        if (isset($parts["scheme"])) {
+            $abs = $parts["scheme"].'://'.$abs;
+        }
+
+        return $abs;
+    }
+
+    /**
         * replace superfluous slashes with a single slash.
         * covers:
         * //
         * /./
         * /foo/../
+        *
+        * @param string $abs
+        *
+        * @return string
         */
+    protected static function replaceSuperfluousSlashes($abs) {
         $n = 1;
         do {
             $abs = preg_replace(
@@ -109,11 +122,6 @@ class UrlUtils
             );
         } while ($n > 0);
 
-        if (isset($parts["scheme"])) {
-            $abs = $parts["scheme"].'://'.$abs;
-        }
-
         return $abs;
     }
-
 }
