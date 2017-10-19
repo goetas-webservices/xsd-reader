@@ -296,18 +296,18 @@ class SchemaReader
         DOMElement $childNode,
         $max
     ) {
-        $loadSeq = [
+        $commonMethods = [
+            [
+                ['sequence', 'choice', 'all'],
             [$this, 'loadSequenceChildNodeLoadSequence'],
             [
                 $elementContainer,
                 $childNode,
                 $max
             ]
+            ],
         ];
         $methods = [
-            'choice' => $loadSeq,
-            'sequence' => $loadSeq,
-            'all' => $loadSeq,
             'element' => [
                 [$this, 'loadSequenceChildNodeLoadElement'],
                 [
@@ -327,7 +327,7 @@ class SchemaReader
             ],
         ];
 
-        $this->maybeCallCallableWithArgs($childNode, $methods);
+        $this->maybeCallCallableWithArgs($childNode, $commonMethods, $methods);
     }
 
     /**
@@ -337,8 +337,16 @@ class SchemaReader
     */
     private function maybeCallCallableWithArgs(
         DOMElement $childNode,
-        array $methods
+        array $commonMethods = [],
+        array $methods = []
     ) {
+        foreach ($commonMethods as $commonMethodsSpec) {
+            list ($localNames, $callable, $args) = $commonMethodsSpec;
+
+            if (in_array($childNode->localName, $localNames)) {
+                return call_user_func_array($callable, $args);
+            }
+        }
         if (isset($methods[$childNode->localName])) {
             list ($callable, $args) = $methods[$childNode->localName];
 
@@ -549,17 +557,17 @@ class SchemaReader
         DOMElement $childNode,
         Schema $schema
     ) {
-        $maybeLoadSeq = [
+        $commonMethods = [
+            [
+                ['sequence', 'choice', 'all'],
             [$this, 'maybeLoadSequenceFromElementContainer'],
             [
                 $type,
                 $childNode
             ]
+            ],
         ];
         $methods = [
-            'sequence' => $maybeLoadSeq,
-            'choice' => $maybeLoadSeq,
-            'all' => $maybeLoadSeq,
             'attribute' => [
                 [$type, 'addAttributeFromAttributeOrRef'],
                 [
@@ -594,7 +602,7 @@ class SchemaReader
             ];
         }
 
-        $this->maybeCallCallableWithArgs($childNode, $methods);
+        $this->maybeCallCallableWithArgs($childNode, $commonMethods, $methods);
     }
 
     /**
@@ -760,18 +768,17 @@ class SchemaReader
         DOMElement $node,
         DOMElement $childNode
     ) {
-        $seqFromElement = [
+        $commonMethods = [
+            [
+                ['sequence', 'choice', 'all'],
             [$this, 'maybeLoadSequenceFromElementContainer'],
             [
                 $type,
                 $childNode
             ]
+            ],
         ];
-
         $methods = [
-            'sequence' => $seqFromElement,
-            'choice' => $seqFromElement,
-            'all' => $seqFromElement,
             'attribute' => [
                 [$type, 'addAttributeFromAttributeOrRef'],
                 [
@@ -793,7 +800,7 @@ class SchemaReader
             ],
         ];
 
-        $this->maybeCallCallableWithArgs($childNode, $methods);
+        $this->maybeCallCallableWithArgs($childNode, $commonMethods, $methods);
     }
 
     private function loadExtension(BaseComplexType $type, DOMElement $node)
