@@ -62,7 +62,6 @@ class Group implements ElementItem, ElementContainer
     * @return Group|GroupRef
     */
     protected static function loadGroupBeforeCheckingChildNodes(
-        SchemaReader $reader,
         Schema $schema,
         DOMElement $node
     ) {
