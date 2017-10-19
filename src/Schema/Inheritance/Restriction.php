@@ -97,6 +97,17 @@ class Restriction extends Base
                     true
                 )
             ) {
+                static::definitelyLoadRestrictionOnChildNode(
+                    $restriction,
+                    $childNode
+                );
+            }
+    }
+
+    protected static function definitelyLoadRestrictionOnChildNode(
+        Restriction $restriction,
+        DOMElement $childNode
+    ) {
                 $restriction->addCheck(
                     $childNode->localName,
                     [
@@ -104,6 +115,5 @@ class Restriction extends Base
                         'doc' => SchemaReader::getDocumentation($childNode)
                     ]
                 );
-            }
     }
 }
