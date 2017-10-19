@@ -298,9 +298,9 @@ class SchemaReader
         $loadSeq = [
             'makeLoadSequenceChildNodeLoadSequence',
             [
-            $elementContainer,
-            $childNode,
-            $max
+                $elementContainer,
+                $childNode,
+                $max
             ]
         ];
         $methods = [
@@ -310,18 +310,18 @@ class SchemaReader
             'element' => [
                 'makeLoadSequenceChildNodeLoadElement',
                 [
-                $elementContainer,
-                $node,
-                $childNode,
-                $max
+                    $elementContainer,
+                    $node,
+                    $childNode,
+                    $max
                 ]
             ],
             'group' => [
                 'makeLoadSequenceChildNodeLoadGroup',
                 [
-                $elementContainer,
-                $node,
-                $childNode
+                    $elementContainer,
+                    $node,
+                    $childNode
                 ]
             ],
         ];
