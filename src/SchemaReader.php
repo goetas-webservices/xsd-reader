@@ -356,7 +356,7 @@ class SchemaReader
         DOMElement $childNode,
         $max
     ) {
-            $this->loadSequence($elementContainer, $childNode, $max);
+        $this->loadSequence($elementContainer, $childNode, $max);
     }
 
     /**
@@ -368,26 +368,26 @@ class SchemaReader
         DOMElement $childNode,
         $max
     ) {
-            if ($childNode->hasAttribute("ref")) {
-                /**
-                * @var ElementDef $referencedElement
-                */
-                $referencedElement = $this->findSomething('findElement', $elementContainer->getSchema(), $node, $childNode->getAttribute("ref"));
-                $element = ElementRef::loadElementRef(
-                    $referencedElement,
-                    $childNode
-                );
-            } else {
-                $element = Element::loadElement(
-                    $this,
-                    $elementContainer->getSchema(),
-                    $childNode
-                );
-            }
-            if (is_int($max) && (bool) $max) {
-                $element->setMax($max);
-            }
-            $elementContainer->addElement($element);
+        if ($childNode->hasAttribute("ref")) {
+            /**
+            * @var ElementDef $referencedElement
+            */
+            $referencedElement = $this->findSomething('findElement', $elementContainer->getSchema(), $node, $childNode->getAttribute("ref"));
+            $element = ElementRef::loadElementRef(
+                $referencedElement,
+                $childNode
+            );
+        } else {
+            $element = Element::loadElement(
+                $this,
+                $elementContainer->getSchema(),
+                $childNode
+            );
+        }
+        if (is_int($max) && (bool) $max) {
+            $element->setMax($max);
+        }
+        $elementContainer->addElement($element);
     }
 
     private function loadSequenceChildNodeLoadGroup(
@@ -395,12 +395,12 @@ class SchemaReader
         DOMElement $node,
         DOMElement $childNode
     ) {
-            $this->addGroupAsElement(
-                $elementContainer->getSchema(),
-                $node,
-                $childNode,
-                $elementContainer
-            );
+        $this->addGroupAsElement(
+            $elementContainer->getSchema(),
+            $node,
+            $childNode,
+            $elementContainer
+        );
     }
 
     private function addGroupAsElement(
