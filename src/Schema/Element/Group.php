@@ -98,7 +98,6 @@ class Group implements ElementItem, ElementContainer
         DOMElement $node
     ) {
         $group = static::loadGroupBeforeCheckingChildNodes(
-            $reader,
             $schema,
             $node
         );
