@@ -296,7 +296,7 @@ class SchemaReader
         $max
     ) {
         $loadSeq = [
-            'makeLoadSequenceChildNodeLoadSequence',
+            'loadSequenceChildNodeLoadSequence',
             [
                 $elementContainer,
                 $childNode,
@@ -308,7 +308,7 @@ class SchemaReader
             'sequence' => $loadSeq,
             'all' => $loadSeq,
             'element' => [
-                'makeLoadSequenceChildNodeLoadElement',
+                'loadSequenceChildNodeLoadElement',
                 [
                     $elementContainer,
                     $node,
@@ -317,7 +317,7 @@ class SchemaReader
                 ]
             ],
             'group' => [
-                'makeLoadSequenceChildNodeLoadGroup',
+                'loadSequenceChildNodeLoadGroup',
                 [
                     $elementContainer,
                     $node,
@@ -350,36 +350,24 @@ class SchemaReader
 
     /**
     * @param int|null $max
-    *
-    * @return Closure
     */
-    private function makeLoadSequenceChildNodeLoadSequence(
+    private function loadSequenceChildNodeLoadSequence(
         ElementContainer $elementContainer,
         DOMElement $childNode,
         $max
     ) {
-        return function () use ($elementContainer, $childNode, $max) {
             $this->loadSequence($elementContainer, $childNode, $max);
-        };
     }
 
     /**
     * @param int|null $max
-    *
-    * @return Closure
     */
-    private function makeLoadSequenceChildNodeLoadElement(
+    private function loadSequenceChildNodeLoadElement(
         ElementContainer $elementContainer,
         DOMElement $node,
         DOMElement $childNode,
         $max
     ) {
-        return function () use (
-            $elementContainer,
-            $node,
-            $childNode,
-            $max
-        ) {
             if ($childNode->hasAttribute("ref")) {
                 /**
                 * @var ElementDef $referencedElement
@@ -400,29 +388,19 @@ class SchemaReader
                 $element->setMax($max);
             }
             $elementContainer->addElement($element);
-        };
     }
 
-    /**
-    * @return Closure
-    */
-    private function makeLoadSequenceChildNodeLoadGroup(
+    private function loadSequenceChildNodeLoadGroup(
         ElementContainer $elementContainer,
         DOMElement $node,
         DOMElement $childNode
     ) {
-        return function () use (
-            $elementContainer,
-            $node,
-            $childNode
-        ) {
             $this->addGroupAsElement(
                 $elementContainer->getSchema(),
                 $node,
                 $childNode,
                 $elementContainer
             );
-        };
     }
 
     private function addGroupAsElement(
