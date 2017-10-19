@@ -1058,13 +1058,10 @@ class SchemaReader
     private $globalSchema;
 
     /**
-     *
-     * @return Schema
-     */
-    public function getGlobalSchema()
+    * @return Schema[]
+    */
+    private function setupGlobalSchemas(array & $callbacks)
     {
-        if (!$this->globalSchema) {
-            $callbacks = array();
             $globalSchemas = array();
             foreach (self::$globalSchemaInfo as $namespace => $uri) {
                 Schema::setLoadedFile(
@@ -1077,6 +1074,19 @@ class SchemaReader
                 $xml = $this->getDOM($this->knownLocationSchemas[$uri]);
                 $callbacks = array_merge($callbacks, $this->schemaNode($schema, $xml->documentElement));
             }
+
+        return $globalSchemas;
+    }
+
+    /**
+     *
+     * @return Schema
+     */
+    public function getGlobalSchema()
+    {
+        if (!$this->globalSchema) {
+            $callbacks = array();
+            $globalSchemas = $this->setupGlobalSchemas($callbacks);
 
             $globalSchemas[self::XSD_NS]->addType(new SimpleType($globalSchemas[self::XSD_NS], "anySimpleType"));
             $globalSchemas[self::XSD_NS]->addType(new SimpleType($globalSchemas[self::XSD_NS], "anyType"));
