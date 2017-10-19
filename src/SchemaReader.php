@@ -759,6 +759,7 @@ class SchemaReader
     */
     private function loadExtensionMakeMethods(
         BaseComplexType $type,
+        Schema $schema,
         DOMElement $node,
         DOMElement $childNode
     ) {
@@ -779,7 +780,7 @@ class SchemaReader
                 [
                     $this,
                     $childNode,
-                    $type->getSchema(),
+                    $schema,
                     $node
                 ]
             ],
@@ -787,7 +788,7 @@ class SchemaReader
                 (AttributeGroup::class . '::findSomethingLikeThis'),
                 [
                     $this,
-                    $type->getSchema(),
+                    $schema,
                     $node,
                     $childNode,
                     $type
@@ -815,6 +816,7 @@ class SchemaReader
             if ($childNode instanceof DOMElement) {
                 $methods = $this->loadExtensionMakeMethods(
                     $type,
+                    $type->getSchema(),
                     $node,
                     $childNode
                 );
