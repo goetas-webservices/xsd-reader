@@ -295,31 +295,56 @@ class SchemaReader
         DOMElement $childNode,
         $max
     ) {
-        $loadSeq = $this->makeLoadSequenceChildNodeLoadSequence(
+        $loadSeq = [
+            'makeLoadSequenceChildNodeLoadSequence',
+            [
             $elementContainer,
             $childNode,
             $max
-        );
+            ]
+        ];
         $methods = [
             'choice' => $loadSeq,
             'sequence' => $loadSeq,
             'all' => $loadSeq,
-            'element' => $this->makeLoadSequenceChildNodeLoadElement(
+            'element' => [
+                'makeLoadSequenceChildNodeLoadElement',
+                [
                 $elementContainer,
                 $node,
                 $childNode,
                 $max
-            ),
-            'group' => $this->makeLoadSequenceChildNodeLoadGroup(
+                ]
+            ],
+            'group' => [
+                'makeLoadSequenceChildNodeLoadGroup',
+                [
                 $elementContainer,
                 $node,
                 $childNode
-            ),
+                ]
+            ],
         ];
 
-        if (isset($methods[$childNode->localName])) {
-            $method = $methods[$childNode->localName];
+        $method = $this->maybeCallMethodWithArgs($childNode, $methods);
+        if ($method instanceof Closure) {
             $method();
+        }
+    }
+
+    /**
+    * @param mixed[][] $methods
+    *
+    * @return mixed
+    */
+    private function maybeCallMethodWithArgs(
+        DOMElement $childNode,
+        array $methods
+    ) {
+        if (isset($methods[$childNode->localName])) {
+            list ($method, $args) = $methods[$childNode->localName];
+
+            return $this->$method(...$args);
         }
     }
 
