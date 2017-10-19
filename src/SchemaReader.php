@@ -299,12 +299,12 @@ class SchemaReader
         $commonMethods = [
             [
                 ['sequence', 'choice', 'all'],
-            [$this, 'loadSequenceChildNodeLoadSequence'],
-            [
-                $elementContainer,
-                $childNode,
-                $max
-            ]
+                [$this, 'loadSequenceChildNodeLoadSequence'],
+                [
+                    $elementContainer,
+                    $childNode,
+                    $max,
+                ],
             ],
         ];
         $methods = [
@@ -481,20 +481,20 @@ class SchemaReader
         return $this->makeCallbackCallback(
             $type,
             $node,
-                function (
-                    DOMElement $node,
-                    DOMElement $childNode
-                ) use(
-                    $schema,
-                    $type
-                ) {
-                    $this->loadComplexTypeFromChildNode(
-                        $type,
-                        $node,
-                        $childNode,
-                        $schema
-                    );
-                },
+            function (
+                DOMElement $node,
+                DOMElement $childNode
+            ) use(
+                $schema,
+                $type
+            ) {
+                $this->loadComplexTypeFromChildNode(
+                    $type,
+                    $node,
+                    $childNode,
+                    $schema
+                );
+            },
             $callback
         );
     }
@@ -560,11 +560,11 @@ class SchemaReader
         $commonMethods = [
             [
                 ['sequence', 'choice', 'all'],
-            [$this, 'maybeLoadSequenceFromElementContainer'],
-            [
-                $type,
-                $childNode
-            ]
+                [$this, 'maybeLoadSequenceFromElementContainer'],
+                [
+                    $type,
+                    $childNode,
+                ],
             ],
         ];
         $methods = [
@@ -771,11 +771,11 @@ class SchemaReader
         $commonMethods = [
             [
                 ['sequence', 'choice', 'all'],
-            [$this, 'maybeLoadSequenceFromElementContainer'],
-            [
-                $type,
-                $childNode
-            ]
+                [$this, 'maybeLoadSequenceFromElementContainer'],
+                [
+                    $type,
+                    $childNode,
+                ],
             ],
         ];
         $methods = [
