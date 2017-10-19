@@ -350,31 +350,31 @@ class SchemaReader
         $max
     ) {
         return function () use (
-                $elementContainer,
-                $node,
-                $childNode,
-                $max
-            ) {
-                if ($childNode->hasAttribute("ref")) {
-                    /**
-                    * @var ElementDef $referencedElement
-                    */
-                    $referencedElement = $this->findSomething('findElement', $elementContainer->getSchema(), $node, $childNode->getAttribute("ref"));
-                    $element = ElementRef::loadElementRef(
-                        $referencedElement,
-                        $childNode
-                    );
-                } else {
-                    $element = Element::loadElement(
-                        $this,
-                        $elementContainer->getSchema(),
-                        $childNode
-                    );
-                }
-                if (is_int($max) && (bool) $max) {
-                    $element->setMax($max);
-                }
-                $elementContainer->addElement($element);
+            $elementContainer,
+            $node,
+            $childNode,
+            $max
+        ) {
+            if ($childNode->hasAttribute("ref")) {
+                /**
+                * @var ElementDef $referencedElement
+                */
+                $referencedElement = $this->findSomething('findElement', $elementContainer->getSchema(), $node, $childNode->getAttribute("ref"));
+                $element = ElementRef::loadElementRef(
+                    $referencedElement,
+                    $childNode
+                );
+            } else {
+                $element = Element::loadElement(
+                    $this,
+                    $elementContainer->getSchema(),
+                    $childNode
+                );
+            }
+            if (is_int($max) && (bool) $max) {
+                $element->setMax($max);
+            }
+            $elementContainer->addElement($element);
         };
     }
 
@@ -387,16 +387,16 @@ class SchemaReader
         DOMElement $childNode
     ) {
         return function () use (
-                $elementContainer,
+            $elementContainer,
+            $node,
+            $childNode
+        ) {
+            $this->addGroupAsElement(
+                $elementContainer->getSchema(),
                 $node,
-                $childNode
-            ) {
-                $this->addGroupAsElement(
-                    $elementContainer->getSchema(),
-                    $node,
-                    $childNode,
-                    $elementContainer
-                );
+                $childNode,
+                $elementContainer
+            );
         };
     }
 
