@@ -75,14 +75,6 @@ class GroupRef extends Group implements InterfaceSetMinMax
     }
 
     /**
-    * @param string $name
-    */
-    public function setName($name)
-    {
-        throw new BadMethodCallException("Can't set the name for a ref group");
-    }
-
-    /**
     * @return ElementItem[]
     */
     public function getElements()
