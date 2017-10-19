@@ -296,7 +296,7 @@ class SchemaReader
         $max
     ) {
         $loadSeq = [
-            'loadSequenceChildNodeLoadSequence',
+            [$this, 'loadSequenceChildNodeLoadSequence'],
             [
                 $elementContainer,
                 $childNode,
@@ -308,7 +308,7 @@ class SchemaReader
             'sequence' => $loadSeq,
             'all' => $loadSeq,
             'element' => [
-                'loadSequenceChildNodeLoadElement',
+                [$this, 'loadSequenceChildNodeLoadElement'],
                 [
                     $elementContainer,
                     $node,
@@ -317,7 +317,7 @@ class SchemaReader
                 ]
             ],
             'group' => [
-                'loadSequenceChildNodeLoadGroup',
+                [$this, 'loadSequenceChildNodeLoadGroup'],
                 [
                     $elementContainer,
                     $node,
@@ -326,10 +326,7 @@ class SchemaReader
             ],
         ];
 
-        $method = $this->maybeCallMethodWithArgs($childNode, $methods);
-        if ($method instanceof Closure) {
-            $method();
-        }
+        $this->maybeCallCallableWithArgs($childNode, $methods);
     }
 
     /**
@@ -337,14 +334,14 @@ class SchemaReader
     *
     * @return mixed
     */
-    private function maybeCallMethodWithArgs(
+    private function maybeCallCallableWithArgs(
         DOMElement $childNode,
         array $methods
     ) {
         if (isset($methods[$childNode->localName])) {
-            list ($method, $args) = $methods[$childNode->localName];
+            list ($callable, $args) = $methods[$childNode->localName];
 
-            return $this->$method(...$args);
+            return call_user_func_array($callable, $args);
         }
     }
 
@@ -551,68 +548,52 @@ class SchemaReader
         DOMElement $childNode,
         Schema $schema
     ) {
-        $maybeLoadSeq = function () use ($type, $childNode) {
-            $this->maybeLoadSequenceFromElementContainer(
+        $maybeLoadSeq = [
+            [$this, 'maybeLoadSequenceFromElementContainer'],
+            [
                 $type,
                 $childNode
-            );
-        };
+            ]
+        ];
         $methods = [
             'sequence' => $maybeLoadSeq,
             'choice' => $maybeLoadSeq,
             'all' => $maybeLoadSeq,
-            'attribute' => function () use (
-                $childNode,
-                $schema,
-                $node,
-                $type
-            ) {
-                $attribute = Attribute::getAttributeFromAttributeOrRef(
+            'attribute' => [
+                [$type, 'addAttributeFromAttributeOrRef'],
+                [
                     $this,
                     $childNode,
                     $schema,
                     $node
-                );
-
-                $type->addAttribute($attribute);
-            },
-            'attributeGroup' => function() use (
-                $schema,
-                $node,
-                $childNode,
-                $type
-            ) {
-                AttributeGroup::findSomethingLikeThis(
+                ]
+            ],
+            'attributeGroup' => [
+                (AttributeGroup::class . '::findSomethingLikeThis'),
+                [
                     $this,
                     $schema,
                     $node,
                     $childNode,
                     $type
-                );
-            },
+                ]
+            ],
         ];
         if (
             $type instanceof ComplexType
         ) {
-            $methods['group'] = function() use (
-                $schema,
-                $node,
-                $childNode,
-                $type
-            ) {
-                $this->addGroupAsElement(
+            $methods['group'] = [
+                [$this, 'addGroupAsElement'],
+                [
                     $schema,
                     $node,
                     $childNode,
                     $type
-                );
-            };
+                ]
+            ];
         }
 
-        if (isset($methods[$childNode->localName])) {
-            $method = $methods[$childNode->localName];
-            $method();
-        }
+        $this->maybeCallCallableWithArgs($childNode, $methods);
     }
 
     /**
@@ -786,52 +767,43 @@ class SchemaReader
             );
         }
 
-        $seqFromElement = function (DOMElement $childNode) use ($type) {
-            $this->maybeLoadSequenceFromElementContainer(
+        foreach ($node->childNodes as $childNode) {
+            if (! ($childNode instanceof DOMElement)) {
+                continue;
+            }
+        $seqFromElement = [
+            [$this, 'maybeLoadSequenceFromElementContainer'],
+            [
                 $type,
                 $childNode
-            );
-        };
+            ]
+        ];
 
         $methods = [
             'sequence' => $seqFromElement,
             'choice' => $seqFromElement,
             'all' => $seqFromElement,
-            'attribute' => function (
-                DOMElement $childNode
-            ) use (
-                $node,
-                $type
-            ) {
-                $attribute = Attribute::getAttributeFromAttributeOrRef(
+            'attribute' => [
+                [$type, 'addAttributeFromAttributeOrRef'],
+                [
                     $this,
                     $childNode,
                     $type->getSchema(),
                     $node
-                );
-                $type->addAttribute($attribute);
-            },
-            'attributeGroup' => function (
-                DOMElement $childNode
-            ) use (
-                $node,
-                $type
-            ) {
-                AttributeGroup::findSomethingLikeThis(
+                ]
+            ],
+            'attributeGroup' => [
+                (AttributeGroup::class . '::findSomethingLikeThis'),
+                [
                     $this,
                     $type->getSchema(),
                     $node,
                     $childNode,
                     $type
-                );
-            },
+                ]
+            ],
         ];
-
-        foreach ($node->childNodes as $childNode) {
-            if (isset($methods[$childNode->localName])) {
-                $method = $methods[$childNode->localName];
-                $method($childNode);
-            }
+            $this->maybeCallCallableWithArgs($childNode, $methods);
         }
     }
 
