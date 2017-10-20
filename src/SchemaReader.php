@@ -35,7 +35,7 @@ use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
 use GoetasWebservices\XML\XSDReader\Utils\UrlUtils;
 use RuntimeException;
 
-class SchemaReader extends SchemaReaderCallbackAbstraction
+class SchemaReader extends SchemaReaderFindAbstraction
 {
     /**
     * @return Closure
@@ -467,46 +467,6 @@ class SchemaReader extends SchemaReaderCallbackAbstraction
                 $addCallback
             );
         }
-    }
-
-    /**
-    * @param string $attributeName
-    *
-    * @return SchemaItem
-    */
-    protected function findSomeType(
-        SchemaItem $fromThis,
-        DOMElement $node,
-        $attributeName
-    ) {
-        return $this->findSomeTypeFromAttribute(
-            $fromThis,
-            $node,
-            $node->getAttribute($attributeName)
-        );
-    }
-
-    /**
-    * @param string $attributeName
-    *
-    * @return SchemaItem
-    */
-    protected function findSomeTypeFromAttribute(
-        SchemaItem $fromThis,
-        DOMElement $node,
-        $attributeName
-    ) {
-        /**
-        * @var SchemaItem $out
-        */
-        $out = $this->findSomething(
-            'findType',
-            $fromThis->getSchema(),
-            $node,
-            $attributeName
-        );
-
-        return $out;
     }
 
     protected function loadUnion(SimpleType $type, DOMElement $node)
