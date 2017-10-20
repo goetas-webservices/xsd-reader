@@ -589,21 +589,22 @@ class Schema
             ($namespace ? new Schema() : $schema)
         );
 
-        $xml = $reader->getDOM(
-            $reader->hasKnownSchemaLocation($file)
-                ? $reader->getKnownSchemaLocation($file)
-                : $file
-        );
-
-        $callbacks = $reader->schemaNode($newSchema, $xml->documentElement, $schema);
-
         if ($namespace) {
             $newSchema->addSchema($reader->getGlobalSchema());
             $schema->addSchema($newSchema);
         }
 
 
-        return function () use ($callbacks) {
+        return function () use ($newSchema, $reader, $schema, $file) {
+            $callbacks = $reader->schemaNode(
+                $newSchema,
+                $reader->getDOM(
+                    $reader->hasKnownSchemaLocation($file)
+                        ? $reader->getKnownSchemaLocation($file)
+                        : $file
+                )->documentElement,
+                $schema
+            );
             foreach ($callbacks as $callback) {
                 $callback();
             }
