@@ -593,13 +593,12 @@ class Schema
     *
     * @return Closure
     */
-    protected static function loadImportFresh(
+    protected static function loadImportFreshCallbacks(
         $namespace,
         SchemaReaderLoadAbstraction $reader,
         Schema $schema,
         $file
     ) {
-        return function () use ($namespace, $reader, $schema, $file) {
             $newSchema = Schema::setLoadedFile(
                 $file,
                 ($namespace ? new Schema() : $schema)
@@ -618,7 +617,24 @@ class Schema
                 )->documentElement,
                 $schema
             );
-            foreach ($callbacks as $callback) {
+
+        return $callbacks;
+    }
+
+    /**
+    * @param string $namespace
+    * @param string $file
+    *
+    * @return Closure
+    */
+    protected static function loadImportFresh(
+        $namespace,
+        SchemaReaderLoadAbstraction $reader,
+        Schema $schema,
+        $file
+    ) {
+        return function () use ($namespace, $reader, $schema, $file) {
+            foreach (static::loadImportFreshCallbacks() as $callback) {
                 $callback();
             }
         };
