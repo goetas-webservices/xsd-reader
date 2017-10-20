@@ -323,12 +323,10 @@ class Schema
         if (isset($this->typeCache[$cid])) {
             return $this->typeCache[$cid];
         } elseif (
-            (
-                $this->getTargetNamespace() === $namespace
-            ) &&
+            $this->getTargetNamespace() === $namespace &&
             (($item = $this->$getter($name)) instanceof SchemaItem)
         ) {
-                return $this->typeCache[$cid] = $item;
+            return $this->typeCache[$cid] = $item;
         }
 
         return $this->findSomethingNoThrowSchemas(
