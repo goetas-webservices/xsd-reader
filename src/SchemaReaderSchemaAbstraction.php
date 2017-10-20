@@ -79,23 +79,23 @@ abstract class SchemaReaderSchemaAbstraction extends SchemaReaderFillAbstraction
         foreach ($node->childNodes as $childNode) {
             if ($childNode instanceof DOMElement) {
                 $callback = $this->maybeCallCallableWithArgs(
-                $childNode,
-                    [],
-                    [],
-                    [
+                    $childNode,
+                        [],
+                        [],
                         [
-                            $methods,
                             [
-                $schema,
-                $childNode
+                                $methods,
+                                [
+                                    $schema,
+                                    $childNode
+                                ],
                             ],
-                        ],
-                    ]
-            );
+                        ]
+                );
 
-            if ($callback instanceof Closure) {
-                $functions[] = $callback;
-            }
+                if ($callback instanceof Closure) {
+                    $functions[] = $callback;
+                }
             }
         }
 
