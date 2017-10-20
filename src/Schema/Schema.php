@@ -584,28 +584,6 @@ class Schema
             };
         }
 
-        return static::loadImportFresh(
-            $reader,
-            $schema,
-            $node,
-            $file,
-            $namespace
-        );
-    }
-
-    /**
-    * @param string $file
-    * @param string $namespace
-    *
-    * @return Closure
-    */
-    protected static function loadImportFresh(
-        SchemaReaderLoadAbstraction $reader,
-        Schema $schema,
-        DOMElement $node,
-        $file,
-        $namespace
-    ) {
         $newSchema = Schema::setLoadedFile(
             $file,
             ($namespace ? new Schema() : $schema)
