@@ -599,26 +599,24 @@ class Schema
         Schema $schema,
         $file
     ) {
-            $newSchema = Schema::setLoadedFile(
-                $file,
-                ($namespace ? new Schema() : $schema)
-            );
+        $newSchema = Schema::setLoadedFile(
+            $file,
+            ($namespace ? new Schema() : $schema)
+        );
 
-            if ($namespace) {
-                $newSchema->addSchema($reader->getGlobalSchema());
-                $schema->addSchema($newSchema);
-            }
-            $callbacks = $reader->schemaNode(
-                $newSchema,
-                $reader->getDOM(
-                    $reader->hasKnownSchemaLocation($file)
-                        ? $reader->getKnownSchemaLocation($file)
-                        : $file
-                )->documentElement,
-                $schema
-            );
-
-        return $callbacks;
+        if ($namespace) {
+            $newSchema->addSchema($reader->getGlobalSchema());
+            $schema->addSchema($newSchema);
+        }
+        return $reader->schemaNode(
+            $newSchema,
+            $reader->getDOM(
+                $reader->hasKnownSchemaLocation($file)
+                    ? $reader->getKnownSchemaLocation($file)
+                    : $file
+            )->documentElement,
+            $schema
+        );
     }
 
     /**
