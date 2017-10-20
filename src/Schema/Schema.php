@@ -359,7 +359,7 @@ class Schema
         $namespace = null,
         array & $calling = array()
     ) {
-        foreach ($this->getSchemas() as $childSchema) {
+        foreach ($schemas as $childSchema) {
             if (!isset($calling[spl_object_hash($childSchema)])) {
                 $in = $childSchema->findSomethingNoThrow($getter, $name, $namespace, $calling);
 
