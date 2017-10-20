@@ -607,9 +607,9 @@ class Schema
     * @param string $namespace
     * @param string $file
     *
-    * @return Closure[]
+    * @return Schema
     */
-    protected static function loadImportFreshCallbacks(
+    protected static function loadImportFreshCallbacksNewSchema(
         $namespace,
         SchemaReaderLoadAbstraction $reader,
         Schema $schema,
@@ -624,8 +624,29 @@ class Schema
             $newSchema->addSchema($reader->getGlobalSchema());
             $schema->addSchema($newSchema);
         }
+
+        return $newSchema;
+    }
+
+    /**
+    * @param string $namespace
+    * @param string $file
+    *
+    * @return Closure[]
+    */
+    protected static function loadImportFreshCallbacks(
+        $namespace,
+        SchemaReaderLoadAbstraction $reader,
+        Schema $schema,
+        $file
+    ) {
         return $reader->schemaNode(
-            $newSchema,
+            static::loadImportFreshCallbacksNewSchema(
+                $namespace,
+                $reader,
+                $schema,
+                $file
+            ),
             $reader->getDOM(
                 $reader->hasKnownSchemaLocation($file)
                     ? $reader->getKnownSchemaLocation($file)
