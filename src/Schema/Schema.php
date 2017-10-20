@@ -195,7 +195,13 @@ class Schema
     {
         if ($namespace !== null) {
             if ($schema->getTargetNamespace() !== $namespace) {
-            throw new SchemaException(sprintf("The target namespace ('%s') for schema, does not match the declared namespace '%s'", $schema->getTargetNamespace(), $namespace));
+                throw new SchemaException(
+                    sprintf(
+                        "The target namespace ('%s') for schema, does not match the declared namespace '%s'",
+                        $schema->getTargetNamespace(),
+                        $namespace
+                    )
+                );
             }
             $this->schemas[$namespace] = $schema;
         } else {
