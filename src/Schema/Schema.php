@@ -3,6 +3,7 @@ namespace GoetasWebservices\XML\XSDReader\Schema;
 
 use Closure;
 use DOMElement;
+use RuntimeException;
 use GoetasWebservices\XML\XSDReader\AbstractSchemaReader;
 use GoetasWebservices\XML\XSDReader\SchemaReaderLoadAbstraction;
 use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
@@ -482,23 +483,37 @@ class Schema
     private static $loadedFiles = array();
 
     /**
-    * @param string $key
+    * @param string ...$keys
     *
     * @return bool
     */
-    public static function hasLoadedFile($key)
+    public static function hasLoadedFile(...$keys)
     {
-        return isset(self::$loadedFiles[$key]);
+        foreach ($keys as $key) {
+            if (isset(self::$loadedFiles[$key])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
-    * @param string $key
+    * @param string ...$keys
     *
     * @return Schema
+    *
+    * @throws RuntimeException if loaded file not found
     */
-    public static function getLoadedFile($key)
+    public static function getLoadedFile(...$keys)
     {
+        foreach ($keys as $key) {
+            if (isset(self::$loadedFiles[$key])) {
         return self::$loadedFiles[$key];
+            }
+        }
+
+        throw new RuntimeException('Loaded file was not found!');
     }
 
     /**
@@ -547,22 +562,23 @@ class Schema
 
         $globalSchemaInfo = $reader->getGlobalSchemaInfo();
 
+        $keys = [];
+
+        if (isset($globalSchemaInfo[$namespace])) {
+            $keys[] = $globalSchemaInfo[$namespace];
+        }
+
+        $keys[] = $reader->getNamespaceSpecificFileIndex(
+            $file,
+            $namespace
+        );
+
+        $keys[] = $file;
+
         if (
-            (
-                isset($globalSchemaInfo[$namespace]) &&
-                Schema::hasLoadedFile(
-                    $loadedFilesKey = $globalSchemaInfo[$namespace]
-                )
-            ) ||
-            Schema::hasLoadedFile(
-                $loadedFilesKey = $reader->getNamespaceSpecificFileIndex(
-                    $file,
-                    $namespace
-                )
-            ) ||
-            Schema::hasLoadedFile($loadedFilesKey = $file)
+            Schema::hasLoadedFile(...$keys)
         ) {
-            $schema->addSchema(Schema::getLoadedFile($loadedFilesKey));
+            $schema->addSchema(Schema::getLoadedFile(...$keys));
 
             return function() {
             };
