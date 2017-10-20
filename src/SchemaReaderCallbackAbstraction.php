@@ -76,18 +76,41 @@ abstract class SchemaReaderCallbackAbstraction extends AbstractSchemaReader
         BaseComplexType $type,
         DOMElement $childNode
     ) {
-        if (! ($type instanceof ElementContainer)) {
+        $this->maybeLoadThingFromThing(
+            $type,
+            $childNode,
+            ElementContainer::class,
+            'loadSequence'
+        );
+    }
+
+    /**
+    * @param string $instanceof
+    * @param string $passTo
+    */
+    protected function maybeLoadThingFromThing(
+        Type $type,
+        DOMElement $childNode,
+        $instanceof,
+        $passTo
+    ) {
+        if (! is_a($type, $instanceof, true)) {
             throw new RuntimeException(
-                '$type passed to ' .
-                __FUNCTION__ .
-                'expected to be an instance of ' .
-                ElementContainer::class .
-                ' when child node localName is "group", ' .
+                'Argument 1 passed to ' .
+                __METHOD__ .
+                ' needs to be an instance of ' .
+                $instanceof .
+                ' when passed onto ' .
+                static::class .
+                '::' .
+                $passTo .
+                '(), ' .
                 get_class($type) .
                 ' given.'
             );
         }
-        $this->loadSequence($type, $childNode);
+
+        $this->$passTo($type, $childNode);
     }
 
     /**
@@ -146,19 +169,11 @@ abstract class SchemaReaderCallbackAbstraction extends AbstractSchemaReader
         Type $type,
         DOMElement $childNode
     ) {
-        if (! ($type instanceof BaseComplexType)) {
-            throw new RuntimeException(
-                'Argument 1 passed to ' .
-                __METHOD__ .
-                ' needs to be an instance of ' .
-                BaseComplexType::class .
-                ' when passed onto ' .
-                static::class .
-                '::loadExtension(), ' .
-                get_class($type) .
-                ' given.'
-            );
-        }
-        $this->loadExtension($type, $childNode);
+        $this->maybeLoadThingFromThing(
+            $type,
+            $childNode,
+            BaseComplexType::class,
+            'loadExtension'
+        );
     }
 }
