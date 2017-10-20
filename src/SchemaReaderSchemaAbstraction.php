@@ -65,28 +65,37 @@ abstract class SchemaReaderSchemaAbstraction extends SchemaReaderFillAbstraction
         $this->setSchemaThingsFromNode($schema, $node, $parent);
         $functions = array();
 
-        static $methods = [
-            'include' => 'loadImport',
-            'import' => 'loadImport',
-            'element' => 'loadElementDef',
-            'attribute' => 'loadAttributeDef',
-            'attributeGroup' => 'loadAttributeGroup',
-            'group' => 'loadGroup',
-            'complexType' => 'loadComplexType',
-            'simpleType' => 'loadSimpleType',
+        $methods = [
+            'include' => [$this, 'loadImport'],
+            'import' => [$this, 'loadImport'],
+            'element' => [$this, 'loadElementDef'],
+            'attribute' => [$this, 'loadAttributeDef'],
+            'attributeGroup' => [$this, 'loadAttributeGroup'],
+            'group' => [$this, 'loadGroup'],
+            'complexType' => [$this, 'loadComplexType'],
+            'simpleType' => [$this, 'loadSimpleType'],
         ];
 
         foreach ($node->childNodes as $childNode) {
-            $callback = $this->maybeCallMethod(
-                $methods,
-                (string) $childNode->localName,
+            if ($childNode instanceof DOMElement) {
+                $callback = $this->maybeCallCallableWithArgs(
                 $childNode,
+                    [],
+                    [],
+                    [
+                        [
+                            $methods,
+                            [
                 $schema,
                 $childNode
+                            ],
+                        ],
+                    ]
             );
 
             if ($callback instanceof Closure) {
                 $functions[] = $callback;
+            }
             }
         }
 

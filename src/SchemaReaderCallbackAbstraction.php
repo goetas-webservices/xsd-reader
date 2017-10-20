@@ -45,13 +45,24 @@ abstract class SchemaReaderCallbackAbstraction extends AbstractSchemaReader
     protected function maybeCallCallableWithArgs(
         DOMElement $childNode,
         array $commonMethods = [],
-        array $methods = []
+        array $methods = [],
+        array $commonArguments = []
     ) {
         foreach ($commonMethods as $commonMethodsSpec) {
             list ($localNames, $callable, $args) = $commonMethodsSpec;
 
             if (in_array($childNode->localName, $localNames)) {
                 return call_user_func_array($callable, $args);
+            }
+        }
+        foreach ($commonArguments as $commonArgumentSpec) {
+            list ($callables, $args) = $commonArgumentSpec;
+
+            if (isset($callables[$childNode->localName])) {
+                return call_user_func_array(
+                    $callables[$childNode->localName],
+                    $args
+                );
             }
         }
         if (isset($methods[$childNode->localName])) {
