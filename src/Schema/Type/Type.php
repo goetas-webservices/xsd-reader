@@ -4,6 +4,7 @@ namespace GoetasWebservices\XML\XSDReader\Schema\Type;
 use Closure;
 use DOMNode;
 use DOMElement;
+use GoetasWebservices\XML\XSDReader\AbstractSchemaReader;
 use GoetasWebservices\XML\XSDReader\SchemaReader;
 use GoetasWebservices\XML\XSDReader\Schema\Schema;
 use GoetasWebservices\XML\XSDReader\Schema\SchemaItem;
@@ -121,7 +122,7 @@ abstract class Type implements SchemaItem
     }
 
     public static function loadTypeWithCallbackOnChildNodes(
-        SchemaReader $schemaReader,
+        AbstractSchemaReader $schemaReader,
         Schema $schema,
         DOMNode $node,
         Closure $callback
@@ -137,7 +138,7 @@ abstract class Type implements SchemaItem
     }
 
     public static function loadTypeWithCallback(
-        SchemaReader $schemaReader,
+        AbstractSchemaReader $schemaReader,
         Schema $schema,
         DOMNode $childNode,
         Closure $callback
