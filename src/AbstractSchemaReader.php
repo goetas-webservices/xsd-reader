@@ -84,6 +84,26 @@ abstract class AbstractSchemaReader
     }
 
     /**
+    * @param string $remote
+    *
+    * @return bool
+    */
+    public function hasKnownSchemaLocation($remote)
+    {
+        return isset($this->knownLocationSchemas[$remote]);
+    }
+
+    /**
+    * @param string $remote
+    *
+    * @return string
+    */
+    public function getKnownSchemaLocation($remote)
+    {
+        return $this->knownLocationSchemas[$remote];
+    }
+
+    /**
     * @return Closure
     */
     abstract protected function loadAttributeGroup(Schema $schema, DOMElement $node);
@@ -122,12 +142,6 @@ abstract class AbstractSchemaReader
         return trim($doc);
     }
 
-    abstract protected function setSchemaThingsFromNode(
-        Schema $schema,
-        DOMElement $node,
-        Schema $parent = null
-    );
-
     /**
     * @param string $key
     *
@@ -157,7 +171,58 @@ abstract class AbstractSchemaReader
      * @param Schema $parent
      * @return Closure[]
      */
-    abstract protected function schemaNode(Schema $schema, DOMElement $node, Schema $parent = null);
+    public function schemaNode(Schema $schema, DOMElement $node, Schema $parent = null)
+    {
+        $schema->setSchemaThingsFromNode($node, $parent);
+        $functions = array();
+
+        $schemaReaderMethods = [
+            'include' => (Schema::class . '::loadImport'),
+            'import' => (Schema::class . '::loadImport'),
+        ];
+
+        $thisMethods = [
+            'element' => [$this, 'loadElementDef'],
+            'attribute' => [$this, 'loadAttributeDef'],
+            'attributeGroup' => [$this, 'loadAttributeGroup'],
+            'group' => [$this, 'loadGroup'],
+            'complexType' => [$this, 'loadComplexType'],
+            'simpleType' => [$this, 'loadSimpleType'],
+        ];
+
+        foreach ($node->childNodes as $childNode) {
+            if ($childNode instanceof DOMElement) {
+                $callback = $this->maybeCallCallableWithArgs(
+                    $childNode,
+                        [],
+                        [],
+                        [
+                            [
+                                $schemaReaderMethods,
+                                [
+                                    $this,
+                                    $schema,
+                                    $childNode,
+                                ]
+                            ],
+                            [
+                                $thisMethods,
+                                [
+                                    $schema,
+                                    $childNode
+                                ],
+                            ],
+                        ]
+                );
+
+                if ($callback instanceof Closure) {
+                    $functions[] = $callback;
+                }
+            }
+        }
+
+        return $functions;
+    }
 
     /**
     * @return InterfaceSetMinMax
@@ -215,7 +280,8 @@ abstract class AbstractSchemaReader
     abstract protected function maybeCallCallableWithArgs(
         DOMElement $childNode,
         array $commonMethods = [],
-        array $methods = []
+        array $methods = [],
+        array $commonArguments = []
     );
 
     /**
@@ -439,24 +505,6 @@ abstract class AbstractSchemaReader
     abstract protected function fillItemNonLocalType(Item $element, DOMElement $node);
 
     /**
-    * @return Closure
-    */
-    abstract protected function loadImport(Schema $schema, DOMElement $node);
-
-    /**
-    * @param string $file
-    * @param string $namespace
-    *
-    * @return Closure
-    */
-    abstract protected function loadImportFresh(
-        Schema $schema,
-        DOMElement $node,
-        $file,
-        $namespace
-    );
-
-    /**
     * @var Schema|null
     */
     protected $globalSchema;
@@ -480,6 +528,14 @@ abstract class AbstractSchemaReader
             }
 
         return $globalSchemas;
+    }
+
+    /**
+    * @return string[]
+    */
+    public function getGlobalSchemaInfo()
+    {
+        return self::$globalSchemaInfo;
     }
 
     /**
@@ -543,7 +599,10 @@ abstract class AbstractSchemaReader
      *
      * @return string
      */
-    abstract protected function getNamespaceSpecificFileIndex($file, $targetNamespace);
+    public function getNamespaceSpecificFileIndex($file, $targetNamespace)
+    {
+        return $file . '#' . $targetNamespace;
+    }
 
     /**
      * @param string $content
@@ -582,5 +641,12 @@ abstract class AbstractSchemaReader
      *
      * @throws IOException
      */
-    abstract protected function getDOM($file);
+    public function getDOM($file)
+    {
+        $xml = new DOMDocument('1.0', 'UTF-8');
+        if (!$xml->load($file)) {
+            throw new IOException("Can't load the file $file");
+        }
+        return $xml;
+    }
 }

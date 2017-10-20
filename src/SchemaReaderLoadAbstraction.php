@@ -35,7 +35,7 @@ use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
 use GoetasWebservices\XML\XSDReader\Utils\UrlUtils;
 use RuntimeException;
 
-abstract class SchemaReaderLoadAbstraction extends SchemaReaderSchemaAbstraction
+abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
 {
     /**
     * @return Closure
@@ -523,74 +523,5 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderSchemaAbstraction
     protected function loadElementDef(Schema $schema, DOMElement $node)
     {
         return $this->loadAttributeOrElementDef($schema, $node, false);
-    }
-
-    /**
-    * @return Closure
-    */
-    protected function loadImport(Schema $schema, DOMElement $node)
-    {
-        $base = urldecode($node->ownerDocument->documentURI);
-        $file = UrlUtils::resolveRelativeUrl($base, $node->getAttribute("schemaLocation"));
-
-        $namespace = $node->getAttribute("namespace");
-
-        if (
-            (
-                isset(self::$globalSchemaInfo[$namespace]) &&
-                Schema::hasLoadedFile(
-                    $loadedFilesKey = self::$globalSchemaInfo[$namespace]
-                )
-            ) ||
-            Schema::hasLoadedFile(
-                $loadedFilesKey = $this->getNamespaceSpecificFileIndex(
-                    $file,
-                    $namespace
-                )
-            ) ||
-            Schema::hasLoadedFile($loadedFilesKey = $file)
-        ) {
-            $schema->addSchema(Schema::getLoadedFile($loadedFilesKey));
-
-            return function() {
-            };
-        }
-
-        return $this->loadImportFresh($schema, $node, $file, $namespace);
-    }
-
-    /**
-    * @param string $file
-    * @param string $namespace
-    *
-    * @return Closure
-    */
-    protected function loadImportFresh(
-        Schema $schema,
-        DOMElement $node,
-        $file,
-        $namespace
-    ) {
-        if (! $namespace) {
-            $newSchema = Schema::setLoadedFile($file, $schema);
-        } else {
-            $newSchema = Schema::setLoadedFile($file, new Schema());
-            $newSchema->addSchema($this->getGlobalSchema());
-        }
-
-        $xml = $this->getDOM(isset($this->knownLocationSchemas[$file]) ? $this->knownLocationSchemas[$file] : $file);
-
-        $callbacks = $this->schemaNode($newSchema, $xml->documentElement, $schema);
-
-        if ($namespace) {
-            $schema->addSchema($newSchema);
-        }
-
-
-        return function () use ($callbacks) {
-            foreach ($callbacks as $callback) {
-                $callback();
-            }
-        };
     }
 }

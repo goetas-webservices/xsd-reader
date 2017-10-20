@@ -57,36 +57,4 @@ class SchemaReader extends SchemaReaderLoadAbstraction
             $prefix
         );
     }
-
-    /**
-     * It is possible that a single file contains multiple <xsd:schema/> nodes, for instance in a WSDL file.
-     *
-     * Each of these  <xsd:schema/> nodes typically target a specific namespace. Append the target namespace to the
-     * file to distinguish between multiple schemas in a single file.
-     *
-     * @param string $file
-     * @param string $targetNamespace
-     *
-     * @return string
-     */
-    protected function getNamespaceSpecificFileIndex($file, $targetNamespace)
-    {
-        return $file . '#' . $targetNamespace;
-    }
-
-    /**
-     * @param string $file
-     *
-     * @return DOMDocument
-     *
-     * @throws IOException
-     */
-    protected function getDOM($file)
-    {
-        $xml = new DOMDocument('1.0', 'UTF-8');
-        if (!$xml->load($file)) {
-            throw new IOException("Can't load the file $file");
-        }
-        return $xml;
-    }
 }

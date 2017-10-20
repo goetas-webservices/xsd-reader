@@ -1,6 +1,10 @@
 <?php
 namespace GoetasWebservices\XML\XSDReader\Schema;
 
+use Closure;
+use DOMElement;
+use GoetasWebservices\XML\XSDReader\AbstractSchemaReader;
+use GoetasWebservices\XML\XSDReader\SchemaReaderLoadAbstraction;
 use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Group;
@@ -10,6 +14,7 @@ use GoetasWebservices\XML\XSDReader\Schema\Exception\TypeNotFoundException;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItem;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
+use GoetasWebservices\XML\XSDReader\Utils\UrlUtils;
 
 class Schema
 {
@@ -506,5 +511,109 @@ class Schema
         self::$loadedFiles[$key] = $schema;
 
         return $schema;
+    }
+
+    public function setSchemaThingsFromNode(
+        DOMElement $node,
+        Schema $parent = null
+    ) {
+        $this->setDoc(AbstractSchemaReader::getDocumentation($node));
+
+        if ($node->hasAttribute("targetNamespace")) {
+            $this->setTargetNamespace($node->getAttribute("targetNamespace"));
+        } elseif ($parent) {
+            $this->setTargetNamespace($parent->getTargetNamespace());
+        }
+        $this->setElementsQualification($node->getAttribute("elementFormDefault") == "qualified");
+        $this->setAttributesQualification($node->getAttribute("attributeFormDefault") == "qualified");
+        $this->setDoc(AbstractSchemaReader::getDocumentation($node));
+    }
+
+    /**
+    * @param string $file
+    * @param string $namespace
+    *
+    * @return Closure
+    */
+    public static function loadImport(
+        SchemaReaderLoadAbstraction $reader,
+        Schema $schema,
+        DOMElement $node
+    ) {
+        $base = urldecode($node->ownerDocument->documentURI);
+        $file = UrlUtils::resolveRelativeUrl($base, $node->getAttribute("schemaLocation"));
+
+        $namespace = $node->getAttribute("namespace");
+
+        $globalSchemaInfo = $reader->getGlobalSchemaInfo();
+
+        if (
+            (
+                isset($globalSchemaInfo[$namespace]) &&
+                Schema::hasLoadedFile(
+                    $loadedFilesKey = $globalSchemaInfo[$namespace]
+                )
+            ) ||
+            Schema::hasLoadedFile(
+                $loadedFilesKey = $reader->getNamespaceSpecificFileIndex(
+                    $file,
+                    $namespace
+                )
+            ) ||
+            Schema::hasLoadedFile($loadedFilesKey = $file)
+        ) {
+            $schema->addSchema(Schema::getLoadedFile($loadedFilesKey));
+
+            return function() {
+            };
+        }
+
+        return static::loadImportFresh(
+            $reader,
+            $schema,
+            $node,
+            $file,
+            $namespace
+        );
+    }
+
+    /**
+    * @param string $file
+    * @param string $namespace
+    *
+    * @return Closure
+    */
+    protected static function loadImportFresh(
+        SchemaReaderLoadAbstraction $reader,
+        Schema $schema,
+        DOMElement $node,
+        $file,
+        $namespace
+    ) {
+        if (! $namespace) {
+            $newSchema = Schema::setLoadedFile($file, $schema);
+        } else {
+            $newSchema = Schema::setLoadedFile($file, new Schema());
+            $newSchema->addSchema($reader->getGlobalSchema());
+        }
+
+        $xml = $reader->getDOM(
+            $reader->hasKnownSchemaLocation($file)
+                ? $reader->getKnownSchemaLocation($file)
+                : $file
+        );
+
+        $callbacks = $reader->schemaNode($newSchema, $xml->documentElement, $schema);
+
+        if ($namespace) {
+            $schema->addSchema($newSchema);
+        }
+
+
+        return function () use ($callbacks) {
+            foreach ($callbacks as $callback) {
+                $callback();
+            }
+        };
     }
 }
