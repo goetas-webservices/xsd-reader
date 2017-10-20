@@ -334,36 +334,6 @@ class Schema
             }
         }
 
-        return $this->findSomethingNoThrowSchemas(
-            $this->getSchemas(),
-            $cid,
-            $getter,
-            $name,
-            $namespace,
-            $calling
-        );
-    }
-
-
-    /**
-    * @param Schema[] $schemas
-    * @param string $cid
-    * @param string $getter
-    * @param string $name
-    * @param string $namespace
-    * @param bool[] $calling
-    * @param bool $throw
-    *
-    * @return SchemaItem|null
-    */
-    protected function findSomethingNoThrowSchemas(
-        array $schemas,
-        $cid,
-        $getter,
-        $name,
-        $namespace = null,
-        array & $calling = array()
-    ) {
         foreach ($this->getSchemas() as $childSchema) {
             if (!isset($calling[spl_object_hash($childSchema)])) {
                 $in = $childSchema->findSomethingNoThrow($getter, $name, $namespace, $calling);
