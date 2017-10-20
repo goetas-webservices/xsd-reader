@@ -606,12 +606,10 @@ class Schema
         $file,
         $namespace
     ) {
-        if (! $namespace) {
-            $newSchema = Schema::setLoadedFile($file, $schema);
-        } else {
-            $newSchema = Schema::setLoadedFile($file, new Schema());
-            $newSchema->addSchema($reader->getGlobalSchema());
-        }
+        $newSchema = Schema::setLoadedFile(
+            $file,
+            ($namespace ? new Schema() : $schema)
+        );
 
         $xml = $reader->getDOM(
             $reader->hasKnownSchemaLocation($file)
@@ -622,6 +620,7 @@ class Schema
         $callbacks = $reader->schemaNode($newSchema, $xml->documentElement, $schema);
 
         if ($namespace) {
+            $newSchema->addSchema($reader->getGlobalSchema());
             $schema->addSchema($newSchema);
         }
 
