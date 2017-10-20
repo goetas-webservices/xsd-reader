@@ -590,15 +590,15 @@ class Schema
         }
 
         return function () use ($namespace, $reader, $schema, $file) {
-        $newSchema = Schema::setLoadedFile(
-            $file,
-            ($namespace ? new Schema() : $schema)
-        );
+            $newSchema = Schema::setLoadedFile(
+                $file,
+                ($namespace ? new Schema() : $schema)
+            );
 
-        if ($namespace) {
-            $newSchema->addSchema($reader->getGlobalSchema());
-            $schema->addSchema($newSchema);
-        }
+            if ($namespace) {
+                $newSchema->addSchema($reader->getGlobalSchema());
+                $schema->addSchema($newSchema);
+            }
             $callbacks = $reader->schemaNode(
                 $newSchema,
                 $reader->getDOM(
