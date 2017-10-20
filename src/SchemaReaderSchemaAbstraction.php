@@ -35,58 +35,61 @@ use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
 use GoetasWebservices\XML\XSDReader\Utils\UrlUtils;
 use RuntimeException;
 
-class SchemaReader extends SchemaReaderLoadAbstraction
-{
-    /**
-    * @param string $typeName
-    *
-    * @return mixed[]
-    */
-    protected static function splitParts(DOMElement $node, $typeName)
-    {
-        $prefix = null;
-        $name = $typeName;
-        if (strpos($typeName, ':') !== false) {
-            list ($prefix, $name) = explode(':', $typeName);
-        }
+abstract class SchemaReaderSchemaAbstraction extends SchemaReaderFillAbstraction
+{    protected function setSchemaThingsFromNode(
+        Schema $schema,
+        DOMElement $node,
+        Schema $parent = null
+    ) {
+        $schema->setDoc(static::getDocumentation($node));
 
-        $namespace = $node->lookupNamespaceUri($prefix ?: '');
-        return array(
-            $name,
-            $namespace,
-            $prefix
-        );
+        if ($node->hasAttribute("targetNamespace")) {
+            $schema->setTargetNamespace($node->getAttribute("targetNamespace"));
+        } elseif ($parent) {
+            $schema->setTargetNamespace($parent->getTargetNamespace());
+        }
+        $schema->setElementsQualification($node->getAttribute("elementFormDefault") == "qualified");
+        $schema->setAttributesQualification($node->getAttribute("attributeFormDefault") == "qualified");
+        $schema->setDoc(static::getDocumentation($node));
     }
 
     /**
-     * It is possible that a single file contains multiple <xsd:schema/> nodes, for instance in a WSDL file.
      *
-     * Each of these  <xsd:schema/> nodes typically target a specific namespace. Append the target namespace to the
-     * file to distinguish between multiple schemas in a single file.
-     *
-     * @param string $file
-     * @param string $targetNamespace
-     *
-     * @return string
+     * @param Schema $schema
+     * @param DOMElement $node
+     * @param Schema $parent
+     * @return Closure[]
      */
-    protected function getNamespaceSpecificFileIndex($file, $targetNamespace)
+    protected function schemaNode(Schema $schema, DOMElement $node, Schema $parent = null)
     {
-        return $file . '#' . $targetNamespace;
-    }
+        $this->setSchemaThingsFromNode($schema, $node, $parent);
+        $functions = array();
 
-    /**
-     * @param string $file
-     *
-     * @return DOMDocument
-     *
-     * @throws IOException
-     */
-    protected function getDOM($file)
-    {
-        $xml = new DOMDocument('1.0', 'UTF-8');
-        if (!$xml->load($file)) {
-            throw new IOException("Can't load the file $file");
+        static $methods = [
+            'include' => 'loadImport',
+            'import' => 'loadImport',
+            'element' => 'loadElementDef',
+            'attribute' => 'loadAttributeDef',
+            'attributeGroup' => 'loadAttributeGroup',
+            'group' => 'loadGroup',
+            'complexType' => 'loadComplexType',
+            'simpleType' => 'loadSimpleType',
+        ];
+
+        foreach ($node->childNodes as $childNode) {
+            $callback = $this->maybeCallMethod(
+                $methods,
+                (string) $childNode->localName,
+                $childNode,
+                $schema,
+                $childNode
+            );
+
+            if ($callback instanceof Closure) {
+                $functions[] = $callback;
+            }
         }
-        return $xml;
+
+        return $functions;
     }
 }

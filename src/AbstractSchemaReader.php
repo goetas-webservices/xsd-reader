@@ -464,7 +464,23 @@ abstract class AbstractSchemaReader
     /**
     * @return Schema[]
     */
-    abstract protected function setupGlobalSchemas(array & $callbacks);
+    protected function setupGlobalSchemas(array & $callbacks)
+    {
+            $globalSchemas = array();
+            foreach (self::$globalSchemaInfo as $namespace => $uri) {
+                Schema::setLoadedFile(
+                    $uri,
+                    $globalSchemas[$namespace] = $schema = new Schema()
+                );
+                if ($namespace === self::XSD_NS) {
+                    $this->globalSchema = $schema;
+                }
+                $xml = $this->getDOM($this->knownLocationSchemas[$uri]);
+                $callbacks = array_merge($callbacks, $this->schemaNode($schema, $xml->documentElement));
+            }
+
+        return $globalSchemas;
+    }
 
     /**
      *

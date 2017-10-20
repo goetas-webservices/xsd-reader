@@ -6,6 +6,7 @@ use DOMXPath;
 use GoetasWebservices\XML\XSDReader\Schema\Item;
 use GoetasWebservices\XML\XSDReader\Schema\Schema;
 use GoetasWebservices\XML\XSDReader\SchemaReader;
+use GoetasWebservices\XML\XSDReader\SchemaReaderLoadAbstraction;
 
 class Element extends Item implements ElementItem, ElementSingle
 {
@@ -109,7 +110,7 @@ class Element extends Item implements ElementItem, ElementSingle
     * @return Element
     */
     public static function loadElement(
-        SchemaReader $reader,
+        SchemaReaderLoadAbstraction $reader,
         Schema $schema,
         DOMElement $node
     ) {

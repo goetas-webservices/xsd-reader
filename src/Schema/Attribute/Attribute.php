@@ -5,6 +5,7 @@ use DOMElement;
 use GoetasWebservices\XML\XSDReader\Schema\Item;
 use GoetasWebservices\XML\XSDReader\Schema\Schema;
 use GoetasWebservices\XML\XSDReader\SchemaReader;
+use GoetasWebservices\XML\XSDReader\SchemaReaderLoadAbstraction;
 
 class Attribute extends Item implements AttributeSingle
 {
@@ -132,7 +133,7 @@ class Attribute extends Item implements AttributeSingle
     * @return Attribute
     */
     public static function loadAttribute(
-        SchemaReader $schemaReader,
+        SchemaReaderLoadAbstraction $schemaReader,
         Schema $schema,
         DOMElement $node
     ) {
@@ -156,7 +157,7 @@ class Attribute extends Item implements AttributeSingle
     * @return AttributeItem
     */
     public static function getAttributeFromAttributeOrRef(
-        SchemaReader $schemaReader,
+        SchemaReaderLoadAbstraction $schemaReader,
         DOMElement $childNode,
         Schema $schema,
         DOMElement $node

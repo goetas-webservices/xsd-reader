@@ -3,6 +3,7 @@ namespace GoetasWebservices\XML\XSDReader\Schema\Attribute;
 
 use DOMElement;
 use GoetasWebservices\XML\XSDReader\SchemaReader;
+use GoetasWebservices\XML\XSDReader\SchemaReaderLoadAbstraction;
 use GoetasWebservices\XML\XSDReader\Schema\Schema;
 
 class Group implements AttributeItem, AttributeContainer
@@ -61,7 +62,7 @@ class Group implements AttributeItem, AttributeContainer
     * @param string $attr
     */
     public static function findSomethingLikeThis(
-        SchemaReader $useThis,
+        SchemaReaderLoadAbstraction $useThis,
         Schema $schema,
         DOMElement $node,
         DOMElement $childNode,
@@ -78,7 +79,7 @@ class Group implements AttributeItem, AttributeContainer
     * @return \Closure
     */
     public static function loadAttributeGroup(
-        SchemaReader $schemaReader,
+        SchemaReaderLoadAbstraction $schemaReader,
         Schema $schema,
         DOMElement $node
     ) {
