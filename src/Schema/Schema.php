@@ -322,16 +322,14 @@ class Schema
 
         if (isset($this->typeCache[$cid])) {
             return $this->typeCache[$cid];
-        }
-
-        if (null === $namespace || $this->getTargetNamespace() === $namespace) {
-            /**
-            * @var \GoetasWebservices\XML\XSDReader\Schema\SchemaItem|null $item
-            */
-            $item = $this->$getter($name);
-            if ($item instanceof SchemaItem) {
+        } elseif (
+            (
+                null === $namespace ||
+                $this->getTargetNamespace() === $namespace
+            ) &&
+            (($item = $this->$getter($name)) instanceof SchemaItem)
+        ) {
                 return $this->typeCache[$cid] = $item;
-            }
         }
 
         return $this->findSomethingNoThrowSchemas(
