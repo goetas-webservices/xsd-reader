@@ -591,7 +591,7 @@ class Schema
     * @param string $namespace
     * @param string $file
     *
-    * @return Closure
+    * @return Closure[]
     */
     protected static function loadImportFreshCallbacks(
         $namespace,
@@ -634,7 +634,14 @@ class Schema
         $file
     ) {
         return function () use ($namespace, $reader, $schema, $file) {
-            foreach (static::loadImportFreshCallbacks() as $callback) {
+            foreach (
+                static::loadImportFreshCallbacks(
+                    $namespace,
+                    $reader,
+                    $schema,
+                    $file
+                ) as $callback
+            ) {
                 $callback();
             }
         };
