@@ -589,6 +589,7 @@ class Schema
             };
         }
 
+        return function () use ($namespace, $reader, $schema, $file) {
         $newSchema = Schema::setLoadedFile(
             $file,
             ($namespace ? new Schema() : $schema)
@@ -598,9 +599,6 @@ class Schema
             $newSchema->addSchema($reader->getGlobalSchema());
             $schema->addSchema($newSchema);
         }
-
-
-        return function () use ($newSchema, $reader, $schema, $file) {
             $callbacks = $reader->schemaNode(
                 $newSchema,
                 $reader->getDOM(
