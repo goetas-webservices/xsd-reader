@@ -560,6 +560,31 @@ class Schema
 
         $namespace = $node->getAttribute("namespace");
 
+        $keys = static::loadImportFreshKeys($reader, $namespace, $file);
+
+        if (
+            Schema::hasLoadedFile(...$keys)
+        ) {
+            $schema->addSchema(Schema::getLoadedFile(...$keys));
+
+            return function() {
+            };
+        }
+
+        return static::loadImportFresh($namespace, $reader, $schema, $file);
+    }
+
+    /**
+    * @param string $namespace
+    * @param string $file
+    *
+    * @return string[]
+    */
+    protected static function loadImportFreshKeys(
+        SchemaReaderLoadAbstraction $reader,
+        $namespace,
+        $file
+    ) {
         $globalSchemaInfo = $reader->getGlobalSchemaInfo();
 
         $keys = [];
@@ -575,16 +600,7 @@ class Schema
 
         $keys[] = $file;
 
-        if (
-            Schema::hasLoadedFile(...$keys)
-        ) {
-            $schema->addSchema(Schema::getLoadedFile(...$keys));
-
-            return function() {
-            };
-        }
-
-        return static::loadImportFresh($namespace, $reader, $schema, $file);
+        return $keys;
     }
 
     /**
