@@ -714,4 +714,34 @@ abstract class AbstractSchemaReader
             }
         }
     }
+
+    public function maybeCallMethodAgainstDOMNodeList(
+        DOMElement $node,
+        SchemaItem $type,
+        array $methods
+    ) {
+        static::againstDOMNodeList(
+            $node,
+            function (
+                DOMElement $node,
+                DOMElement $childNode
+            ) use (
+                $methods,
+                $type
+            ) {
+                /**
+                * @var string[] $methods
+                */
+                $methods = $methods;
+
+                $this->maybeCallMethod(
+                    $methods,
+                    $childNode->localName,
+                    $childNode,
+                    $type,
+                    $childNode
+                );
+            }
+        );
+    }
 }

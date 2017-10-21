@@ -46,7 +46,6 @@ abstract class SchemaReaderFillAbstraction extends SchemaReaderFindAbstraction
         if ($checkAbstract) {
             $type->setAbstract($node->getAttribute("abstract") === "true" || $node->getAttribute("abstract") === "1");
         }
-
         static $methods = [
             'restriction' => 'loadRestriction',
             'extension' => 'maybeLoadExtensionFromBaseComplexType',
@@ -54,29 +53,12 @@ abstract class SchemaReaderFillAbstraction extends SchemaReaderFindAbstraction
             'complexContent' => 'fillTypeNode',
         ];
 
-        static::againstDOMNodeList(
-            $node,
-            function (
-                DOMElement $node,
-                DOMElement $childNode
-            ) use (
-                $methods,
-                $type
-            ) {
-                /**
-                * @var string[] $methods
-                */
-                $methods = $methods;
+        /**
+        * @var string[] $methods
+        */
+        $methods = $methods;
 
-                $this->maybeCallMethod(
-                    $methods,
-                    $childNode->localName,
-                    $childNode,
-                    $type,
-                    $childNode
-                );
-            }
-        );
+        $this->maybeCallMethodAgainstDOMNodeList($node, $type, $methods);
     }
 
     protected function fillItemNonLocalType(Item $element, DOMElement $node)

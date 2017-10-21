@@ -109,29 +109,14 @@ class Group implements ElementItem, ElementContainer
         ];
 
         return function () use ($reader, $group, $node, $methods) {
-            SchemaReaderLoadAbstraction::againstDOMNodeList(
+            /**
+            * @var string[] $methods
+            */
+            $methods = $methods;
+            $reader->maybeCallMethodAgainstDOMNodeList(
                 $node,
-                function (
-                    DOMElement $node,
-                    DOMElement $childNode
-                ) use (
-                    $methods,
-                    $reader,
-                    $group
-                ) {
-                    /**
-                    * @var string[] $methods
-                    */
-                    $methods = $methods;
-
-                    $reader->maybeCallMethod(
-                        $methods,
-                        $childNode->localName,
-                        $childNode,
-                        $group,
-                        $childNode
-                    );
-                }
+                $group,
+                $methods
             );
         };
     }
