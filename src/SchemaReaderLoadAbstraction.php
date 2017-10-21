@@ -477,39 +477,43 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
             ) use (
                 $type
             ) {
-        $commonMethods = [
-            [
-                ['sequence', 'choice', 'all'],
-                [$this, 'maybeLoadSequenceFromElementContainer'],
-                [
-                    $type,
-                    $childNode,
-                ],
-            ],
-        ];
-        $methods = [
-            'attribute' => [
-                [$type, 'addAttributeFromAttributeOrRef'],
-                [
-                    $this,
-                    $childNode,
-                    $type->getSchema(),
-                    $node
-                ]
-            ],
-            'attributeGroup' => [
-                (AttributeGroup::class . '::findSomethingLikeThis'),
-                [
-                    $this,
-                    $type->getSchema(),
-                    $node,
-                    $childNode,
-                    $type
-                ]
-            ],
-        ];
+                $commonMethods = [
+                    [
+                        ['sequence', 'choice', 'all'],
+                        [$this, 'maybeLoadSequenceFromElementContainer'],
+                        [
+                            $type,
+                            $childNode,
+                        ],
+                    ],
+                ];
+                $methods = [
+                    'attribute' => [
+                        [$type, 'addAttributeFromAttributeOrRef'],
+                        [
+                            $this,
+                            $childNode,
+                            $type->getSchema(),
+                            $node
+                        ]
+                    ],
+                    'attributeGroup' => [
+                        (AttributeGroup::class . '::findSomethingLikeThis'),
+                        [
+                            $this,
+                            $type->getSchema(),
+                            $node,
+                            $childNode,
+                            $type
+                        ]
+                    ],
+                ];
 
-        $this->maybeCallCallableWithArgs($childNode, $commonMethods, $methods);
+                $this->maybeCallCallableWithArgs(
+                    $childNode,
+                    $commonMethods,
+                    $methods
+                );
             }
         );
     }
@@ -526,10 +530,7 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
                 $node
             );
         }
-        $this->loadExtensionChildNodes(
-                    $type,
-                    $node
-        );
+        $this->loadExtensionChildNodes($type, $node);
     }
 
     protected function loadRestriction(Type $type, DOMElement $node)
