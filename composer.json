@@ -36,6 +36,7 @@
     },
     "extra" : {
         "branch-alias" : {
+            "dev-static-analysis": "0.3-dev",
             "dev-master" : "0.2-dev"
         }
     },
