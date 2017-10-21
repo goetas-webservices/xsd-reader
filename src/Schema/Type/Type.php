@@ -124,7 +124,7 @@ abstract class Type implements SchemaItem
     public static function loadTypeWithCallbackOnChildNodes(
         AbstractSchemaReader $schemaReader,
         Schema $schema,
-        DOMNode $node,
+        DOMElement $node,
         Closure $callback
     ) {
         AbstractSchemaReader::againstDOMNodeList(
@@ -150,12 +150,9 @@ abstract class Type implements SchemaItem
     public static function loadTypeWithCallback(
         AbstractSchemaReader $schemaReader,
         Schema $schema,
-        DOMNode $childNode,
+        DOMElement $childNode,
         Closure $callback
     ) {
-        if (! ($childNode instanceof DOMElement)) {
-            return;
-        }
         $methods = [
             'complexType' => 'loadComplexType',
             'simpleType' => 'loadSimpleType',
