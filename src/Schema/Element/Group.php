@@ -126,7 +126,7 @@ class Group implements ElementItem, ElementContainer
 
                     $reader->maybeCallMethod(
                         $methods,
-                        (string) $childNode->localName,
+                        $childNode->localName,
                         $childNode,
                         $group,
                         $childNode

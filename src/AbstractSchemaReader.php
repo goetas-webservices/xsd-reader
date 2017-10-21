@@ -142,7 +142,7 @@ abstract class AbstractSchemaReader
                 if ($childNode->localName == "annotation") {
                     $doc .= static::getDocumentation($childNode);
                 } elseif ($childNode->localName == 'documentation') {
-                    $doc .= (string) $childNode->nodeValue;
+                    $doc .= $childNode->nodeValue;
                 }
             }
         );
