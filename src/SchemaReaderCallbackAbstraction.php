@@ -184,17 +184,10 @@ abstract class SchemaReaderCallbackAbstraction extends AbstractSchemaReader
         };
     }
 
-    /**
-    * @param Closure|null $callback
-    */
-    protected function runCallbackAgainstDOMNodeList(
-        Type $type,
+    public static function againstDOMNodeList(
         DOMElement $node,
-        Closure $againstNodeList,
-        $callback = null
+        Closure $againstNodeList
     ) {
-        $this->fillTypeNode($type, $node, true);
-
         $limit = $node->childNodes->length;
         for ($i = 0; $i < $limit; $i += 1) {
             /**
@@ -209,6 +202,20 @@ abstract class SchemaReaderCallbackAbstraction extends AbstractSchemaReader
                 );
             }
         }
+    }
+
+    /**
+    * @param Closure|null $callback
+    */
+    protected function runCallbackAgainstDOMNodeList(
+        Type $type,
+        DOMElement $node,
+        Closure $againstNodeList,
+        $callback = null
+    ) {
+        $this->fillTypeNode($type, $node, true);
+
+        static::againstDOMNodeList($node, $againstNodeList);
 
         if ($callback) {
             call_user_func($callback, $type);
