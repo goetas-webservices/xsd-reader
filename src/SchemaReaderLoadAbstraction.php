@@ -254,6 +254,9 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
         Schema $schema,
         DOMElement $node
     ) {
+        /**
+        * @var bool $isSimple
+        */
         $isSimple = false;
 
         static::againstDOMNodeList(

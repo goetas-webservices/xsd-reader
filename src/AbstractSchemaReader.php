@@ -503,6 +503,9 @@ abstract class AbstractSchemaReader
 
     public function fillItem(Item $element, DOMElement $node)
     {
+        /**
+        * @var bool $skip
+        */
         $skip = false;
         static::againstDOMNodeList(
             $node,
