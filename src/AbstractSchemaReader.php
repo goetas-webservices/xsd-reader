@@ -682,4 +682,24 @@ abstract class AbstractSchemaReader
         }
         return $xml;
     }
+
+    public static function againstDOMNodeList(
+        DOMElement $node,
+        Closure $againstNodeList
+    ) {
+        $limit = $node->childNodes->length;
+        for ($i = 0; $i < $limit; $i += 1) {
+            /**
+            * @var DOMNode $childNode
+            */
+            $childNode = $node->childNodes->item($i);
+
+            if ($childNode instanceof DOMElement) {
+                $againstNodeList(
+                    $node,
+                    $childNode
+                );
+            }
+        }
+    }
 }
