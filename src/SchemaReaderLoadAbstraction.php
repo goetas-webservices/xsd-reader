@@ -465,11 +465,18 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
         );
     }
 
-    protected function loadExtensionChildNode(
+    protected function loadExtensionChildNodes(
         BaseComplexType $type,
-        DOMElement $node,
-        DOMElement $childNode
+        DOMElement $node
     ) {
+        static::againstDOMNodeList(
+            $node,
+            function (
+                DOMElement $node,
+                DOMElement $childNode
+            ) use (
+                $type
+            ) {
         $commonMethods = [
             [
                 ['sequence', 'choice', 'all'],
@@ -503,6 +510,8 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
         ];
 
         $this->maybeCallCallableWithArgs($childNode, $commonMethods, $methods);
+            }
+        );
     }
 
     protected function loadExtension(BaseComplexType $type, DOMElement $node)
@@ -517,20 +526,9 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
                 $node
             );
         }
-        static::againstDOMNodeList(
-            $node,
-            function (
-                DOMElement $node,
-                DOMElement $childNode
-            ) use (
-                $type
-            ) {
-                $this->loadExtensionChildNode(
+        $this->loadExtensionChildNodes(
                     $type,
-                    $node,
-                    $childNode
-                );
-            }
+                    $node
         );
     }
 

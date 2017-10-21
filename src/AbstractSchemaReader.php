@@ -432,12 +432,6 @@ abstract class AbstractSchemaReader
     */
     abstract protected function fillTypeNode(Type $type, DOMElement $node, $checkAbstract = false);
 
-    abstract protected function loadExtensionChildNode(
-        BaseComplexType $type,
-        DOMElement $node,
-        DOMElement $childNode
-    );
-
     abstract protected function loadExtension(BaseComplexType $type, DOMElement $node);
 
     public function findAndSetSomeBase(
