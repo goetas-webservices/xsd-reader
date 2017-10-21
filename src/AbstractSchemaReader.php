@@ -131,15 +131,21 @@ abstract class AbstractSchemaReader
     public static function getDocumentation(DOMElement $node)
     {
         $doc = '';
-        $limit = $node->childNodes->length;
-        for ($i = 0; $i < $limit; $i += 1) {
-            $childNode = $node->childNodes->item($i);
+        static::againstDOMNodeList(
+            $node,
+            function (
+                DOMElement $node,
+                DOMElement $childNode
+            ) use (
+                & $doc
+            ) {
             if ($childNode->localName == "annotation") {
                 $doc .= static::getDocumentation($childNode);
             } elseif ($childNode->localName == 'documentation') {
                 $doc .= (string) $childNode->nodeValue;
             }
-        }
+            }
+        );
         $doc = preg_replace('/[\t ]+/', ' ', $doc);
         return trim($doc);
     }
@@ -196,13 +202,17 @@ abstract class AbstractSchemaReader
             'simpleType' => [$this, 'loadSimpleType'],
         ];
 
-        $limit = $node->childNodes->length;
-        for ($i = 0; $i < $limit; $i += 1) {
-            /**
-            * @var DOMNode $childNode
-            */
-            $childNode = $node->childNodes->item($i);
-            if ($childNode instanceof DOMElement) {
+        static::againstDOMNodeList(
+            $node,
+            function (
+                DOMElement $node,
+                DOMElement $childNode
+            ) use (
+                $schemaReaderMethods,
+                $schema,
+                $thisMethods,
+                & $functions
+            ) {
                 /**
                 * @var Closure|null $callback
                 */
@@ -233,7 +243,7 @@ abstract class AbstractSchemaReader
                     $functions[] = $callback;
                 }
             }
-        }
+        );
 
         return $functions;
     }
@@ -430,12 +440,6 @@ abstract class AbstractSchemaReader
 
     abstract protected function loadExtension(BaseComplexType $type, DOMElement $node);
 
-    abstract protected function loadExtensionChildNodes(
-        BaseComplexType $type,
-        DOMNodeList $childNodes,
-        DOMElement $node
-    );
-
     public function findAndSetSomeBase(
         Type $type,
         Base $setBaseOnThis,
@@ -499,10 +503,18 @@ abstract class AbstractSchemaReader
 
     public function fillItem(Item $element, DOMElement $node)
     {
-        $limit = $node->childNodes->length;
-        for ($i = 0; $i < $limit; $i += 1) {
-            $childNode = $node->childNodes->item($i);
+        $skip = false;
+        static::againstDOMNodeList(
+            $node,
+            function (
+                DOMElement $node,
+                DOMElement $childNode
+            ) use (
+                $element,
+                & $skip
+            ) {
             if (
+                ! $skip &&
                 in_array(
                     $childNode->localName,
                     [
@@ -519,10 +531,13 @@ abstract class AbstractSchemaReader
                         $element->setType($type);
                     }
                 );
-                return;
+                $skip = true;
             }
+            }
+        );
+        if ($skip) {
+            return;
         }
-
         $this->fillItemNonLocalType($element, $node);
     }
 

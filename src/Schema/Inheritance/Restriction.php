@@ -64,20 +64,20 @@ class Restriction extends Base
                 $addCallback
             );
         }
-        $limit = $node->childNodes->length;
-        for ($i = 0; $i < $limit; $i += 1) {
-            /**
-            * @var DOMNode $childNode
-            */
-            $childNode = $node->childNodes->item($i);
-
-            if ($childNode instanceof DOMElement) {
+        SchemaReaderLoadAbstraction::againstDOMNodeList(
+            $node,
+            function (
+                DOMElement $node,
+                DOMElement $childNode
+            ) use (
+                $restriction
+            ) {
                 static::maybeLoadRestrictionOnChildNode(
                     $restriction,
                     $childNode
                 );
             }
-        }
+        );
     }
 
     protected static function maybeLoadRestrictionOnChildNode(

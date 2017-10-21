@@ -127,19 +127,24 @@ abstract class Type implements SchemaItem
         DOMNode $node,
         Closure $callback
     ) {
-        $limit = $node->childNodes->length;
-        for ($i = 0; $i < $limit; $i += 1) {
-            /**
-            * @var DOMNode $childNode
-            */
-            $childNode = $node->childNodes->item($i);
+        AbstractSchemaReader::againstDOMNodeList(
+            $node,
+            function (
+                DOMElement $node,
+                DOMElement $childNode
+            ) use (
+                $schemaReader,
+                $schema,
+                $callback
+            ) {
             static::loadTypeWithCallback(
                 $schemaReader,
                 $schema,
                 $childNode,
                 $callback
             );
-        }
+            }
+        );
     }
 
     public static function loadTypeWithCallback(

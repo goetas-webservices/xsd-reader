@@ -54,13 +54,15 @@ abstract class SchemaReaderFillAbstraction extends SchemaReaderFindAbstraction
             'complexContent' => 'fillTypeNode',
         ];
 
-        $limit = $node->childNodes->length;
-        for ($i = 0; $i < $limit; $i += 1) {
-            /**
-            * @var DOMNode $childNode
-            */
-            $childNode = $node->childNodes->item($i);
-
+        static::againstDOMNodeList(
+            $node,
+            function (
+                DOMElement $node,
+                DOMElement $childNode
+            ) use (
+                $methods,
+                $type
+            ) {
             /**
             * @var string[] $methods
             */
@@ -73,7 +75,8 @@ abstract class SchemaReaderFillAbstraction extends SchemaReaderFindAbstraction
                 $type,
                 $childNode
             );
-        }
+            }
+        );
     }
 
     protected function fillItemNonLocalType(Item $element, DOMElement $node)

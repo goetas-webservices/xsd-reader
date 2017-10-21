@@ -102,13 +102,15 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
     {
         $max = static::loadSequenceNormaliseMax($node, $max);
 
-        $limit = $node->childNodes->length;
-        for ($i = 0; $i < $limit; $i += 1) {
-            /**
-            * @var DOMNode $childNode
-            */
-            $childNode = $node->childNodes->item($i);
-            if ($childNode instanceof DOMElement) {
+        static::againstDOMNodeList(
+            $node,
+            function (
+                DOMElement $node,
+                DOMElement $childNode
+            ) use (
+                $elementContainer,
+                $max
+            ) {
                 $this->loadSequenceChildNode(
                     $elementContainer,
                     $node,
@@ -116,7 +118,7 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
                     $max
                 );
             }
-        }
+        );
     }
 
     /**
@@ -254,17 +256,22 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
     ) {
         $isSimple = false;
 
-        $limit = $node->childNodes->length;
-        for ($i = 0; $i < $limit; $i += 1) {
-            /**
-            * @var DOMNode $childNode
-            */
-            $childNode = $node->childNodes->item($i);
+        static::againstDOMNodeList(
+            $node,
+            function (
+                DOMElement $node,
+                DOMElement $childNode
+            ) use (
+                & $isSimple
+            ) {
+                if ($isSimple) {
+                    return;
+                }
             if ($childNode->localName === "simpleContent") {
                 $isSimple = true;
-                break;
             }
-        }
+            }
+        );
 
         $type = $isSimple ? new ComplexTypeSimpleContent($schema, $node->getAttribute("name")) : new ComplexType($schema, $node->getAttribute("name"));
 
@@ -507,29 +514,21 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
                 $node
             );
         }
-
-        $this->loadExtensionChildNodes($type, $node->childNodes, $node);
-    }
-
-    protected function loadExtensionChildNodes(
-        BaseComplexType $type,
-        DOMNodeList $childNodes,
-        DOMElement $node
-    ) {
-        $limit = $childNodes->length;
-        for ($i = 0; $i < $limit; $i += 1) {
-            /**
-            * @var DOMElement $childNode
-            */
-            $childNode = $childNodes->item($i);
-            if ($childNode instanceof DOMElement) {
+        static::againstDOMNodeList(
+            $node,
+            function (
+                DOMElement $node,
+                DOMElement $childNode
+            ) use (
+                $type
+            ) {
                 $this->loadExtensionChildNode(
                     $type,
                     $node,
                     $childNode
                 );
             }
-        }
+        );
     }
 
     protected function loadRestriction(Type $type, DOMElement $node)

@@ -109,10 +109,16 @@ class Group implements ElementItem, ElementContainer
         ];
 
         return function () use ($reader, $group, $node, $methods) {
-            $limit = $node->childNodes->length;
-            for ($i = 0; $i < $limit; $i += 1) {
-                $childNode = $node->childNodes->item($i);
-
+            SchemaReaderLoadAbstraction::againstDOMNodeList(
+                $node,
+                function (
+                    DOMElement $node,
+                    DOMElement $childNode
+                ) use (
+                    $methods,
+                    $reader,
+                    $group
+                ) {
                 /**
                 * @var string[] $methods
                 */
@@ -125,7 +131,8 @@ class Group implements ElementItem, ElementContainer
                     $group,
                     $childNode
                 );
-            }
+                }
+            );
         };
     }
 }

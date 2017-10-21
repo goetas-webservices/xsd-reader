@@ -88,9 +88,16 @@ class Group implements AttributeItem, AttributeContainer
         $schema->addAttributeGroup($attGroup);
 
         return function () use ($schemaReader, $schema, $node, $attGroup) {
-            $limit = $node->childNodes->length;
-            for ($i = 0; $i < $limit; $i += 1) {
-                $childNode = $node->childNodes->item($i);
+            SchemaReaderLoadAbstraction::againstDOMNodeList(
+                $node,
+                function (
+                    DOMElement $node,
+                    DOMElement $childNode
+                ) use (
+                    $schemaReader,
+                    $schema,
+                    $attGroup
+                ) {
                 switch ($childNode->localName) {
                     case 'attribute':
                         $attribute = Attribute::getAttributeFromAttributeOrRef(
@@ -111,7 +118,8 @@ class Group implements AttributeItem, AttributeContainer
                         );
                         break;
                 }
-            }
+                }
+            );
         };
     }
 }
