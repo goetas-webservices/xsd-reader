@@ -137,12 +137,12 @@ abstract class Type implements SchemaItem
                 $schema,
                 $callback
             ) {
-            static::loadTypeWithCallback(
-                $schemaReader,
-                $schema,
-                $childNode,
-                $callback
-            );
+                static::loadTypeWithCallback(
+                    $schemaReader,
+                    $schema,
+                    $childNode,
+                    $callback
+                );
             }
         );
     }

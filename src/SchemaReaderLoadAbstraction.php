@@ -267,9 +267,9 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
                 if ($isSimple) {
                     return;
                 }
-            if ($childNode->localName === "simpleContent") {
-                $isSimple = true;
-            }
+                if ($childNode->localName === "simpleContent") {
+                    $isSimple = true;
+                }
             }
         );
 

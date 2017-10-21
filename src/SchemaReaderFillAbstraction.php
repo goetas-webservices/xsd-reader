@@ -63,18 +63,18 @@ abstract class SchemaReaderFillAbstraction extends SchemaReaderFindAbstraction
                 $methods,
                 $type
             ) {
-            /**
-            * @var string[] $methods
-            */
-            $methods = $methods;
+                /**
+                * @var string[] $methods
+                */
+                $methods = $methods;
 
-            $this->maybeCallMethod(
-                $methods,
-                $childNode->localName,
-                $childNode,
-                $type,
-                $childNode
-            );
+                $this->maybeCallMethod(
+                    $methods,
+                    $childNode->localName,
+                    $childNode,
+                    $type,
+                    $childNode
+                );
             }
         );
     }

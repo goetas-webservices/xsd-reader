@@ -119,18 +119,18 @@ class Group implements ElementItem, ElementContainer
                     $reader,
                     $group
                 ) {
-                /**
-                * @var string[] $methods
-                */
-                $methods = $methods;
+                    /**
+                    * @var string[] $methods
+                    */
+                    $methods = $methods;
 
-                $reader->maybeCallMethod(
-                    $methods,
-                    (string) $childNode->localName,
-                    $childNode,
-                    $group,
-                    $childNode
-                );
+                    $reader->maybeCallMethod(
+                        $methods,
+                        (string) $childNode->localName,
+                        $childNode,
+                        $group,
+                        $childNode
+                    );
                 }
             );
         };

@@ -98,26 +98,26 @@ class Group implements AttributeItem, AttributeContainer
                     $schema,
                     $attGroup
                 ) {
-                switch ($childNode->localName) {
-                    case 'attribute':
-                        $attribute = Attribute::getAttributeFromAttributeOrRef(
-                            $schemaReader,
-                            $childNode,
-                            $schema,
-                            $node
-                        );
-                        $attGroup->addAttribute($attribute);
-                        break;
-                    case 'attributeGroup':
-                        self::findSomethingLikeThis(
-                            $schemaReader,
-                            $schema,
-                            $node,
-                            $childNode,
-                            $attGroup
-                        );
-                        break;
-                }
+                    switch ($childNode->localName) {
+                        case 'attribute':
+                            $attribute = Attribute::getAttributeFromAttributeOrRef(
+                                $schemaReader,
+                                $childNode,
+                                $schema,
+                                $node
+                            );
+                            $attGroup->addAttribute($attribute);
+                            break;
+                        case 'attributeGroup':
+                            self::findSomethingLikeThis(
+                                $schemaReader,
+                                $schema,
+                                $node,
+                                $childNode,
+                                $attGroup
+                            );
+                            break;
+                    }
                 }
             );
         };

@@ -139,11 +139,11 @@ abstract class AbstractSchemaReader
             ) use (
                 & $doc
             ) {
-            if ($childNode->localName == "annotation") {
-                $doc .= static::getDocumentation($childNode);
-            } elseif ($childNode->localName == 'documentation') {
-                $doc .= (string) $childNode->nodeValue;
-            }
+                if ($childNode->localName == "annotation") {
+                    $doc .= static::getDocumentation($childNode);
+                } elseif ($childNode->localName == 'documentation') {
+                    $doc .= (string) $childNode->nodeValue;
+                }
             }
         );
         $doc = preg_replace('/[\t ]+/', ' ', $doc);
@@ -513,26 +513,26 @@ abstract class AbstractSchemaReader
                 $element,
                 & $skip
             ) {
-            if (
-                ! $skip &&
-                in_array(
-                    $childNode->localName,
-                    [
-                        'complexType',
-                        'simpleType',
-                    ]
-                )
-            ) {
-                Type::loadTypeWithCallback(
-                    $this,
-                    $element->getSchema(),
-                    $childNode,
-                    function (Type $type) use ($element) {
-                        $element->setType($type);
-                    }
-                );
-                $skip = true;
-            }
+                if (
+                    ! $skip &&
+                    in_array(
+                        $childNode->localName,
+                        [
+                            'complexType',
+                            'simpleType',
+                        ]
+                    )
+                ) {
+                    Type::loadTypeWithCallback(
+                        $this,
+                        $element->getSchema(),
+                        $childNode,
+                        function (Type $type) use ($element) {
+                            $element->setType($type);
+                        }
+                    );
+                    $skip = true;
+                }
             }
         );
         if ($skip) {
