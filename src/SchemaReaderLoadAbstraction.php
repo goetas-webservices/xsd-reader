@@ -102,7 +102,12 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
     {
         $max = static::loadSequenceNormaliseMax($node, $max);
 
-        foreach ($node->childNodes as $childNode) {
+        $limit = $node->childNodes->length;
+        for ($i = 0; $i < $limit; $i += 1) {
+            /**
+            * @var DOMNode $childNode
+            */
+            $childNode = $node->childNodes->item($i);
             if ($childNode instanceof DOMElement) {
                 $this->loadSequenceChildNode(
                     $elementContainer,
@@ -249,7 +254,12 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
     ) {
         $isSimple = false;
 
-        foreach ($node->childNodes as $childNode) {
+        $limit = $node->childNodes->length;
+        for ($i = 0; $i < $limit; $i += 1) {
+            /**
+            * @var DOMNode $childNode
+            */
+            $childNode = $node->childNodes->item($i);
             if ($childNode->localName === "simpleContent") {
                 $isSimple = true;
                 break;
@@ -378,6 +388,11 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
                 $methods,
                 $type
             ) {
+                /**
+                * @var string[]
+                */
+                $methods = $methods;
+
                 $this->maybeCallMethod(
                     $methods,
                     $childNode->localName,
@@ -501,7 +516,12 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
         DOMNodeList $childNodes,
         DOMElement $node
     ) {
-        foreach ($childNodes as $childNode) {
+        $limit = $childNodes->length;
+        for ($i = 0; $i < $limit; $i += 1) {
+            /**
+            * @var DOMElement $childNode
+            */
+            $childNode = $childNodes->item($i);
             if ($childNode instanceof DOMElement) {
                 $this->loadExtensionChildNode(
                     $type,

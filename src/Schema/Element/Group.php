@@ -102,7 +102,6 @@ class Group implements ElementItem, ElementContainer
             $schema,
             $node
         );
-
         static $methods = [
             'sequence' => 'loadSequence',
             'choice' => 'loadSequence',
@@ -110,7 +109,15 @@ class Group implements ElementItem, ElementContainer
         ];
 
         return function () use ($reader, $group, $node, $methods) {
-            foreach ($node->childNodes as $childNode) {
+            $limit = $node->childNodes->length;
+            for ($i = 0; $i < $limit; $i += 1) {
+                $childNode = $node->childNodes->item($i);
+
+                /**
+                * @var string[] $methods
+                */
+                $methods = $methods;
+
                 $reader->maybeCallMethod(
                     $methods,
                     (string) $childNode->localName,

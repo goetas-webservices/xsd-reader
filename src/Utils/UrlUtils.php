@@ -46,7 +46,9 @@ class UrlUtils
         /* fix url file for Windows */
         $base = preg_replace('#^file:\/\/([^/])#', 'file:///\1', $base);
 
-        /*
+        /**
+         * @var mixed[] $parts
+         *
          * parse base URL and convert to local variables:
          * $scheme, $host, $path
          */
@@ -59,7 +61,11 @@ class UrlUtils
                     ? ''  // destroy path if relative url points to root
                     : ( // remove non-directory element from path
                         isset($parts['path'])
-                            ? preg_replace('#/[^/]*$#', '', $parts["path"])
+                            ? preg_replace(
+                                '#/[^/]*$#',
+                                '',
+                                (string) $parts["path"]
+                            )
                             : ''
                     )
             ),
@@ -82,18 +88,18 @@ class UrlUtils
         $abs = '';
 
         if (isset($parts["host"])) {
-            $abs .= $parts['host'];
+            $abs .= (string) $parts['host'];
         }
 
         if (isset($parts["port"])) {
-            $abs .= ":".$parts["port"];
+            $abs .= ":" . (string) $parts["port"];
         }
 
         $abs .= $path."/".$rel;
         $abs = static::replaceSuperfluousSlashes($abs);
 
         if (isset($parts["scheme"])) {
-            $abs = $parts["scheme"].'://'.$abs;
+            $abs = (string) $parts["scheme"] . '://' . $abs;
         }
 
         return $abs;

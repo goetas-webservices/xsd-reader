@@ -131,11 +131,13 @@ abstract class AbstractSchemaReader
     public static function getDocumentation(DOMElement $node)
     {
         $doc = '';
-        foreach ($node->childNodes as $childNode) {
+        $limit = $node->childNodes->length;
+        for ($i = 0; $i < $limit; $i += 1) {
+            $childNode = $node->childNodes->item($i);
             if ($childNode->localName == "annotation") {
                 $doc .= static::getDocumentation($childNode);
             } elseif ($childNode->localName == 'documentation') {
-                $doc .= ($childNode->nodeValue);
+                $doc .= (string) $childNode->nodeValue;
             }
         }
         $doc = preg_replace('/[\t ]+/', ' ', $doc);
@@ -143,6 +145,7 @@ abstract class AbstractSchemaReader
     }
 
     /**
+    * @param string[] $methods
     * @param string $key
     *
     * @return Closure|null
@@ -156,6 +159,9 @@ abstract class AbstractSchemaReader
         if ($childNode instanceof DOMElement && isset($methods[$key])) {
             $method = $methods[$key];
 
+            /**
+            * @var Closure|null $append
+            */
             $append = $this->$method(...$args);
 
             if ($append instanceof Closure) {
@@ -190,8 +196,16 @@ abstract class AbstractSchemaReader
             'simpleType' => [$this, 'loadSimpleType'],
         ];
 
-        foreach ($node->childNodes as $childNode) {
+        $limit = $node->childNodes->length;
+        for ($i = 0; $i < $limit; $i += 1) {
+            /**
+            * @var DOMNode $childNode
+            */
+            $childNode = $node->childNodes->item($i);
             if ($childNode instanceof DOMElement) {
+                /**
+                * @var Closure|null $callback
+                */
                 $callback = $this->maybeCallCallableWithArgs(
                     $childNode,
                         [],
@@ -461,10 +475,18 @@ abstract class AbstractSchemaReader
     {
         list ($name, $namespace) = static::splitParts($node, $typeName);
 
+        /**
+        * @var string|null $namespace
+        */
         $namespace = $namespace ?: $schema->getTargetNamespace();
 
         try {
-            return $schema->$finder($name, $namespace);
+            /**
+            * @var ElementItem|Group|AttributeItem|AttributeGroup|Type $out
+            */
+            $out = $schema->$finder($name, $namespace);
+
+            return $out;
         } catch (TypeNotFoundException $e) {
             throw new TypeException(sprintf("Can't find %s named {%s}#%s, at line %d in %s ", strtolower(substr($finder, 4)), $namespace, $name, $node->getLineNo(), $node->ownerDocument->documentURI), 0, $e);
         }
@@ -477,7 +499,9 @@ abstract class AbstractSchemaReader
 
     public function fillItem(Item $element, DOMElement $node)
     {
-        foreach ($node->childNodes as $childNode) {
+        $limit = $node->childNodes->length;
+        for ($i = 0; $i < $limit; $i += 1) {
+            $childNode = $node->childNodes->item($i);
             if (
                 in_array(
                     $childNode->localName,
@@ -551,9 +575,18 @@ abstract class AbstractSchemaReader
             $globalSchemas[static::XSD_NS]->addType(new SimpleType($globalSchemas[static::XSD_NS], "anySimpleType"));
             $globalSchemas[static::XSD_NS]->addType(new SimpleType($globalSchemas[static::XSD_NS], "anyType"));
 
-            $globalSchemas[static::XML_NS]->addSchema($globalSchemas[static::XSD_NS], static::XSD_NS);
-            $globalSchemas[static::XSD_NS]->addSchema($globalSchemas[static::XML_NS], static::XML_NS);
+            $globalSchemas[static::XML_NS]->addSchema(
+                $globalSchemas[static::XSD_NS],
+                (string) static::XSD_NS
+            );
+            $globalSchemas[static::XSD_NS]->addSchema(
+                $globalSchemas[static::XML_NS],
+                (string) static::XML_NS
+            );
 
+            /**
+            * @var Closure $callback
+            */
             foreach ($callbacks as $callback) {
                 $callback();
             }

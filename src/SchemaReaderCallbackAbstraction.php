@@ -38,7 +38,9 @@ use RuntimeException;
 abstract class SchemaReaderCallbackAbstraction extends AbstractSchemaReader
 {
     /**
+    * @param mixed[][] $commonMethods
     * @param mixed[][] $methods
+    * @param mixed[][] $commonArguments
     *
     * @return mixed
     */
@@ -51,12 +53,40 @@ abstract class SchemaReaderCallbackAbstraction extends AbstractSchemaReader
         foreach ($commonMethods as $commonMethodsSpec) {
             list ($localNames, $callable, $args) = $commonMethodsSpec;
 
+            /**
+            * @var string[] $localNames
+            */
+            $localNames = $localNames;
+
+            /**
+            * @var callable $callable
+            */
+            $callable = $callable;
+
+            /**
+            * @var mixed[] $args
+            */
+            $args = $args;
+
             if (in_array($childNode->localName, $localNames)) {
                 return call_user_func_array($callable, $args);
             }
         }
         foreach ($commonArguments as $commonArgumentSpec) {
+            /**
+            * @var mixed[] $commonArgumentSpec
+            */
             list ($callables, $args) = $commonArgumentSpec;
+
+            /**
+            * @var callable[] $callables
+            */
+            $callables = $callables;
+
+            /**
+            * @var mixed[]
+            */
+            $args = $args;
 
             if (isset($callables[$childNode->localName])) {
                 return call_user_func_array(
@@ -67,6 +97,16 @@ abstract class SchemaReaderCallbackAbstraction extends AbstractSchemaReader
         }
         if (isset($methods[$childNode->localName])) {
             list ($callable, $args) = $methods[$childNode->localName];
+
+            /**
+            * @var callable $callable
+            */
+            $callable = $callable;
+
+            /**
+            * @var mixed[] $args
+            */
+            $args = $args;
 
             return call_user_func_array($callable, $args);
         }
@@ -95,17 +135,21 @@ abstract class SchemaReaderCallbackAbstraction extends AbstractSchemaReader
         $passTo
     ) {
         if (! is_a($type, $instanceof, true)) {
+            /**
+            * @var string $class
+            */
+            $class = static::class;
             throw new RuntimeException(
                 'Argument 1 passed to ' .
                 __METHOD__ .
                 ' needs to be an instance of ' .
                 $instanceof .
                 ' when passed onto ' .
-                static::class .
+                $class .
                 '::' .
                 $passTo .
                 '(), ' .
-                get_class($type) .
+                (string) get_class($type) .
                 ' given.'
             );
         }
@@ -151,7 +195,13 @@ abstract class SchemaReaderCallbackAbstraction extends AbstractSchemaReader
     ) {
         $this->fillTypeNode($type, $node, true);
 
-        foreach ($node->childNodes as $childNode) {
+        $limit = $node->childNodes->length;
+        for ($i = 0; $i < $limit; $i += 1) {
+            /**
+            * @var DOMNode $childNode
+            */
+            $childNode = $node->childNodes->item($i);
+
             if ($childNode instanceof DOMElement) {
                 $againstNodeList(
                     $node,

@@ -88,7 +88,9 @@ class Group implements AttributeItem, AttributeContainer
         $schema->addAttributeGroup($attGroup);
 
         return function () use ($schemaReader, $schema, $node, $attGroup) {
-            foreach ($node->childNodes as $childNode) {
+            $limit = $node->childNodes->length;
+            for ($i = 0; $i < $limit; $i += 1) {
+                $childNode = $node->childNodes->item($i);
                 switch ($childNode->localName) {
                     case 'attribute':
                         $attribute = Attribute::getAttributeFromAttributeOrRef(

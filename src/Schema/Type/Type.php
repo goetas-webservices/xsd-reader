@@ -127,7 +127,12 @@ abstract class Type implements SchemaItem
         DOMNode $node,
         Closure $callback
     ) {
-        foreach ($node->childNodes as $childNode) {
+        $limit = $node->childNodes->length;
+        for ($i = 0; $i < $limit; $i += 1) {
+            /**
+            * @var DOMNode $childNode
+            */
+            $childNode = $node->childNodes->item($i);
             static::loadTypeWithCallback(
                 $schemaReader,
                 $schema,
@@ -151,6 +156,9 @@ abstract class Type implements SchemaItem
             'simpleType' => 'loadSimpleType',
         ];
 
+        /**
+        * @var Closure|null $func
+        */
         $func = $schemaReader->maybeCallMethod(
             $methods,
             $childNode->localName,
