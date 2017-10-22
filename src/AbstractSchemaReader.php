@@ -737,24 +737,24 @@ abstract class AbstractSchemaReader
         array $methods
     ) {
         return function (
-                DOMElement $node,
-                DOMElement $childNode
-            ) use (
-                $methods,
-                $type
-            ) {
-                /**
-                * @var string[] $methods
-                */
-                $methods = $methods;
+            DOMElement $node,
+            DOMElement $childNode
+        ) use (
+            $methods,
+            $type
+        ) {
+            /**
+            * @var string[] $methods
+            */
+            $methods = $methods;
 
-                $this->maybeCallMethod(
-                    $methods,
-                    $childNode->localName,
-                    $childNode,
-                    $type,
-                    $childNode
-                );
-            };
+            $this->maybeCallMethod(
+                $methods,
+                $childNode->localName,
+                $childNode,
+                $type,
+                $childNode
+            );
+        };
     }
 }
