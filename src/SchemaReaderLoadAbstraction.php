@@ -383,34 +383,16 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
             $schema->addType($type);
         }
 
-        static $methods = [
-            'union' => 'loadUnion',
-            'list' => 'loadList',
-        ];
-
         return $this->makeCallbackCallback(
             $type,
             $node,
-            function (
-                DOMElement $node,
-                DOMElement $childNode
-            ) use (
-                $methods,
-                $type
-            ) {
-                /**
-                * @var string[]
-                */
-                $methods = $methods;
-
-                $this->maybeCallMethod(
-                    $methods,
-                    $childNode->localName,
-                    $childNode,
-                    $type,
-                    $childNode
-                );
-            },
+            $this->CallbackGeneratorMaybeCallMethodAgainstDOMNodeList(
+                $type,
+                [
+                    'union' => 'loadUnion',
+                    'list' => 'loadList',
+                ]
+            ),
             $callback
         );
     }

@@ -722,7 +722,21 @@ abstract class AbstractSchemaReader
     ) {
         static::againstDOMNodeList(
             $node,
-            function (
+            $this->CallbackGeneratorMaybeCallMethodAgainstDOMNodeList(
+                $type,
+                $methods
+            )
+        );
+    }
+
+    /**
+    * @return Closure
+    */
+    public function CallbackGeneratorMaybeCallMethodAgainstDOMNodeList(
+        SchemaItem $type,
+        array $methods
+    ) {
+        return function (
                 DOMElement $node,
                 DOMElement $childNode
             ) use (
@@ -741,7 +755,6 @@ abstract class AbstractSchemaReader
                     $type,
                     $childNode
                 );
-            }
-        );
+            };
     }
 }
