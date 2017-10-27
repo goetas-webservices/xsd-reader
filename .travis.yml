@@ -10,6 +10,10 @@ php:
   - 7.2
   - hhvm
 
+allow_failures:
+    - php: 7.2
+    - hhvm
+
 cache:
   directories:
     - vendor
