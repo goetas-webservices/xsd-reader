@@ -27,6 +27,7 @@
     },
     "autoload-dev" : {
         "psr-4" : {
+            "GoetasWebservices\\CS\\": "./php-cs-fixer/",
             "GoetasWebservices\\XML\\XSDReader\\Tests\\" : "tests/"
         }
     },
@@ -36,6 +37,7 @@
         }
     },
     "scripts": {
+        "php-cs-fixer": "php-cs-fixer fix --verbose --dry-run",
         "test": "vendor/bin/phpunit"
     }
 }
