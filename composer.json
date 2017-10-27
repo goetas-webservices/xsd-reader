@@ -1,41 +1,41 @@
 {
-	"name" : "goetas-webservices/xsd-reader",
-	"description" : "Read any XML Schema (XSD) programmatically with PHP",
-	"keywords" : [
-		"xsd",
-		"xml",
-		"php",
-		"parser",
-		"xmlschema"
-	],
-	"license" : "MIT",
-	"authors" : [{
-			"name" : "Asmir Mustafic",
-			"email" : "goetas@lignano.it"
-		}
-	],
-	"require" : {
-		"php" : ">=5.4.0"
-	},
-	"require-dev" : {
-		"phpunit/phpunit" : "^4.8|^5.0"
-	},
-	"autoload" : {
-		"psr-4" : {
-			"GoetasWebservices\\XML\\XSDReader\\" : "src/"
-		}
-	},
-	"autoload-dev" : {
-		"psr-4" : {
-			"GoetasWebservices\\XML\\XSDReader\\Tests\\" : "tests/"
-		}
-	},
-	"extra" : {
-		"branch-alias" : {
-			"dev-master" : "0.2-dev"
-		}
-	},
-	"scripts": {
-		"test": "vendor/bin/phpunit"
-	}
+    "name" : "goetas-webservices/xsd-reader",
+    "description" : "Read any XML Schema (XSD) programmatically with PHP",
+    "keywords" : [
+        "xsd",
+        "xml",
+        "php",
+        "parser",
+        "xmlschema"
+    ],
+    "license" : "MIT",
+    "authors" : [{
+            "name" : "Asmir Mustafic",
+            "email" : "goetas@lignano.it"
+        }
+    ],
+    "require" : {
+        "php" : ">=5.4.0"
+    },
+    "require-dev" : {
+        "phpunit/phpunit" : "^4.8|^5.0"
+    },
+    "autoload" : {
+        "psr-4" : {
+            "GoetasWebservices\\XML\\XSDReader\\" : "src/"
+        }
+    },
+    "autoload-dev" : {
+        "psr-4" : {
+            "GoetasWebservices\\XML\\XSDReader\\Tests\\" : "tests/"
+        }
+    },
+    "extra" : {
+        "branch-alias" : {
+            "dev-master" : "0.2-dev"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit"
+    }
 }

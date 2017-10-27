@@ -14,6 +14,3 @@ insert_final_newline = false
 
 [.travis.yml]
 indent_size = 2
-
-[composer.json]
-indent_style = tab
