@@ -1,14 +1,15 @@
 <?php
+
 namespace GoetasWebservices\XML\XSDReader\Schema\Inheritance;
 
 class Restriction extends Base
 {
-
     protected $checks = array();
 
     public function addCheck($type, $value)
     {
         $this->checks[$type][] = $value;
+
         return $this;
     }
 
@@ -16,8 +17,9 @@ class Restriction extends Base
     {
         return $this->checks;
     }
+
     public function getChecksByType($type)
     {
-        return isset($this->checks[$type])?$this->checks[$type]:array();
+        return isset($this->checks[$type]) ? $this->checks[$type] : array();
     }
 }

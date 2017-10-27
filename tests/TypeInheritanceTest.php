@@ -1,9 +1,9 @@
 <?php
+
 namespace GoetasWebservices\XML\XSDReader\Tests;
 
 class TypeInheritanceTest extends BaseTest
 {
-
     public function testInheritanceWithExtension()
     {
         $schema = $this->reader->readString('
@@ -38,8 +38,6 @@ class TypeInheritanceTest extends BaseTest
 
         $this->assertEquals('complexType-2-el1', $elements[0]->getName());
         $this->assertEquals('complexType-2-att1', $attributes[0]->getName());
-
-
     }
 
     public function testBase()
@@ -127,13 +125,11 @@ class TypeInheritanceTest extends BaseTest
         $this->assertEquals('http://www.example.com', $base->getSchema()->getTargetNamespace());
         $this->assertTrue(!$base->getName());
 
-
         $restriction2 = $base->getRestriction();
         $base2 = $restriction2->getBase();
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType', $base2);
         $this->assertEquals('http://www.w3.org/2001/XMLSchema', $base2->getSchema()->getTargetNamespace());
         $this->assertEquals('string', $base2->getName());
-
     }
 
     public function testAnonymUnion()
@@ -156,9 +152,7 @@ class TypeInheritanceTest extends BaseTest
 
             </xs:schema>');
 
-
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType', $type = $schema->findType('myAnonUnion', 'http://www.example.com'));
-
 
         $unions = $type->getUnions();
 
@@ -183,6 +177,5 @@ class TypeInheritanceTest extends BaseTest
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType', $base2);
         $this->assertEquals('http://www.example.com', $base2->getSchema()->getTargetNamespace());
         $this->assertEquals('myType', $base2->getName());
-
     }
 }

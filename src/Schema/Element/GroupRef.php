@@ -1,9 +1,9 @@
 <?php
+
 namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
 class GroupRef extends Group
 {
-
     protected $wrapped;
 
     protected $min = 1;
@@ -24,6 +24,7 @@ class GroupRef extends Group
     public function setMin($min)
     {
         $this->min = $min;
+
         return $this;
     }
 
@@ -35,6 +36,7 @@ class GroupRef extends Group
     public function setMax($max)
     {
         $this->max = $max;
+
         return $this;
     }
 
@@ -51,13 +53,14 @@ class GroupRef extends Group
     public function getElements()
     {
         $elements = $this->wrapped->getElements();
-        if($this->getMax()>0 || $this->getMax()===-1){
+        if ($this->getMax() > 0 || $this->getMax() === -1) {
             foreach ($elements as $k => $element) {
                 $e = clone $element;
                 $e->setMax($this->getMax());
                 $elements[$k] = $e;
             }
         }
+
         return $elements;
     }
 

@@ -1,11 +1,11 @@
 <?php
+
 namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
 use GoetasWebservices\XML\XSDReader\Schema\Item;
 
 class Element extends Item implements ElementItem, ElementSingle
 {
-
     protected $min = 1;
 
     protected $max = 1;
@@ -22,6 +22,7 @@ class Element extends Item implements ElementItem, ElementSingle
     public function setMin($min)
     {
         $this->min = $min;
+
         return $this;
     }
 
@@ -33,6 +34,7 @@ class Element extends Item implements ElementItem, ElementSingle
     public function setMax($max)
     {
         $this->max = $max;
+
         return $this;
     }
 
@@ -43,7 +45,8 @@ class Element extends Item implements ElementItem, ElementSingle
 
     public function setQualified($qualified)
     {
-        $this->qualified = (boolean) $qualified;
+        $this->qualified = (bool) $qualified;
+
         return $this;
     }
 
@@ -54,7 +57,8 @@ class Element extends Item implements ElementItem, ElementSingle
 
     public function setNil($nil)
     {
-        $this->nil = (boolean) $nil;
+        $this->nil = (bool) $nil;
+
         return $this;
     }
 }
