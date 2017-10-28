@@ -1,3 +1,5 @@
+tools:
+    external_code_coverage: true
 build:
     nodes:
         php56:
@@ -14,13 +16,6 @@ build:
                 override: true
             tests:
                 override: [php-scrutinizer-run]
-    tests:
-        override:
-            -
-                command: 'vendor/bin/phpunit --coverage-clover=some-file'
-                coverage:
-                    file: 'some-file'
-                    format: 'clover'
 checks:
     php:
         code_rating: true
