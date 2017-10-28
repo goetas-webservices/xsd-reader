@@ -8,10 +8,6 @@ php:
   - 7.2
   - hhvm
 
-matrix:
-  allow_failures:
-    - php: hhvm
-
 cache:
   directories:
     - vendor
@@ -26,5 +22,5 @@ before_script:
 
 script:
   - vendor/bin/phpunit $PHPUNIT_FLAGS
-  - if [[ $TRAVIS_PHP_VERSION != '5.4' && $TRAVIS_PHP_VERSION != '5.5' ]]; then travis_retry composer require --dev friendsofphp/php-cs-fixer; fi
-  - if [[ $TRAVIS_PHP_VERSION != '5.4' && $TRAVIS_PHP_VERSION != '5.5' ]]; then php ./vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix --verbose --dry-run; fi
+  - if [[ $TRAVIS_PHP_VERSION != 'hhvm' ]]; then travis_retry composer require --dev friendsofphp/php-cs-fixer; fi
+  - if [[ $TRAVIS_PHP_VERSION != 'hhvm' ]]; then php ./vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix --verbose --dry-run; fi
