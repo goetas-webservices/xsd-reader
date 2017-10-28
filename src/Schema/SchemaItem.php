@@ -1,4 +1,5 @@
 <?php
+
 namespace GoetasWebservices\XML\XSDReader\Schema;
 
 interface SchemaItem

@@ -1,11 +1,11 @@
 <?php
+
 namespace GoetasWebservices\XML\XSDReader\Schema\Attribute;
 
 use GoetasWebservices\XML\XSDReader\Schema\Item;
 
 class AttributeRef extends Item implements AttributeSingle
 {
-
     protected $qualified = true;
 
     protected $nil = false;
@@ -13,7 +13,6 @@ class AttributeRef extends Item implements AttributeSingle
     protected $use = self::USE_OPTIONAL;
 
     /**
-     *
      * @var Attribute
      */
     protected $wrapped;
@@ -23,8 +22,8 @@ class AttributeRef extends Item implements AttributeSingle
         parent::__construct($att->getSchema(), $att->getName());
         $this->wrapped = $att;
     }
+
     /**
-     *
      * @return AttributeDef
      */
     public function getReferencedAttribute()
@@ -45,6 +44,7 @@ class AttributeRef extends Item implements AttributeSingle
     public function setQualified($qualified)
     {
         $this->qualified = $qualified;
+
         return $this;
     }
 
@@ -56,6 +56,7 @@ class AttributeRef extends Item implements AttributeSingle
     public function setNil($nil)
     {
         $this->nil = $nil;
+
         return $this;
     }
 
@@ -67,6 +68,7 @@ class AttributeRef extends Item implements AttributeSingle
     public function setUse($use)
     {
         $this->use = $use;
+
         return $this;
     }
 }

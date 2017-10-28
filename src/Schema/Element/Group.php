@@ -1,13 +1,12 @@
 <?php
+
 namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
 use GoetasWebservices\XML\XSDReader\Schema\Schema;
 
 class Group implements ElementItem, ElementContainer
 {
-
     /**
-     *
      * @var Schema
      */
     protected $schema;
@@ -32,6 +31,7 @@ class Group implements ElementItem, ElementContainer
     public function setName($name)
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -53,6 +53,7 @@ class Group implements ElementItem, ElementContainer
     public function setDoc($doc)
     {
         $this->doc = $doc;
+
         return $this;
     }
 

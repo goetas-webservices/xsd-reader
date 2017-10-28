@@ -1,4 +1,5 @@
 <?php
+
 namespace GoetasWebservices\XML\XSDReader\Schema;
 
 use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
@@ -13,7 +14,6 @@ use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
 
 class Schema
 {
-
     protected $elementsQualification = false;
 
     protected $attributesQualification = false;
@@ -35,7 +35,6 @@ class Schema
     protected $doc;
 
     private $typeCache = array();
-
 
     public function getElementsQualification()
     {
@@ -146,8 +145,8 @@ class Schema
     }
 
     /**
-     *
      * @param string $name
+     *
      * @return Group|false
      */
     public function getGroup($name)
@@ -155,12 +154,13 @@ class Schema
         if (isset($this->groups[$name])) {
             return $this->groups[$name];
         }
+
         return false;
     }
 
     /**
-     *
      * @param string $name
+     *
      * @return ElementItem|false
      */
     public function getElement($name)
@@ -168,12 +168,13 @@ class Schema
         if (isset($this->elements[$name])) {
             return $this->elements[$name];
         }
+
         return false;
     }
 
     /**
-     *
      * @param string $name
+     *
      * @return Type|false
      */
     public function getType($name)
@@ -181,12 +182,13 @@ class Schema
         if (isset($this->types[$name])) {
             return $this->types[$name];
         }
+
         return false;
     }
 
     /**
-     *
      * @param string $name
+     *
      * @return AttributeItem|false
      */
     public function getAttribute($name)
@@ -194,12 +196,13 @@ class Schema
         if (isset($this->attributes[$name])) {
             return $this->attributes[$name];
         }
+
         return false;
     }
 
     /**
-     *
      * @param string $name
+     *
      * @return AttributeGroup|false
      */
     public function getAttributeGroup($name)
@@ -207,20 +210,22 @@ class Schema
         if (isset($this->attributeGroups[$name])) {
             return $this->attributeGroups[$name];
         }
+
         return false;
     }
 
     public function __toString()
     {
-        return sprintf("Target namespace %s", $this->getTargetNamespace());
+        return sprintf('Target namespace %s', $this->getTargetNamespace());
     }
 
     /**
-     *
      * @param string $getter
      * @param string $name
      * @param string $namespace
+     *
      * @throws TypeNotFoundException
+     *
      * @return \GoetasWebservices\XML\XSDReader\Schema\SchemaItem
      */
     protected function findSomething($getter, $name, $namespace = null, &$calling = array())
@@ -249,9 +254,9 @@ class Schema
     }
 
     /**
-     *
      * @param string $name
      * @param string $namespace
+     *
      * @return Type
      */
     public function findType($name, $namespace = null)
@@ -260,9 +265,9 @@ class Schema
     }
 
     /**
-     *
      * @param string $name
      * @param string $namespace
+     *
      * @return Group
      */
     public function findGroup($name, $namespace = null)
@@ -271,9 +276,9 @@ class Schema
     }
 
     /**
-     *
      * @param string $name
      * @param string $namespace
+     *
      * @return ElementDef
      */
     public function findElement($name, $namespace = null)
@@ -282,9 +287,9 @@ class Schema
     }
 
     /**
-     *
      * @param string $name
      * @param string $namespace
+     *
      * @return AttributeReal
      */
     public function findAttribute($name, $namespace = null)
@@ -293,9 +298,9 @@ class Schema
     }
 
     /**
-     *
      * @param string $name
      * @param string $namespace
+     *
      * @return AttributeGroup
      */
     public function findAttributeGroup($name, $namespace = null)

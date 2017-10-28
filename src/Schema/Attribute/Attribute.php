@@ -1,11 +1,11 @@
 <?php
+
 namespace GoetasWebservices\XML\XSDReader\Schema\Attribute;
 
 use GoetasWebservices\XML\XSDReader\Schema\Item;
 
 class Attribute extends Item implements AttributeSingle
 {
-
     protected $fixed;
 
     protected $default;
@@ -24,6 +24,7 @@ class Attribute extends Item implements AttributeSingle
     public function setFixed($fixed)
     {
         $this->fixed = $fixed;
+
         return $this;
     }
 
@@ -35,6 +36,7 @@ class Attribute extends Item implements AttributeSingle
     public function setDefault($default)
     {
         $this->default = $default;
+
         return $this;
     }
 
@@ -46,6 +48,7 @@ class Attribute extends Item implements AttributeSingle
     public function setQualified($qualified)
     {
         $this->qualified = $qualified;
+
         return $this;
     }
 
@@ -57,6 +60,7 @@ class Attribute extends Item implements AttributeSingle
     public function setNil($nil)
     {
         $this->nil = $nil;
+
         return $this;
     }
 
@@ -68,6 +72,7 @@ class Attribute extends Item implements AttributeSingle
     public function setUse($use)
     {
         $this->use = $use;
+
         return $this;
     }
 }

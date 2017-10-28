@@ -5,7 +5,14 @@ php:
   - 5.4
   - 5.5
   - 5.6
+  - 7.0
+  - 7.1
+  - 7.2
   - hhvm
+
+matrix:
+  allow_failures:
+    - php: hhvm
 
 cache:
   directories:
@@ -19,9 +26,11 @@ before_script:
   - travis_retry composer self-update
   - travis_retry composer update $COMPOSER_FLAGS
 
-script: vendor/bin/phpunit $PHPUNIT_FLAGS
+script:
+  - vendor/bin/phpunit $PHPUNIT_FLAGS
+  - if [[ $TRAVIS_PHP_VERSION != '5.4' && $TRAVIS_PHP_VERSION != '5.5' ]]; then travis_retry composer require --dev friendsofphp/php-cs-fixer; fi
+  - if [[ $TRAVIS_PHP_VERSION != '5.4' && $TRAVIS_PHP_VERSION != '5.5' ]]; then php ./vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix --verbose --dry-run; fi
 
 after_script:
   - wget https://scrutinizer-ci.com/ocular.phar
   - if [[ $TRAVIS_PHP_VERSION = '5.6' ]] ; then php ocular.phar code-coverage:upload --format=php-clover coverage.clover; fi
-

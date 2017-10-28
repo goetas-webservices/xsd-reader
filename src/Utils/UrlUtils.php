@@ -1,16 +1,15 @@
 <?php
+
 namespace GoetasWebservices\XML\XSDReader\Utils;
 
 class UrlUtils
 {
-
     public static function resolveRelativeUrl($base, $rel)
     {
         $re = array(
             '#(/\.?/)#',
-            '#/(?!\.\.)[^/]+/\.\./#'
+            '#/(?!\.\.)[^/]+/\.\./#',
         );
-
 
         if (!$rel) {
             return $base;
@@ -25,7 +24,7 @@ class UrlUtils
         if ($rel[0] === '#' || $rel[0] === '?') {
             return $base.$rel;
         }
-        
+
         /* fix url file for Windows */
         $base = preg_replace('#^file:\/\/([^/])#', 'file:///\1', $base);
 
@@ -36,7 +35,7 @@ class UrlUtils
         $parts = parse_url($base);
 
         /* remove non-directory element from path */
-        $path = isset($parts['path']) ? preg_replace('#/[^/]*$#', '', $parts["path"]) : '';
+        $path = isset($parts['path']) ? preg_replace('#/[^/]*$#', '', $parts['path']) : '';
 
         /* destroy path if relative url points to root */
         if ($rel[0] === '/') {
@@ -46,15 +45,15 @@ class UrlUtils
         /* Build absolute URL */
         $abs = '';
 
-        if (isset($parts["host"])) {
+        if (isset($parts['host'])) {
             $abs .= $parts['host'];
         }
 
-        if (isset($parts["port"])) {
-            $abs .= ":".$parts["port"];
+        if (isset($parts['port'])) {
+            $abs .= ':'.$parts['port'];
         }
 
-        $abs .= $path."/".$rel;
+        $abs .= $path.'/'.$rel;
 
         /* replace '//' or '/./' or '/foo/../' with '/' */
         $n = 1;
@@ -62,11 +61,10 @@ class UrlUtils
             $abs = preg_replace($re, '/', $abs, -1, $n);
         } while ($n > 0);
 
-        if (isset($parts["scheme"])) {
-            $abs = $parts["scheme"].'://'.$abs;
+        if (isset($parts['scheme'])) {
+            $abs = $parts['scheme'].'://'.$abs;
         }
 
         return $abs;
     }
-
 }
