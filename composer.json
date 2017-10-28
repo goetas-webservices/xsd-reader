@@ -26,6 +26,7 @@
     },
     "autoload" : {
         "psr-4" : {
+            "GoetasWebservices\\CS\\": "./php-cs-fixer/",
             "GoetasWebservices\\XML\\XSDReader\\" : "src/"
         }
     },
@@ -36,11 +37,11 @@
     },
     "extra" : {
         "branch-alias" : {
-            "dev-static-analysis": "0.3-dev",
             "dev-master" : "0.2-dev"
         }
     },
     "scripts": {
+        "php-cs-fixer": "php-cs-fixer fix --verbose --dry-run",
         "tests": [
             "php ./vendor/phpunit/phpunit/phpunit -v",
             "phpstan analyse -l7 src",
