@@ -12,6 +12,8 @@ class Config extends BaseConfig
     const DEFAULT_RULES = [
         '@Symfony' => true,
         'yoda_style' => false,
+        'phpdoc_to_comment' => false, // required for type hinting
+        'phpdoc_var_without_name' => false, // required for type hinting
     ];
 
     public function __construct(array $inPaths)

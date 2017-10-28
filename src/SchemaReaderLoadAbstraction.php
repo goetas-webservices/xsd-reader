@@ -173,7 +173,7 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
     ) {
         if ($childNode->hasAttribute('ref')) {
             /**
-             * @var ElementDef
+             * @var ElementDef $referencedElement
              */
             $referencedElement = $this->findSomething('findElement', $elementContainer->getSchema(), $node, $childNode->getAttribute('ref'));
             $element = ElementRef::loadElementRef(

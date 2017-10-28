@@ -86,7 +86,7 @@ class GroupRef extends Group implements InterfaceSetMinMax
         if ($this->getMax() > 0 || $this->getMax() === -1) {
             foreach ($elements as $k => $element) {
                 /**
-                 * @var Element|ElementRef|ElementSingle|GroupRef
+                 * @var Element|ElementRef|ElementSingle|GroupRef $e
                  */
                 $e = clone $element;
                 $e->setMax($this->getMax());
