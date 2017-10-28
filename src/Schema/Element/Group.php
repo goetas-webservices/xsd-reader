@@ -1,4 +1,5 @@
 <?php
+
 namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
 use DOMElement;
@@ -13,19 +14,18 @@ class Group implements ElementItem, ElementContainer
     use ElementContainerTrait;
 
     /**
-     *
      * @var Schema
      */
     protected $schema;
 
     /**
-    * @var string|null
-    */
+     * @var string|null
+     */
     protected $doc;
 
     /**
-    * @param string $name
-    */
+     * @param string $name
+     */
     public function __construct(Schema $schema, $name)
     {
         $this->schema = $schema;
@@ -33,52 +33,53 @@ class Group implements ElementItem, ElementContainer
     }
 
     /**
-    * @return string|null
-    */
+     * @return string|null
+     */
     public function getDoc()
     {
         return $this->doc;
     }
 
     /**
-    * @param string $doc
-    *
-    * @return $this
-    */
+     * @param string $doc
+     *
+     * @return $this
+     */
     public function setDoc($doc)
     {
         $this->doc = $doc;
+
         return $this;
     }
 
     /**
-    * @return Schema
-    */
+     * @return Schema
+     */
     public function getSchema()
     {
         return $this->schema;
     }
 
     /**
-    * @return Group|GroupRef
-    */
+     * @return Group|GroupRef
+     */
     protected static function loadGroupBeforeCheckingChildNodes(
         Schema $schema,
         DOMElement $node
     ) {
-        $group = new Group($schema, $node->getAttribute("name"));
+        $group = new self($schema, $node->getAttribute('name'));
         $group->setDoc(SchemaReader::getDocumentation($node));
 
-        if ($node->hasAttribute("maxOccurs")) {
+        if ($node->hasAttribute('maxOccurs')) {
             /**
-            * @var GroupRef $group
-            */
+             * @var GroupRef
+             */
             $group = SchemaReader::maybeSetMax(new GroupRef($group), $node);
         }
-        if ($node->hasAttribute("minOccurs")) {
+        if ($node->hasAttribute('minOccurs')) {
             /**
-            * @var GroupRef $group
-            */
+             * @var GroupRef
+             */
             $group = SchemaReader::maybeSetMin(
                 $group instanceof GroupRef ? $group : new GroupRef($group),
                 $node
@@ -91,8 +92,8 @@ class Group implements ElementItem, ElementContainer
     }
 
     /**
-    * @return \Closure
-    */
+     * @return \Closure
+     */
     public static function loadGroup(
         SchemaReaderLoadAbstraction $reader,
         Schema $schema,
@@ -110,8 +111,8 @@ class Group implements ElementItem, ElementContainer
 
         return function () use ($reader, $group, $node, $methods) {
             /**
-            * @var string[] $methods
-            */
+             * @var string[]
+             */
             $methods = $methods;
             $reader->maybeCallMethodAgainstDOMNodeList(
                 $node,

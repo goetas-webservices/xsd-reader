@@ -1,16 +1,17 @@
 <?php
+
 namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
 trait ElementContainerTrait
 {
     /**
-    * @var ElementItem[]
-    */
+     * @var ElementItem[]
+     */
     protected $elements = array();
 
     /**
-    * @return ElementItem[]
-    */
+     * @return ElementItem[]
+     */
     public function getElements()
     {
         return $this->elements;

@@ -1,55 +1,43 @@
 <?php
+
 namespace GoetasWebservices\XML\XSDReader;
 
 use Closure;
-use DOMDocument;
 use DOMElement;
-use DOMNode;
-use DOMNodeList;
-use GoetasWebservices\XML\XSDReader\Exception\IOException;
-use GoetasWebservices\XML\XSDReader\Exception\TypeException;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Attribute;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
-use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItem;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Element;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementContainer;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
-use GoetasWebservices\XML\XSDReader\Schema\Element\ElementItem;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementRef;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Group;
 use GoetasWebservices\XML\XSDReader\Schema\Element\GroupRef;
-use GoetasWebservices\XML\XSDReader\Schema\Element\InterfaceSetMinMax;
-use GoetasWebservices\XML\XSDReader\Schema\Exception\TypeNotFoundException;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Base;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Extension;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction;
-use GoetasWebservices\XML\XSDReader\Schema\Item;
 use GoetasWebservices\XML\XSDReader\Schema\Schema;
-use GoetasWebservices\XML\XSDReader\Schema\SchemaItem;
 use GoetasWebservices\XML\XSDReader\Schema\Type\BaseComplexType;
 use GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType;
 use GoetasWebservices\XML\XSDReader\Schema\Type\ComplexTypeSimpleContent;
 use GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType;
 use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
-use GoetasWebservices\XML\XSDReader\Utils\UrlUtils;
-use RuntimeException;
 
 abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
 {
     /**
-    * @return Closure
-    */
+     * @return Closure
+     */
     protected function loadAttributeGroup(Schema $schema, DOMElement $node)
     {
         return AttributeGroup::loadAttributeGroup($this, $schema, $node);
     }
 
     /**
-    * @param bool $attributeDef
-    *
-    * @return Closure
-    */
+     * @param bool $attributeDef
+     *
+     * @return Closure
+     */
     protected function loadAttributeOrElementDef(
         Schema $schema,
         DOMElement $node,
@@ -64,40 +52,39 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
             $schema->addElement($attribute);
         }
 
-
         return function () use ($attribute, $node) {
             $this->fillItem($attribute, $node);
         };
     }
 
     /**
-    * @return Closure
-    */
+     * @return Closure
+     */
     protected function loadAttributeDef(Schema $schema, DOMElement $node)
     {
         return $this->loadAttributeOrElementDef($schema, $node, true);
     }
 
     /**
-    * @param int|null $max
-    *
-    * @return int|null
-    */
+     * @param int|null $max
+     *
+     * @return int|null
+     */
     protected static function loadSequenceNormaliseMax(DOMElement $node, $max)
     {
         return
         (
             (is_int($max) && (bool) $max) ||
-            $node->getAttribute("maxOccurs") == "unbounded" ||
-            $node->getAttribute("maxOccurs") > 1
+            $node->getAttribute('maxOccurs') == 'unbounded' ||
+            $node->getAttribute('maxOccurs') > 1
         )
             ? 2
             : null;
     }
 
     /**
-    * @param int|null $max
-    */
+     * @param int|null $max
+     */
     protected function loadSequence(ElementContainer $elementContainer, DOMElement $node, $max = null)
     {
         $max = static::loadSequenceNormaliseMax($node, $max);
@@ -122,8 +109,8 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
     }
 
     /**
-    * @param int|null $max
-    */
+     * @param int|null $max
+     */
     protected function loadSequenceChildNode(
         ElementContainer $elementContainer,
         DOMElement $node,
@@ -148,16 +135,16 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
                     $elementContainer,
                     $node,
                     $childNode,
-                    $max
-                ]
+                    $max,
+                ],
             ],
             'group' => [
                 [$this, 'loadSequenceChildNodeLoadGroup'],
                 [
                     $elementContainer,
                     $node,
-                    $childNode
-                ]
+                    $childNode,
+                ],
             ],
         ];
 
@@ -165,8 +152,8 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
     }
 
     /**
-    * @param int|null $max
-    */
+     * @param int|null $max
+     */
     protected function loadSequenceChildNodeLoadSequence(
         ElementContainer $elementContainer,
         DOMElement $childNode,
@@ -176,19 +163,19 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
     }
 
     /**
-    * @param int|null $max
-    */
+     * @param int|null $max
+     */
     protected function loadSequenceChildNodeLoadElement(
         ElementContainer $elementContainer,
         DOMElement $node,
         DOMElement $childNode,
         $max
     ) {
-        if ($childNode->hasAttribute("ref")) {
+        if ($childNode->hasAttribute('ref')) {
             /**
-            * @var ElementDef $referencedElement
-            */
-            $referencedElement = $this->findSomething('findElement', $elementContainer->getSchema(), $node, $childNode->getAttribute("ref"));
+             * @var ElementDef
+             */
+            $referencedElement = $this->findSomething('findElement', $elementContainer->getSchema(), $node, $childNode->getAttribute('ref'));
             $element = ElementRef::loadElementRef(
                 $referencedElement,
                 $childNode
@@ -226,13 +213,13 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
         ElementContainer $elementContainer
     ) {
         /**
-        * @var Group $referencedGroup
-        */
+         * @var Group
+         */
         $referencedGroup = $this->findSomething(
             'findGroup',
             $schema,
             $node,
-            $childNode->getAttribute("ref")
+            $childNode->getAttribute('ref')
         );
 
         $group = GroupRef::loadGroupRef($referencedGroup, $childNode);
@@ -240,23 +227,23 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
     }
 
     /**
-    * @return Closure
-    */
+     * @return Closure
+     */
     protected function loadGroup(Schema $schema, DOMElement $node)
     {
         return Group::loadGroup($this, $schema, $node);
     }
 
     /**
-    * @return BaseComplexType
-    */
+     * @return BaseComplexType
+     */
     protected function loadComplexTypeBeforeCallbackCallback(
         Schema $schema,
         DOMElement $node
     ) {
         /**
-        * @var bool $isSimple
-        */
+         * @var bool
+         */
         $isSimple = false;
 
         static::againstDOMNodeList(
@@ -265,21 +252,21 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
                 DOMElement $node,
                 DOMElement $childNode
             ) use (
-                & $isSimple
+                &$isSimple
             ) {
                 if ($isSimple) {
                     return;
                 }
-                if ($childNode->localName === "simpleContent") {
+                if ($childNode->localName === 'simpleContent') {
                     $isSimple = true;
                 }
             }
         );
 
-        $type = $isSimple ? new ComplexTypeSimpleContent($schema, $node->getAttribute("name")) : new ComplexType($schema, $node->getAttribute("name"));
+        $type = $isSimple ? new ComplexTypeSimpleContent($schema, $node->getAttribute('name')) : new ComplexType($schema, $node->getAttribute('name'));
 
         $type->setDoc(static::getDocumentation($node));
-        if ($node->getAttribute("name")) {
+        if ($node->getAttribute('name')) {
             $schema->addType($type);
         }
 
@@ -287,10 +274,10 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
     }
 
     /**
-    * @param Closure|null $callback
-    *
-    * @return Closure
-    */
+     * @param Closure|null $callback
+     *
+     * @return Closure
+     */
     protected function loadComplexType(Schema $schema, DOMElement $node, $callback = null)
     {
         $type = $this->loadComplexTypeBeforeCallbackCallback($schema, $node);
@@ -301,7 +288,7 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
             function (
                 DOMElement $node,
                 DOMElement $childNode
-            ) use(
+            ) use (
                 $schema,
                 $type
             ) {
@@ -339,18 +326,18 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
                     $this,
                     $childNode,
                     $schema,
-                    $node
-                ]
+                    $node,
+                ],
             ],
             'attributeGroup' => [
-                (AttributeGroup::class . '::findSomethingLikeThis'),
+                (AttributeGroup::class.'::findSomethingLikeThis'),
                 [
                     $this,
                     $schema,
                     $node,
                     $childNode,
-                    $type
-                ]
+                    $type,
+                ],
             ],
         ];
         if (
@@ -362,8 +349,8 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
                     $schema,
                     $node,
                     $childNode,
-                    $type
-                ]
+                    $type,
+                ],
             ];
         }
 
@@ -371,15 +358,15 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
     }
 
     /**
-    * @param Closure|null $callback
-    *
-    * @return Closure
-    */
+     * @param Closure|null $callback
+     *
+     * @return Closure
+     */
     protected function loadSimpleType(Schema $schema, DOMElement $node, $callback = null)
     {
-        $type = new SimpleType($schema, $node->getAttribute("name"));
+        $type = new SimpleType($schema, $node->getAttribute('name'));
         $type->setDoc(static::getDocumentation($node));
-        if ($node->getAttribute("name")) {
+        if ($node->getAttribute('name')) {
             $schema->addType($type);
         }
 
@@ -399,10 +386,10 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
 
     protected function loadList(SimpleType $type, DOMElement $node)
     {
-        if ($node->hasAttribute("itemType")) {
+        if ($node->hasAttribute('itemType')) {
             /**
-            * @var SimpleType $listType
-            */
+             * @var SimpleType
+             */
             $listType = $this->findSomeType($type, $node, 'itemType');
             $type->setList($listType);
         } else {
@@ -421,12 +408,12 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
 
     protected function loadUnion(SimpleType $type, DOMElement $node)
     {
-        if ($node->hasAttribute("memberTypes")) {
-            $types = preg_split('/\s+/', $node->getAttribute("memberTypes"));
+        if ($node->hasAttribute('memberTypes')) {
+            $types = preg_split('/\s+/', $node->getAttribute('memberTypes'));
             foreach ($types as $typeName) {
                 /**
-                * @var SimpleType $unionType
-                */
+                 * @var SimpleType
+                 */
                 $unionType = $this->findSomeTypeFromAttribute(
                     $type,
                     $node,
@@ -476,18 +463,18 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
                             $this,
                             $childNode,
                             $type->getSchema(),
-                            $node
-                        ]
+                            $node,
+                        ],
                     ],
                     'attributeGroup' => [
-                        (AttributeGroup::class . '::findSomethingLikeThis'),
+                        (AttributeGroup::class.'::findSomethingLikeThis'),
                         [
                             $this,
                             $type->getSchema(),
                             $node,
                             $childNode,
-                            $type
-                        ]
+                            $type,
+                        ],
                     ],
                 ];
 
@@ -505,7 +492,7 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
         $extension = new Extension();
         $type->setExtension($extension);
 
-        if ($node->hasAttribute("base")) {
+        if ($node->hasAttribute('base')) {
             $this->findAndSetSomeBase(
                 $type,
                 $extension,
@@ -521,8 +508,8 @@ abstract class SchemaReaderLoadAbstraction extends SchemaReaderFillAbstraction
     }
 
     /**
-    * @return Closure
-    */
+     * @return Closure
+     */
     protected function loadElementDef(Schema $schema, DOMElement $node)
     {
         return $this->loadAttributeOrElementDef($schema, $node, false);

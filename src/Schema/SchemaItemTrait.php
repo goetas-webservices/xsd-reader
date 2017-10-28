@@ -1,16 +1,17 @@
 <?php
+
 namespace GoetasWebservices\XML\XSDReader\Schema;
 
 trait SchemaItemTrait
 {
     /**
-    * @var Schema
-    */
+     * @var Schema
+     */
     protected $schema;
 
     /**
-    * @var string
-    */
+     * @var string
+     */
     protected $doc = '';
 
     /**
@@ -30,13 +31,14 @@ trait SchemaItemTrait
     }
 
     /**
-    * @param string $doc
-    *
-    * @return $this
-    */
+     * @param string $doc
+     *
+     * @return $this
+     */
     public function setDoc($doc)
     {
         $this->doc = $doc;
+
         return $this;
     }
 }

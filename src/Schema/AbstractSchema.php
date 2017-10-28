@@ -1,4 +1,5 @@
 <?php
+
 namespace GoetasWebservices\XML\XSDReader\Schema;
 
 use Closure;
@@ -20,159 +21,159 @@ use GoetasWebservices\XML\XSDReader\Utils\UrlUtils;
 abstract class AbstractSchema
 {
     /**
-    * @var bool
-    */
+     * @var bool
+     */
     protected $elementsQualification = false;
 
     /**
-    * @var bool
-    */
+     * @var bool
+     */
     protected $attributesQualification = false;
 
     /**
-    * @var string|null
-    */
+     * @var string|null
+     */
     protected $targetNamespace;
 
     /**
-    * @var Schema[]
-    */
+     * @var Schema[]
+     */
     protected $schemas = array();
 
     /**
-    * @var Type[]
-    */
+     * @var Type[]
+     */
     protected $types = array();
 
     /**
-    * @var ElementDef[]
-    */
+     * @var ElementDef[]
+     */
     protected $elements = array();
 
     /**
-    * @var Group[]
-    */
+     * @var Group[]
+     */
     protected $groups = array();
 
     /**
-    * @var AttributeGroup[]
-    */
+     * @var AttributeGroup[]
+     */
     protected $attributeGroups = array();
 
     /**
-    * @var AttributeDef[]
-    */
+     * @var AttributeDef[]
+     */
     protected $attributes = array();
 
     /**
-    * @var string|null
-    */
+     * @var string|null
+     */
     protected $doc;
 
     /**
-    * @var \GoetasWebservices\XML\XSDReader\Schema\SchemaItem[]
-    */
+     * @var \GoetasWebservices\XML\XSDReader\Schema\SchemaItem[]
+     */
     protected $typeCache = array();
 
     /**
-    * @return bool
-    */
+     * @return bool
+     */
     public function getElementsQualification()
     {
         return $this->elementsQualification;
     }
 
     /**
-    * @param bool $elementsQualification
-    */
+     * @param bool $elementsQualification
+     */
     public function setElementsQualification($elementsQualification)
     {
         $this->elementsQualification = $elementsQualification;
     }
 
     /**
-    * @return bool
-    */
+     * @return bool
+     */
     public function getAttributesQualification()
     {
         return $this->attributesQualification;
     }
 
     /**
-    * @param bool $attributesQualification
-    */
+     * @param bool $attributesQualification
+     */
     public function setAttributesQualification($attributesQualification)
     {
         $this->attributesQualification = $attributesQualification;
     }
 
     /**
-    * @return string|null
-    */
+     * @return string|null
+     */
     public function getTargetNamespace()
     {
         return $this->targetNamespace;
     }
 
     /**
-    * @param string|null $targetNamespace
-    */
+     * @param string|null $targetNamespace
+     */
     public function setTargetNamespace($targetNamespace)
     {
         $this->targetNamespace = $targetNamespace;
     }
 
     /**
-    * @return Type[]
-    */
+     * @return Type[]
+     */
     public function getTypes()
     {
         return $this->types;
     }
 
     /**
-    * @return ElementDef[]
-    */
+     * @return ElementDef[]
+     */
     public function getElements()
     {
         return $this->elements;
     }
 
     /**
-    * @return Schema[]
-    */
+     * @return Schema[]
+     */
     public function getSchemas()
     {
         return $this->schemas;
     }
 
     /**
-    * @return AttributeDef[]
-    */
+     * @return AttributeDef[]
+     */
     public function getAttributes()
     {
         return $this->attributes;
     }
 
     /**
-    * @return Group[]
-    */
+     * @return Group[]
+     */
     public function getGroups()
     {
         return $this->groups;
     }
 
     /**
-    * @return string|null
-    */
+     * @return string|null
+     */
     public function getDoc()
     {
         return $this->doc;
     }
 
     /**
-    * @param string $doc
-    */
+     * @param string $doc
+     */
     public function setDoc($doc)
     {
         $this->doc = $doc;
@@ -189,8 +190,8 @@ abstract class AbstractSchema
     }
 
     /**
-    * @param string|null $namespace
-    */
+     * @param string|null $namespace
+     */
     public function addSchema(Schema $schema, $namespace = null)
     {
         if ($namespace !== null) {
@@ -225,16 +226,16 @@ abstract class AbstractSchema
     }
 
     /**
-    * @return AttributeGroup[]
-    */
+     * @return AttributeGroup[]
+     */
     public function getAttributeGroups()
     {
         return $this->attributeGroups;
     }
 
     /**
-     *
      * @param string $name
+     *
      * @return Group|false
      */
     public function getGroup($name)
@@ -242,12 +243,13 @@ abstract class AbstractSchema
         if (isset($this->groups[$name])) {
             return $this->groups[$name];
         }
+
         return false;
     }
 
     /**
-     *
      * @param string $name
+     *
      * @return ElementItem|false
      */
     public function getElement($name)
@@ -255,12 +257,13 @@ abstract class AbstractSchema
         if (isset($this->elements[$name])) {
             return $this->elements[$name];
         }
+
         return false;
     }
 
     /**
-     *
      * @param string $name
+     *
      * @return Type|false
      */
     public function getType($name)
@@ -268,12 +271,13 @@ abstract class AbstractSchema
         if (isset($this->types[$name])) {
             return $this->types[$name];
         }
+
         return false;
     }
 
     /**
-     *
      * @param string $name
+     *
      * @return AttributeItem|false
      */
     public function getAttribute($name)
@@ -281,12 +285,13 @@ abstract class AbstractSchema
         if (isset($this->attributes[$name])) {
             return $this->attributes[$name];
         }
+
         return false;
     }
 
     /**
-     *
      * @param string $name
+     *
      * @return AttributeGroup|false
      */
     public function getAttributeGroup($name)
@@ -294,60 +299,60 @@ abstract class AbstractSchema
         if (isset($this->attributeGroups[$name])) {
             return $this->attributeGroups[$name];
         }
+
         return false;
     }
 
     public function __toString()
     {
-        return sprintf("Target namespace %s", $this->getTargetNamespace());
+        return sprintf('Target namespace %s', $this->getTargetNamespace());
     }
 
     /**
-    * @param string $getter
-    * @param string $name
-    * @param string $namespace
-    * @param bool[] $calling
-    * @param bool $throw
-    *
-    * @return SchemaItem|null
-    */
+     * @param string $getter
+     * @param string $name
+     * @param string $namespace
+     * @param bool[] $calling
+     * @param bool   $throw
+     *
+     * @return SchemaItem|null
+     */
     abstract protected function findSomethingNoThrow(
         $getter,
         $name,
         $namespace = null,
-        array & $calling = array()
+        array &$calling = array()
     );
 
-
     /**
-    * @param Schema[] $schemas
-    * @param string $cid
-    * @param string $getter
-    * @param string $name
-    * @param string $namespace
-    * @param bool[] $calling
-    * @param bool $throw
-    *
-    * @return SchemaItem|null
-    */
+     * @param Schema[] $schemas
+     * @param string   $cid
+     * @param string   $getter
+     * @param string   $name
+     * @param string   $namespace
+     * @param bool[]   $calling
+     * @param bool     $throw
+     *
+     * @return SchemaItem|null
+     */
     abstract protected function findSomethingNoThrowSchemas(
         array $schemas,
         $cid,
         $getter,
         $name,
         $namespace = null,
-        array & $calling = array()
+        array &$calling = array()
     );
 
     /**
-     *
      * @param string $getter
      * @param string $name
      * @param string $namespace
      * @param bool[] $calling
-     * @param bool $throw
+     * @param bool   $throw
      *
      * @throws TypeNotFoundException
+     *
      * @return SchemaItem
      */
     abstract protected function findSomething(
@@ -358,95 +363,95 @@ abstract class AbstractSchema
     );
 
     /**
-     *
      * @param string $name
      * @param string $namespace
+     *
      * @return Type
      */
     public function findType($name, $namespace = null)
     {
         /**
-        * @var Type $out
-        */
+         * @var Type
+         */
         $out = $this->findSomething('getType', $name, $namespace);
 
         return $out;
     }
 
     /**
-     *
      * @param string $name
      * @param string $namespace
+     *
      * @return Group
      */
     public function findGroup($name, $namespace = null)
     {
         /**
-        * @var Group $out
-        */
+         * @var Group
+         */
         $out = $this->findSomething('getGroup', $name, $namespace);
 
         return $out;
     }
 
     /**
-     *
      * @param string $name
      * @param string $namespace
+     *
      * @return ElementDef
      */
     public function findElement($name, $namespace = null)
     {
         /**
-        * @var ElementDef $out
-        */
+         * @var ElementDef
+         */
         $out = $this->findSomething('getElement', $name, $namespace);
 
         return $out;
     }
 
     /**
-     *
      * @param string $name
      * @param string $namespace
+     *
      * @return AttributeItem
      */
     public function findAttribute($name, $namespace = null)
     {
         /**
-        * @var AttributeItem $out
-        */
+         * @var AttributeItem
+         */
         $out = $this->findSomething('getAttribute', $name, $namespace);
 
         return $out;
     }
 
     /**
-     *
      * @param string $name
      * @param string $namespace
+     *
      * @return AttributeGroup
      */
     public function findAttributeGroup($name, $namespace = null)
     {
         /**
-        * @var AttributeGroup
-        */
+         * @var AttributeGroup
+         */
         $out = $this->findSomething('getAttributeGroup', $name, $namespace);
 
         return $out;
     }
 
     /**
-    * @var Schema[]
-    */
+     * @var Schema[]
+     */
     protected static $loadedFiles = array();
 
     /**
-    * @param string ...$keys
-    *
-    * @return bool
-    */
+     * @param string ...$keys
+     *
+     * @return bool
+     */
     public static function hasLoadedFile(...$keys)
     {
         foreach ($keys as $key) {
@@ -459,17 +464,17 @@ abstract class AbstractSchema
     }
 
     /**
-    * @param string ...$keys
-    *
-    * @return Schema
-    *
-    * @throws RuntimeException if loaded file not found
-    */
+     * @param string ...$keys
+     *
+     * @return Schema
+     *
+     * @throws RuntimeException if loaded file not found
+     */
     public static function getLoadedFile(...$keys)
     {
         foreach ($keys as $key) {
             if (isset(self::$loadedFiles[$key])) {
-        return self::$loadedFiles[$key];
+                return self::$loadedFiles[$key];
             }
         }
 
@@ -477,10 +482,10 @@ abstract class AbstractSchema
     }
 
     /**
-    * @param string $key
-    *
-    * @return Schema
-    */
+     * @param string $key
+     *
+     * @return Schema
+     */
     public static function setLoadedFile($key, Schema $schema)
     {
         self::$loadedFiles[$key] = $schema;
@@ -494,31 +499,31 @@ abstract class AbstractSchema
     ) {
         $this->setDoc(AbstractSchemaReader::getDocumentation($node));
 
-        if ($node->hasAttribute("targetNamespace")) {
-            $this->setTargetNamespace($node->getAttribute("targetNamespace"));
+        if ($node->hasAttribute('targetNamespace')) {
+            $this->setTargetNamespace($node->getAttribute('targetNamespace'));
         } elseif ($parent) {
             $this->setTargetNamespace($parent->getTargetNamespace());
         }
-        $this->setElementsQualification($node->getAttribute("elementFormDefault") == "qualified");
-        $this->setAttributesQualification($node->getAttribute("attributeFormDefault") == "qualified");
+        $this->setElementsQualification($node->getAttribute('elementFormDefault') == 'qualified');
+        $this->setAttributesQualification($node->getAttribute('attributeFormDefault') == 'qualified');
         $this->setDoc(AbstractSchemaReader::getDocumentation($node));
     }
 
     /**
-    * @param string $file
-    * @param string $namespace
-    *
-    * @return Closure
-    */
+     * @param string $file
+     * @param string $namespace
+     *
+     * @return Closure
+     */
     public static function loadImport(
         SchemaReaderLoadAbstraction $reader,
         Schema $schema,
         DOMElement $node
     ) {
         $base = urldecode($node->ownerDocument->documentURI);
-        $file = UrlUtils::resolveRelativeUrl($base, $node->getAttribute("schemaLocation"));
+        $file = UrlUtils::resolveRelativeUrl($base, $node->getAttribute('schemaLocation'));
 
-        $namespace = $node->getAttribute("namespace");
+        $namespace = $node->getAttribute('namespace');
 
         $keys = static::loadImportFreshKeys($reader, $namespace, $file);
 
@@ -527,7 +532,7 @@ abstract class AbstractSchema
         ) {
             $schema->addSchema(static::getLoadedFile(...$keys));
 
-            return function() {
+            return function () {
             };
         }
 
@@ -535,11 +540,11 @@ abstract class AbstractSchema
     }
 
     /**
-    * @param string $namespace
-    * @param string $file
-    *
-    * @return mixed[]
-    */
+     * @param string $namespace
+     * @param string $file
+     *
+     * @return mixed[]
+     */
     abstract protected static function loadImportFreshKeys(
         SchemaReaderLoadAbstraction $reader,
         $namespace,
@@ -547,11 +552,11 @@ abstract class AbstractSchema
     );
 
     /**
-    * @param string $namespace
-    * @param string $file
-    *
-    * @return Schema
-    */
+     * @param string $namespace
+     * @param string $file
+     *
+     * @return Schema
+     */
     abstract protected static function loadImportFreshCallbacksNewSchema(
         $namespace,
         SchemaReaderLoadAbstraction $reader,
@@ -560,11 +565,11 @@ abstract class AbstractSchema
     );
 
     /**
-    * @param string $namespace
-    * @param string $file
-    *
-    * @return Closure[]
-    */
+     * @param string $namespace
+     * @param string $file
+     *
+     * @return Closure[]
+     */
     abstract protected static function loadImportFreshCallbacks(
         $namespace,
         SchemaReaderLoadAbstraction $reader,
@@ -573,11 +578,11 @@ abstract class AbstractSchema
     );
 
     /**
-    * @param string $namespace
-    * @param string $file
-    *
-    * @return Closure
-    */
+     * @param string $namespace
+     * @param string $file
+     *
+     * @return Closure
+     */
     abstract protected static function loadImportFresh(
         $namespace,
         SchemaReaderLoadAbstraction $reader,

@@ -1,4 +1,5 @@
 <?php
+
 namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
 use BadMethodCallException;
@@ -8,18 +9,18 @@ use GoetasWebservices\XML\XSDReader\SchemaReader;
 class GroupRef extends Group implements InterfaceSetMinMax
 {
     /**
-    * @var Group
-    */
+     * @var Group
+     */
     protected $wrapped;
 
     /**
-    * @var int
-    */
+     * @var int
+     */
     protected $min = 1;
 
     /**
-    * @var int
-    */
+     * @var int
+     */
     protected $max = 1;
 
     public function __construct(Group $group)
@@ -29,67 +30,70 @@ class GroupRef extends Group implements InterfaceSetMinMax
     }
 
     /**
-    * @return int
-    */
+     * @return int
+     */
     public function getMin()
     {
         return $this->min;
     }
 
     /**
-    * @param int $min
-    *
-    * @return $this
-    */
+     * @param int $min
+     *
+     * @return $this
+     */
     public function setMin($min)
     {
         $this->min = $min;
+
         return $this;
     }
 
     /**
-    * @return int
-    */
+     * @return int
+     */
     public function getMax()
     {
         return $this->max;
     }
 
     /**
-    * @param int $max
-    *
-    * @return $this
-    */
+     * @param int $max
+     *
+     * @return $this
+     */
     public function setMax($max)
     {
         $this->max = $max;
+
         return $this;
     }
 
     /**
-    * @return string
-    */
+     * @return string
+     */
     public function getName()
     {
         return $this->wrapped->getName();
     }
 
     /**
-    * @return ElementItem[]
-    */
+     * @return ElementItem[]
+     */
     public function getElements()
     {
         $elements = $this->wrapped->getElements();
-        if($this->getMax()>0 || $this->getMax()===-1){
+        if ($this->getMax() > 0 || $this->getMax() === -1) {
             foreach ($elements as $k => $element) {
                 /**
-                * @var Element|ElementRef|ElementSingle|GroupRef $e
-                */
+                 * @var Element|ElementRef|ElementSingle|GroupRef
+                 */
                 $e = clone $element;
                 $e->setMax($this->getMax());
                 $elements[$k] = $e;
             }
         }
+
         return $elements;
     }
 
@@ -99,11 +103,11 @@ class GroupRef extends Group implements InterfaceSetMinMax
     }
 
     /**
-    * @return GroupRef
-    */
+     * @return GroupRef
+     */
     public static function loadGroupRef(Group $referenced, DOMElement $node)
     {
-        $ref = new GroupRef($referenced);
+        $ref = new self($referenced);
         $ref->setDoc(SchemaReader::getDocumentation($node));
 
         SchemaReader::maybeSetMax($ref, $node);

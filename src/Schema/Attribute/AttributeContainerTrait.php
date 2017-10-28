@@ -1,11 +1,12 @@
 <?php
+
 namespace GoetasWebservices\XML\XSDReader\Schema\Attribute;
 
 trait AttributeContainerTrait
 {
     /**
-    * @var AttributeItem[]
-    */
+     * @var AttributeItem[]
+     */
     protected $attributes = array();
 
     public function addAttribute(AttributeItem $attribute)
@@ -14,8 +15,8 @@ trait AttributeContainerTrait
     }
 
     /**
-    * @return AttributeItem[]
-    */
+     * @return AttributeItem[]
+     */
     public function getAttributes()
     {
         return $this->attributes;

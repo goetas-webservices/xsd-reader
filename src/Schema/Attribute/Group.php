@@ -1,4 +1,5 @@
 <?php
+
 namespace GoetasWebservices\XML\XSDReader\Schema\Attribute;
 
 use DOMElement;
@@ -12,19 +13,18 @@ class Group implements AttributeItem, AttributeContainer
     use AttributeContainerTrait;
 
     /**
-     *
      * @var Schema
      */
     protected $schema;
 
     /**
-    * @var string|null
-    */
+     * @var string|null
+     */
     protected $doc;
 
     /**
-    * @param string $name
-    */
+     * @param string $name
+     */
     public function __construct(Schema $schema, $name)
     {
         $this->schema = $schema;
@@ -32,35 +32,36 @@ class Group implements AttributeItem, AttributeContainer
     }
 
     /**
-    * @return string|null
-    */
+     * @return string|null
+     */
     public function getDoc()
     {
         return $this->doc;
     }
 
     /**
-    * @param string $doc
-    *
-    * @return $this
-    */
+     * @param string $doc
+     *
+     * @return $this
+     */
     public function setDoc($doc)
     {
         $this->doc = $doc;
+
         return $this;
     }
 
     /**
-    * @return Schema
-    */
+     * @return Schema
+     */
     public function getSchema()
     {
         return $this->schema;
     }
 
     /**
-    * @param string $attr
-    */
+     * @param string $attr
+     */
     public static function findSomethingLikeThis(
         SchemaReaderLoadAbstraction $useThis,
         Schema $schema,
@@ -69,21 +70,21 @@ class Group implements AttributeItem, AttributeContainer
         AttributeContainer $addToThis
     ) {
         /**
-        * @var AttributeItem $attribute
-        */
-        $attribute = $useThis->findSomething('findAttributeGroup', $schema, $node, $childNode->getAttribute("ref"));
+         * @var AttributeItem
+         */
+        $attribute = $useThis->findSomething('findAttributeGroup', $schema, $node, $childNode->getAttribute('ref'));
         $addToThis->addAttribute($attribute);
     }
 
     /**
-    * @return \Closure
-    */
+     * @return \Closure
+     */
     public static function loadAttributeGroup(
         SchemaReaderLoadAbstraction $schemaReader,
         Schema $schema,
         DOMElement $node
     ) {
-        $attGroup = new self($schema, $node->getAttribute("name"));
+        $attGroup = new self($schema, $node->getAttribute('name'));
         $attGroup->setDoc(SchemaReader::getDocumentation($node));
         $schema->addAttributeGroup($attGroup);
 

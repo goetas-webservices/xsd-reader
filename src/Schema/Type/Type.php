@@ -1,54 +1,52 @@
 <?php
+
 namespace GoetasWebservices\XML\XSDReader\Schema\Type;
 
 use Closure;
-use DOMNode;
 use DOMElement;
 use GoetasWebservices\XML\XSDReader\AbstractSchemaReader;
-use GoetasWebservices\XML\XSDReader\SchemaReader;
 use GoetasWebservices\XML\XSDReader\Schema\Schema;
 use GoetasWebservices\XML\XSDReader\Schema\SchemaItem;
 use GoetasWebservices\XML\XSDReader\Schema\SchemaItemTrait;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Extension;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction;
+
 abstract class Type implements SchemaItem
 {
     use SchemaItemTrait;
 
     /**
-    * @var string|null
-    */
+     * @var string|null
+     */
     protected $name;
 
     /**
-    * @var bool
-    */
+     * @var bool
+     */
     protected $abstract = false;
 
     /**
-     *
      * @var Restriction|null
      */
     protected $restriction;
 
     /**
-     *
      * @var Extension|null
      */
     protected $extension;
 
     /**
-    * @param string|null $name
-    */
+     * @param string|null $name
+     */
     public function __construct(Schema $schema, $name = null)
     {
-        $this->name = $name?:null;
+        $this->name = $name ?: null;
         $this->schema = $schema;
     }
 
     /**
-    * @return string|null
-    */
+     * @return string|null
+     */
     public function getName()
     {
         return $this->name;
@@ -60,64 +58,66 @@ abstract class Type implements SchemaItem
     }
 
     /**
-    * @return bool
-    */
+     * @return bool
+     */
     public function isAbstract()
     {
         return $this->abstract;
     }
 
     /**
-    * @param bool $abstract
-    *
-    * @return $this
-    */
+     * @param bool $abstract
+     *
+     * @return $this
+     */
     public function setAbstract($abstract)
     {
         $this->abstract = $abstract;
+
         return $this;
     }
 
     /**
-     *
      * @return Restriction|Extension|null
-    */
+     */
     public function getParent()
     {
-        return $this->restriction ?  : $this->extension;
+        return $this->restriction ?: $this->extension;
     }
 
     /**
-    * @return Restriction|null
-    */
+     * @return Restriction|null
+     */
     public function getRestriction()
     {
         return $this->restriction;
     }
 
     /**
-    * @return $this
-    */
+     * @return $this
+     */
     public function setRestriction(Restriction $restriction)
     {
         $this->restriction = $restriction;
+
         return $this;
     }
 
     /**
-    * @return Extension|null
-    */
+     * @return Extension|null
+     */
     public function getExtension()
     {
         return $this->extension;
     }
 
     /**
-    * @return $this
-    */
+     * @return $this
+     */
     public function setExtension(Extension $extension)
     {
         $this->extension = $extension;
+
         return $this;
     }
 
@@ -159,8 +159,8 @@ abstract class Type implements SchemaItem
         ];
 
         /**
-        * @var Closure|null $func
-        */
+         * @var Closure|null
+         */
         $func = $schemaReader->maybeCallMethod(
             $methods,
             $childNode->localName,

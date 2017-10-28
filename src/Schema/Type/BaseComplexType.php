@@ -1,12 +1,10 @@
 <?php
+
 namespace GoetasWebservices\XML\XSDReader\Schema\Type;
 
 use DOMElement;
 use GoetasWebservices\XML\XSDReader\SchemaReader;
-use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Extension;
-use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Attribute;
-use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItem;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeContainer;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeContainerTrait;
 use GoetasWebservices\XML\XSDReader\Schema\Schema;

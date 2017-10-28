@@ -7,7 +7,7 @@ use GoetasWebservices\XML\XSDReader\Schema\SchemaItem;
 interface AttributeItem extends SchemaItem
 {
     /**
-    * @return string
-    */
+     * @return string
+     */
     public function getName();
 }

@@ -1,11 +1,9 @@
 <?php
+
 namespace GoetasWebservices\XML\XSDReader\Schema;
 
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItemTrait;
 use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
-use GoetasWebservices\XML\XSDReader\Schema\Schema;
-use GoetasWebservices\XML\XSDReader\Schema\SchemaItem;
-use GoetasWebservices\XML\XSDReader\Schema\SchemaItemTrait;
 
 abstract class Item implements SchemaItem
 {
@@ -13,13 +11,13 @@ abstract class Item implements SchemaItem
     use SchemaItemTrait;
 
     /**
-    * @var Type|null
-    */
+     * @var Type|null
+     */
     protected $type;
 
     /**
-    * @param string $name
-    */
+     * @param string $name
+     */
     public function __construct(Schema $schema, $name)
     {
         $this->schema = $schema;
@@ -27,7 +25,6 @@ abstract class Item implements SchemaItem
     }
 
     /**
-     *
      * @return Type|null
      */
     public function getType()
@@ -36,11 +33,12 @@ abstract class Item implements SchemaItem
     }
 
     /**
-    * @return $this
-    */
+     * @return $this
+     */
     public function setType(Type $type)
     {
         $this->type = $type;
+
         return $this;
     }
 }

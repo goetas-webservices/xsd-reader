@@ -1,32 +1,20 @@
 <?php
+
 namespace GoetasWebservices\XML\XSDReader\Schema;
 
-use Closure;
-use DOMElement;
-use RuntimeException;
-use GoetasWebservices\XML\XSDReader\AbstractSchemaReader;
 use GoetasWebservices\XML\XSDReader\SchemaReaderLoadAbstraction;
-use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
-use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
-use GoetasWebservices\XML\XSDReader\Schema\Element\Group;
-use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
-use GoetasWebservices\XML\XSDReader\Schema\Element\ElementItem;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\TypeNotFoundException;
-use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
-use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItem;
-use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
-use GoetasWebservices\XML\XSDReader\Utils\UrlUtils;
 
 class Schema extends AbstractSchema
 {
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     protected function findSomethingNoThrow(
         $getter,
         $name,
         $namespace = null,
-        array & $calling = array()
+        array &$calling = array()
     ) {
         $calling[spl_object_hash($this)] = true;
         $cid = "$getter, $name, $namespace";
@@ -37,12 +25,12 @@ class Schema extends AbstractSchema
             $this->getTargetNamespace() === $namespace
         ) {
             /**
-            * @var SchemaItem|null $item
-            */
+             * @var SchemaItem|null
+             */
             $item = $this->$getter($name);
 
             if ($item instanceof SchemaItem) {
-            return $this->typeCache[$cid] = $item;
+                return $this->typeCache[$cid] = $item;
             }
         }
 
@@ -56,24 +44,23 @@ class Schema extends AbstractSchema
         );
     }
 
-
     /**
-    * @param Schema[] $schemas
-    * {@inheritdoc}
-    */
+     * @param Schema[] $schemas
+     *                          {@inheritdoc}
+     */
     protected function findSomethingNoThrowSchemas(
         array $schemas,
         $cid,
         $getter,
         $name,
         $namespace = null,
-        array & $calling = array()
+        array &$calling = array()
     ) {
         foreach ($schemas as $childSchema) {
             if (!isset($calling[spl_object_hash($childSchema)])) {
                 /**
-                * @var SchemaItem|null $in
-                */
+                 * @var SchemaItem|null
+                 */
                 $in = $childSchema->findSomethingNoThrow($getter, $name, $namespace, $calling);
 
                 if ($in instanceof SchemaItem) {
@@ -85,7 +72,7 @@ class Schema extends AbstractSchema
 
     /**
      * @param string $getter
-     * {@inheritdoc}
+     *                       {@inheritdoc}
      */
     protected function findSomething($getter, $name, $namespace = null, &$calling = array())
     {
@@ -104,10 +91,10 @@ class Schema extends AbstractSchema
     }
 
     /**
-    * @param string $namespace
-    * @param string $file
-    * {@inheritdoc}
-    */
+     * @param string $namespace
+     * @param string $file
+     *                          {@inheritdoc}
+     */
     protected static function loadImportFreshKeys(
         SchemaReaderLoadAbstraction $reader,
         $namespace,
@@ -132,8 +119,8 @@ class Schema extends AbstractSchema
     }
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     protected static function loadImportFreshCallbacksNewSchema(
         $namespace,
         SchemaReaderLoadAbstraction $reader,
@@ -141,11 +128,11 @@ class Schema extends AbstractSchema
         $file
     ) {
         /**
-        * @var string $file
-        */
-        $newSchema = Schema::setLoadedFile(
+         * @var string
+         */
+        $newSchema = self::setLoadedFile(
             $file,
-            ($namespace ? new Schema() : $schema)
+            ($namespace ? new self() : $schema)
         );
 
         if ($namespace) {
@@ -157,8 +144,8 @@ class Schema extends AbstractSchema
     }
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     protected static function loadImportFreshCallbacks(
         $namespace,
         SchemaReaderLoadAbstraction $reader,
@@ -166,8 +153,8 @@ class Schema extends AbstractSchema
         $file
     ) {
         /**
-        * @var string $file
-        */
+         * @var string
+         */
         $file = $file;
 
         return $reader->schemaNode(
@@ -187,8 +174,8 @@ class Schema extends AbstractSchema
     }
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     protected static function loadImportFresh(
         $namespace,
         SchemaReaderLoadAbstraction $reader,
