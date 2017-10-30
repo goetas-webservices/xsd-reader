@@ -179,7 +179,7 @@ abstract class AbstractSchemaReader
             'include' => (Schema::class.'::loadImport'),
             'import' => (Schema::class.'::loadImport'),
             'attributeGroup' => (
-                AttributeGroup::class .
+                AttributeGroup::class.
                 '::loadAttributeGroup'
             ),
         ];
