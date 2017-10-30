@@ -94,11 +94,6 @@ abstract class AbstractSchemaReader
     }
 
     /**
-     * @return Closure
-     */
-    abstract protected function loadAttributeGroup(Schema $schema, DOMElement $node);
-
-    /**
      * @param bool $attributeDef
      *
      * @return Closure
@@ -183,12 +178,15 @@ abstract class AbstractSchemaReader
         $schemaReaderMethods = [
             'include' => (Schema::class.'::loadImport'),
             'import' => (Schema::class.'::loadImport'),
+            'attributeGroup' => (
+                AttributeGroup::class .
+                '::loadAttributeGroup'
+            ),
         ];
 
         $thisMethods = [
             'element' => [$this, 'loadElementDef'],
             'attribute' => [$this, 'loadAttributeDef'],
-            'attributeGroup' => [$this, 'loadAttributeGroup'],
             'group' => [$this, 'loadGroup'],
             'complexType' => [$this, 'loadComplexType'],
             'simpleType' => [$this, 'loadSimpleType'],
