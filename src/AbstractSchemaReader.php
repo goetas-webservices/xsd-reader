@@ -210,25 +210,25 @@ abstract class AbstractSchemaReader
                  */
                 $callback = $this->maybeCallCallableWithArgs(
                     $childNode,
-                        [],
-                        [],
+                    [],
+                    [],
+                    [
                         [
+                            $schemaReaderMethods,
                             [
-                                $schemaReaderMethods,
-                                [
-                                    $this,
-                                    $schema,
-                                    $childNode,
-                                ],
+                                $this,
+                                $schema,
+                                $childNode,
                             ],
+                        ],
+                        [
+                            $thisMethods,
                             [
-                                $thisMethods,
-                                [
-                                    $schema,
-                                    $childNode,
-                                ],
+                                $schema,
+                                $childNode,
                             ],
-                        ]
+                        ],
+                    ]
                 );
 
                 if ($callback instanceof Closure) {
