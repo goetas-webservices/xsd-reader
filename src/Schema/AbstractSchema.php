@@ -5,7 +5,6 @@ namespace GoetasWebservices\XML\XSDReader\Schema;
 use Closure;
 use DOMElement;
 use RuntimeException;
-use GoetasWebservices\XML\XSDReader\AbstractSchemaReader;
 use GoetasWebservices\XML\XSDReader\SchemaReader;
 use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
@@ -497,7 +496,7 @@ abstract class AbstractSchema
         DOMElement $node,
         Schema $parent = null
     ) {
-        $this->setDoc(AbstractSchemaReader::getDocumentation($node));
+        $this->setDoc(SchemaReader::getDocumentation($node));
 
         if ($node->hasAttribute('targetNamespace')) {
             $this->setTargetNamespace($node->getAttribute('targetNamespace'));
@@ -506,7 +505,7 @@ abstract class AbstractSchema
         }
         $this->setElementsQualification($node->getAttribute('elementFormDefault') == 'qualified');
         $this->setAttributesQualification($node->getAttribute('attributeFormDefault') == 'qualified');
-        $this->setDoc(AbstractSchemaReader::getDocumentation($node));
+        $this->setDoc(SchemaReader::getDocumentation($node));
     }
 
     /**
