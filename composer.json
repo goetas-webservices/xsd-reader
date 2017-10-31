@@ -45,7 +45,8 @@
         "tests": [
             "php ./vendor/phpunit/phpunit/phpunit -v",
             "phpstan analyse -l7 src",
-            "psalm"
+            "psalm",
+            "phpcpd ./src/"
         ]
     }
 }
