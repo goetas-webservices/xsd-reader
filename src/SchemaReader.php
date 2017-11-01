@@ -1328,7 +1328,7 @@ class SchemaReader
         DOMElement $node,
         Closure $callback
     ) {
-        SchemaReader::againstDOMNodeList(
+        self::againstDOMNodeList(
             $node,
             function (
                 DOMElement $node,

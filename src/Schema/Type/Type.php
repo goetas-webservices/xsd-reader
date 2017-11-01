@@ -2,9 +2,6 @@
 
 namespace GoetasWebservices\XML\XSDReader\Schema\Type;
 
-use Closure;
-use DOMElement;
-use GoetasWebservices\XML\XSDReader\SchemaReader;
 use GoetasWebservices\XML\XSDReader\Schema\Schema;
 use GoetasWebservices\XML\XSDReader\Schema\SchemaItem;
 use GoetasWebservices\XML\XSDReader\Schema\SchemaItemTrait;
