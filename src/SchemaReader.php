@@ -543,7 +543,7 @@ class SchemaReader
                 $addCallback
             );
         }
-        SchemaReader::againstDOMNodeList(
+        self::againstDOMNodeList(
             $node,
             function (
                 DOMElement $node,
@@ -598,7 +598,7 @@ class SchemaReader
             $childNode->localName,
             [
                 'value' => $childNode->getAttribute('value'),
-                'doc' => SchemaReader::getDocumentation($childNode),
+                'doc' => self::getDocumentation($childNode),
             ]
         );
     }
