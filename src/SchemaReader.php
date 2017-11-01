@@ -257,7 +257,58 @@ class SchemaReader
      */
     protected function loadGroup(Schema $schema, DOMElement $node)
     {
-        return Group::loadGroup($this, $schema, $node);
+        $group = static::loadGroupBeforeCheckingChildNodes(
+            $schema,
+            $node
+        );
+        static $methods = [
+            'sequence' => 'loadSequence',
+            'choice' => 'loadSequence',
+            'all' => 'loadSequence',
+        ];
+
+        return function () use ($group, $node, $methods) {
+            /**
+             * @var string[]
+             */
+            $methods = $methods;
+            $this->maybeCallMethodAgainstDOMNodeList(
+                $node,
+                $group,
+                $methods
+            );
+        };
+    }
+
+    /**
+     * @return Group|GroupRef
+     */
+    protected static function loadGroupBeforeCheckingChildNodes(
+        Schema $schema,
+        DOMElement $node
+    ) {
+        $group = new Group($schema, $node->getAttribute('name'));
+        $group->setDoc(SchemaReader::getDocumentation($node));
+
+        if ($node->hasAttribute('maxOccurs')) {
+            /**
+             * @var GroupRef
+             */
+            $group = SchemaReader::maybeSetMax(new GroupRef($group), $node);
+        }
+        if ($node->hasAttribute('minOccurs')) {
+            /**
+             * @var GroupRef
+             */
+            $group = SchemaReader::maybeSetMin(
+                $group instanceof GroupRef ? $group : new GroupRef($group),
+                $node
+            );
+        }
+
+        $schema->addGroup($group);
+
+        return $group;
     }
 
     /**
