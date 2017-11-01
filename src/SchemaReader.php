@@ -288,19 +288,19 @@ class SchemaReader
         DOMElement $node
     ) {
         $group = new Group($schema, $node->getAttribute('name'));
-        $group->setDoc(SchemaReader::getDocumentation($node));
+        $group->setDoc(self::getDocumentation($node));
 
         if ($node->hasAttribute('maxOccurs')) {
             /**
              * @var GroupRef
              */
-            $group = SchemaReader::maybeSetMax(new GroupRef($group), $node);
+            $group = self::maybeSetMax(new GroupRef($group), $node);
         }
         if ($node->hasAttribute('minOccurs')) {
             /**
              * @var GroupRef
              */
-            $group = SchemaReader::maybeSetMin(
+            $group = self::maybeSetMin(
                 $group instanceof GroupRef ? $group : new GroupRef($group),
                 $node
             );
