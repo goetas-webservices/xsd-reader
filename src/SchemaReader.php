@@ -1657,12 +1657,12 @@ class SchemaReader
         DOMElement $node
     ) {
         $element = new Element($schema, $node->getAttribute('name'));
-        $element->setDoc(SchemaReader::getDocumentation($node));
+        $element->setDoc(self::getDocumentation($node));
 
         $this->fillItem($element, $node);
 
-        SchemaReader::maybeSetMax($element, $node);
-        SchemaReader::maybeSetMin($element, $node);
+        self::maybeSetMax($element, $node);
+        self::maybeSetMin($element, $node);
 
         $xp = new \DOMXPath($node->ownerDocument);
         $xp->registerNamespace('xs', 'http://www.w3.org/2001/XMLSchema');
