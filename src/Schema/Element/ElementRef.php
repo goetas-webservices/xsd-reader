@@ -2,9 +2,6 @@
 
 namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
-use DOMElement;
-use GoetasWebservices\XML\XSDReader\SchemaReader;
-
 class ElementRef extends AbstractElementSingle
 {
     /**

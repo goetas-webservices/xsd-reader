@@ -1658,10 +1658,10 @@ class SchemaReader
         DOMElement $node
     ) {
         $ref = new ElementRef($referenced);
-        $ref->setDoc(SchemaReader::getDocumentation($node));
+        $ref->setDoc(self::getDocumentation($node));
 
-        SchemaReader::maybeSetMax($ref, $node);
-        SchemaReader::maybeSetMin($ref, $node);
+        self::maybeSetMax($ref, $node);
+        self::maybeSetMin($ref, $node);
         if ($node->hasAttribute('nillable')) {
             $ref->setNil($node->getAttribute('nillable') == 'true');
         }
