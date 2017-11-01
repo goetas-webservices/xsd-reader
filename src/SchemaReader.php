@@ -32,6 +32,7 @@ use GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType;
 use GoetasWebservices\XML\XSDReader\Schema\Type\ComplexTypeSimpleContent;
 use GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType;
 use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
+use GoetasWebservices\XML\XSDReader\Utils\UrlUtils;
 use RuntimeException;
 
 class SchemaReader
@@ -931,8 +932,6 @@ class SchemaReader
         $functions = array();
 
         $schemaReaderMethods = [
-            'include' => (Schema::class.'::loadImport'),
-            'import' => (Schema::class.'::loadImport'),
             'attributeGroup' => (
                 AttributeGroup::class.
                 '::loadAttributeGroup'
@@ -940,6 +939,8 @@ class SchemaReader
         ];
 
         $thisMethods = [
+            'include' => [$this, 'loadImport'],
+            'import' => [$this, 'loadImport'],
             'element' => [$this, 'loadElementDef'],
             'attribute' => [$this, 'loadAttributeDef'],
             'group' => [$this, 'loadGroup'],
@@ -1371,5 +1372,144 @@ class SchemaReader
         if ($func instanceof Closure) {
             call_user_func($func);
         }
+    }
+
+    /**
+     * @param string $file
+     * @param string $namespace
+     *
+     * @return Closure
+     */
+    public function loadImport(
+        Schema $schema,
+        DOMElement $node
+    ) {
+        $base = urldecode($node->ownerDocument->documentURI);
+        $file = UrlUtils::resolveRelativeUrl($base, $node->getAttribute('schemaLocation'));
+
+        $namespace = $node->getAttribute('namespace');
+
+        $keys = $this->loadImportFreshKeys($namespace, $file);
+
+        if (
+            Schema::hasLoadedFile(...$keys)
+        ) {
+            $schema->addSchema(Schema::getLoadedFile(...$keys));
+
+            return function () {
+            };
+        }
+
+        return $this->loadImportFresh($namespace, $schema, $file);
+    }
+
+    /**
+     * @param string $namespace
+     * @param string $file
+     *
+     * @return mixed[]
+     */
+    protected function loadImportFreshKeys(
+        $namespace,
+        $file
+    ) {
+        $globalSchemaInfo = $this->getGlobalSchemaInfo();
+
+        $keys = [];
+
+        if (isset($globalSchemaInfo[$namespace])) {
+            $keys[] = $globalSchemaInfo[$namespace];
+        }
+
+        $keys[] = $this->getNamespaceSpecificFileIndex(
+            $file,
+            $namespace
+        );
+
+        $keys[] = $file;
+
+        return $keys;
+    }
+
+    /**
+     * @param string $namespace
+     * @param string $file
+     *
+     * @return Schema
+     */
+    protected function loadImportFreshCallbacksNewSchema(
+        $namespace,
+        Schema $schema,
+        $file
+    ) {
+        /**
+         * @var Schema $newSchema
+         */
+        $newSchema = Schema::setLoadedFile(
+            $file,
+            ($namespace ? new Schema() : $schema)
+        );
+
+        if ($namespace) {
+            $newSchema->addSchema($this->getGlobalSchema());
+            $schema->addSchema($newSchema);
+        }
+
+        return $newSchema;
+    }
+
+    /**
+     * @param string $namespace
+     * @param string $file
+     *
+     * @return Closure[]
+     */
+    protected function loadImportFreshCallbacks(
+        $namespace,
+        Schema $schema,
+        $file
+    ) {
+        /**
+         * @var string
+         */
+        $file = $file;
+
+        return $this->schemaNode(
+            $this->loadImportFreshCallbacksNewSchema(
+                $namespace,
+                $schema,
+                $file
+            ),
+            $this->getDOM(
+                $this->hasKnownSchemaLocation($file)
+                    ? $this->getKnownSchemaLocation($file)
+                    : $file
+            )->documentElement,
+            $schema
+        );
+    }
+
+    /**
+     * @param string $namespace
+     * @param string $file
+     *
+     * @return Closure
+     */
+    protected function loadImportFresh(
+        $namespace,
+        Schema $schema,
+        $file
+    ) {
+        return function () use ($namespace, $schema, $file) {
+            foreach (
+                $this->loadImportFreshCallbacks(
+                    $namespace,
+                    $schema,
+                    $file
+                ) as $callback
+            ) {
+                $callback();
+            }
+        };
     }
 }
