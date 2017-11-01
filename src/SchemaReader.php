@@ -266,10 +266,10 @@ class SchemaReader
     public function loadGroupRef(Group $referenced, DOMElement $node)
     {
         $ref = new GroupRef($referenced);
-        $ref->setDoc(SchemaReader::getDocumentation($node));
+        $ref->setDoc(self::getDocumentation($node));
 
-        SchemaReader::maybeSetMax($ref, $node);
-        SchemaReader::maybeSetMin($ref, $node);
+        self::maybeSetMax($ref, $node);
+        self::maybeSetMin($ref, $node);
 
         return $ref;
     }

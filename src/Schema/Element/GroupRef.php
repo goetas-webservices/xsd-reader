@@ -3,8 +3,6 @@
 namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
 use BadMethodCallException;
-use DOMElement;
-use GoetasWebservices\XML\XSDReader\SchemaReader;
 
 class GroupRef extends Group implements InterfaceSetMinMax
 {
