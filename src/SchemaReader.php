@@ -1695,7 +1695,7 @@ class SchemaReader
         DOMElement $node
     ) {
         $attGroup = new AttributeGroup($schema, $node->getAttribute('name'));
-        $attGroup->setDoc(SchemaReader::getDocumentation($node));
+        $attGroup->setDoc(self::getDocumentation($node));
         $schema->addAttributeGroup($attGroup);
 
         return function () use ($schema, $node, $attGroup) {
@@ -1762,7 +1762,7 @@ class SchemaReader
         DOMElement $node
     ) {
         $attribute = new Attribute($schema, $node->getAttribute('name'));
-        $attribute->setDoc(SchemaReader::getDocumentation($node));
+        $attribute->setDoc(self::getDocumentation($node));
         $this->fillItem($attribute, $node);
 
         if ($node->hasAttribute('nillable')) {

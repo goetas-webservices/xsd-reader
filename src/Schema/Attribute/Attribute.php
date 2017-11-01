@@ -2,10 +2,7 @@
 
 namespace GoetasWebservices\XML\XSDReader\Schema\Attribute;
 
-use DOMElement;
 use GoetasWebservices\XML\XSDReader\Schema\Item;
-use GoetasWebservices\XML\XSDReader\Schema\Schema;
-use GoetasWebservices\XML\XSDReader\SchemaReader;
 
 class Attribute extends Item implements AttributeSingle
 {

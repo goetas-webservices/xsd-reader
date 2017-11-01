@@ -2,8 +2,6 @@
 
 namespace GoetasWebservices\XML\XSDReader\Schema\Attribute;
 
-use DOMElement;
-use GoetasWebservices\XML\XSDReader\SchemaReader;
 use GoetasWebservices\XML\XSDReader\Schema\Schema;
 
 class Group implements AttributeItem, AttributeContainer
