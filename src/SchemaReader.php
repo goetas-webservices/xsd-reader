@@ -528,7 +528,79 @@ class SchemaReader
 
     protected function loadRestriction(Type $type, DOMElement $node)
     {
-        Restriction::loadRestriction($this, $type, $node);
+        $restriction = new Restriction();
+        $type->setRestriction($restriction);
+        if ($node->hasAttribute('base')) {
+            $this->findAndSetSomeBase($type, $restriction, $node);
+        } else {
+            $addCallback = function (Type $restType) use ($restriction) {
+                $restriction->setBase($restType);
+            };
+
+            $this->loadTypeWithCallbackOnChildNodes(
+                $type->getSchema(),
+                $node,
+                $addCallback
+            );
+        }
+        SchemaReader::againstDOMNodeList(
+            $node,
+            function (
+                DOMElement $node,
+                DOMElement $childNode
+            ) use (
+                $restriction
+            ) {
+                static::maybeLoadRestrictionOnChildNode(
+                    $restriction,
+                    $childNode
+                );
+            }
+        );
+    }
+
+    protected static function maybeLoadRestrictionOnChildNode(
+        Restriction $restriction,
+        DOMElement $childNode
+    ) {
+        if (
+            in_array(
+                $childNode->localName,
+                [
+                    'enumeration',
+                    'pattern',
+                    'length',
+                    'minLength',
+                    'maxLength',
+                    'minInclusive',
+                    'maxInclusive',
+                    'minExclusive',
+                    'maxExclusive',
+                    'fractionDigits',
+                    'totalDigits',
+                    'whiteSpace',
+                ],
+                true
+            )
+        ) {
+            static::definitelyLoadRestrictionOnChildNode(
+                $restriction,
+                $childNode
+            );
+        }
+    }
+
+    protected static function definitelyLoadRestrictionOnChildNode(
+        Restriction $restriction,
+        DOMElement $childNode
+    ) {
+        $restriction->addCheck(
+            $childNode->localName,
+            [
+                'value' => $childNode->getAttribute('value'),
+                'doc' => SchemaReader::getDocumentation($childNode),
+            ]
+        );
     }
 
     /**
