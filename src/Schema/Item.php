@@ -2,12 +2,12 @@
 
 namespace GoetasWebservices\XML\XSDReader\Schema;
 
-use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItemTrait;
+use GoetasWebservices\XML\XSDReader\Schema\NamedItemTrait;
 use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
 
 abstract class Item implements SchemaItem
 {
-    use AttributeItemTrait;
+    use NamedItemTrait;
     use SchemaItemTrait;
 
     /**

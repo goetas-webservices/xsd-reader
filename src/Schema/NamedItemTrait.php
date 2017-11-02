@@ -1,8 +1,8 @@
 <?php
 
-namespace GoetasWebservices\XML\XSDReader\Schema\Attribute;
+namespace GoetasWebservices\XML\XSDReader\Schema;
 
-trait AttributeItemTrait
+trait NamedItemTrait
 {
     /**
      * @var string
