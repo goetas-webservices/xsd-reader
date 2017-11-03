@@ -292,7 +292,7 @@ class Schema
     /**
      * @param string|null $namespace
      */
-    public function addSchema(Schema $schema, $namespace = null)
+    public function addSchema(self $schema, $namespace = null)
     {
         if ($namespace !== null) {
             if ($schema->getTargetNamespace() !== $namespace) {
@@ -532,7 +532,7 @@ class Schema
      *
      * @return Schema
      */
-    public static function setLoadedFile($key, Schema $schema)
+    public static function setLoadedFile($key, self $schema)
     {
         self::$loadedFiles[$key] = $schema;
 
@@ -541,7 +541,7 @@ class Schema
 
     public function setSchemaThingsFromNode(
         DOMElement $node,
-        Schema $parent = null
+        self $parent = null
     ) {
         $this->setDoc(SchemaReader::getDocumentation($node));
 
