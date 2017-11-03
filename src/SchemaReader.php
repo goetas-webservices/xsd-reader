@@ -319,7 +319,7 @@ class SchemaReader
     /**
      * @return GroupRef
      */
-    public function loadGroupRef(Group $referenced, DOMElement $node)
+    private function loadGroupRef(Group $referenced, DOMElement $node)
     {
         $ref = new GroupRef($referenced);
         $ref->setDoc(self::getDocumentation($node));
@@ -990,7 +990,7 @@ class SchemaReader
      *
      * @return bool
      */
-    public function hasKnownSchemaLocation($remote)
+    private function hasKnownSchemaLocation($remote)
     {
         return isset($this->knownLocationSchemas[$remote]);
     }
@@ -1000,7 +1000,7 @@ class SchemaReader
      *
      * @return string
      */
-    public function getKnownSchemaLocation($remote)
+    private function getKnownSchemaLocation($remote)
     {
         return $this->knownLocationSchemas[$remote];
     }
@@ -1039,7 +1039,7 @@ class SchemaReader
      *
      * @return Closure|null
      */
-    public function maybeCallMethod(
+    private function maybeCallMethod(
         array $methods,
         $key,
         DOMNode $childNode,
@@ -1066,7 +1066,7 @@ class SchemaReader
      *
      * @return Closure[]
      */
-    public function schemaNode(Schema $schema, DOMElement $node, Schema $parent = null)
+    private function schemaNode(Schema $schema, DOMElement $node, Schema $parent = null)
     {
         $schema->setSchemaThingsFromNode($node, $parent);
         $functions = array();
@@ -1122,7 +1122,7 @@ class SchemaReader
     /**
      * @return InterfaceSetMinMax
      */
-    public static function maybeSetMax(InterfaceSetMinMax $ref, DOMElement $node)
+    private static function maybeSetMax(InterfaceSetMinMax $ref, DOMElement $node)
     {
         if (
             $node->hasAttribute('maxOccurs')
@@ -1136,7 +1136,7 @@ class SchemaReader
     /**
      * @return InterfaceSetMinMax
      */
-    public static function maybeSetMin(InterfaceSetMinMax $ref, DOMElement $node)
+    private static function maybeSetMin(InterfaceSetMinMax $ref, DOMElement $node)
     {
         if ($node->hasAttribute('minOccurs')) {
             $ref->setMin((int) $node->getAttribute('minOccurs'));
@@ -1145,7 +1145,7 @@ class SchemaReader
         return $ref;
     }
 
-    public function findAndSetSomeBase(
+    private function findAndSetSomeBase(
         Type $type,
         Base $setBaseOnThis,
         DOMElement $node
@@ -1167,7 +1167,7 @@ class SchemaReader
      *
      * @return ElementItem|Group|AttributeItem|AttributeGroup|Type
      */
-    public function findSomething($finder, Schema $schema, DOMElement $node, $typeName)
+    private function findSomething($finder, Schema $schema, DOMElement $node, $typeName)
     {
         list($name, $namespace) = static::splitParts($node, $typeName);
 
@@ -1188,7 +1188,7 @@ class SchemaReader
         }
     }
 
-    public function fillItem(Item $element, DOMElement $node)
+    private function fillItem(Item $element, DOMElement $node)
     {
         /**
          * @var bool
@@ -1267,7 +1267,7 @@ class SchemaReader
     /**
      * @return Schema
      */
-    public function getGlobalSchema()
+    private function getGlobalSchema()
     {
         if (!$this->globalSchema) {
             $callbacks = array();
@@ -1333,7 +1333,7 @@ class SchemaReader
      *
      * @return string
      */
-    public function getNamespaceSpecificFileIndex($file, $targetNamespace)
+    private function getNamespaceSpecificFileIndex($file, $targetNamespace)
     {
         return $file.'#'.$targetNamespace;
     }
@@ -1376,7 +1376,7 @@ class SchemaReader
      *
      * @throws IOException
      */
-    public function getDOM($file)
+    private function getDOM($file)
     {
         $xml = new DOMDocument('1.0', 'UTF-8');
         if (!$xml->load($file)) {
@@ -1386,7 +1386,7 @@ class SchemaReader
         return $xml;
     }
 
-    public static function againstDOMNodeList(
+    private static function againstDOMNodeList(
         DOMElement $node,
         Closure $againstNodeList
     ) {
@@ -1406,7 +1406,7 @@ class SchemaReader
         }
     }
 
-    public function maybeCallMethodAgainstDOMNodeList(
+    private function maybeCallMethodAgainstDOMNodeList(
         DOMElement $node,
         SchemaItem $type,
         array $methods
@@ -1423,7 +1423,7 @@ class SchemaReader
     /**
      * @return Closure
      */
-    public function CallbackGeneratorMaybeCallMethodAgainstDOMNodeList(
+    private function CallbackGeneratorMaybeCallMethodAgainstDOMNodeList(
         SchemaItem $type,
         array $methods
     ) {
@@ -1449,7 +1449,7 @@ class SchemaReader
         };
     }
 
-    public function loadTypeWithCallbackOnChildNodes(
+    private function loadTypeWithCallbackOnChildNodes(
         Schema $schema,
         DOMElement $node,
         Closure $callback
@@ -1472,7 +1472,7 @@ class SchemaReader
         );
     }
 
-    public function loadTypeWithCallback(
+    private function loadTypeWithCallback(
         Schema $schema,
         DOMElement $childNode,
         Closure $callback
@@ -1505,7 +1505,7 @@ class SchemaReader
      *
      * @return Closure
      */
-    public function loadImport(
+    private function loadImport(
         Schema $schema,
         DOMElement $node
     ) {
@@ -1641,7 +1641,7 @@ class SchemaReader
     /**
      * @return Element
      */
-    public function loadElement(
+    private function loadElement(
         Schema $schema,
         DOMElement $node
     ) {
@@ -1673,7 +1673,7 @@ class SchemaReader
     /**
      * @return ElementRef
      */
-    public static function loadElementRef(
+    private static function loadElementRef(
         ElementDef $referenced,
         DOMElement $node
     ) {
@@ -1695,7 +1695,7 @@ class SchemaReader
     /**
      * @return \Closure
      */
-    public function loadAttributeGroup(
+    private function loadAttributeGroup(
         Schema $schema,
         DOMElement $node
     ) {
@@ -1739,7 +1739,7 @@ class SchemaReader
     /**
      * @return AttributeItem
      */
-    public function getAttributeFromAttributeOrRef(
+    private function getAttributeFromAttributeOrRef(
         DOMElement $childNode,
         Schema $schema,
         DOMElement $node
@@ -1762,7 +1762,7 @@ class SchemaReader
     /**
      * @return Attribute
      */
-    public function loadAttribute(
+    private function loadAttribute(
         Schema $schema,
         DOMElement $node
     ) {
@@ -1783,7 +1783,7 @@ class SchemaReader
         return $attribute;
     }
 
-    public function addAttributeFromAttributeOrRef(
+    private function addAttributeFromAttributeOrRef(
         BaseComplexType $type,
         DOMElement $childNode,
         Schema $schema,
@@ -1798,7 +1798,7 @@ class SchemaReader
         $type->addAttribute($attribute);
     }
 
-    public function findSomethingLikeAttributeGroup(
+    private function findSomethingLikeAttributeGroup(
         Schema $schema,
         DOMElement $node,
         DOMElement $childNode,
@@ -1821,7 +1821,7 @@ class SchemaReader
      *
      * @return bool
      */
-    public static function hasLoadedFile(...$keys)
+    private static function hasLoadedFile(...$keys)
     {
         foreach ($keys as $key) {
             if (isset(self::$loadedFiles[$key])) {
@@ -1855,7 +1855,7 @@ class SchemaReader
      *
      * @return Schema
      */
-    public static function setLoadedFile($key, Schema $schema)
+    private static function setLoadedFile($key, Schema $schema)
     {
         self::$loadedFiles[$key] = $schema;
 
