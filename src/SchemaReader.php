@@ -214,6 +214,11 @@ class SchemaReader
             );
         }
         if ($max > 1) {
+            /*
+            * although one might think the typecast is not needed with $max being `? int $max` after passing > 1,
+            * phpstan@a4f89fa still thinks it's possibly null.
+            * see https://github.com/phpstan/phpstan/issues/577 for related issue
+            */
             $element->setMax((int) $max);
         }
         $elementContainer->addElement($element);
