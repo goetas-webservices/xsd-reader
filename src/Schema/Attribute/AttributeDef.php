@@ -7,17 +7,17 @@ use GoetasWebservices\XML\XSDReader\Schema\Item;
 class AttributeDef extends Item implements AttributeItem
 {
     /**
-     * @var static|null
+     * @var string|null
      */
     protected $fixed;
 
     /**
-     * @var static|null
+     * @var string|null
      */
     protected $default;
 
     /**
-     * @return static|null
+     * @return string|null
      */
     public function getFixed()
     {
@@ -25,7 +25,7 @@ class AttributeDef extends Item implements AttributeItem
     }
 
     /**
-     * @param static $fixed
+     * @param string $fixed
      *
      * @return $this
      */
@@ -37,7 +37,7 @@ class AttributeDef extends Item implements AttributeItem
     }
 
     /**
-     * @return static|null
+     * @return string|null
      */
     public function getDefault()
     {
@@ -45,7 +45,7 @@ class AttributeDef extends Item implements AttributeItem
     }
 
     /**
-     * @param static $default
+     * @param string $default
      *
      * @return $this
      */
