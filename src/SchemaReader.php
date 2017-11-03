@@ -1307,7 +1307,7 @@ class SchemaReader
      *
      * @return Schema
      */
-    public function readNode(DOMElement $node, $file = 'schema.xsd')
+    private function readNode(DOMElement $node, $file = 'schema.xsd')
     {
         $fileKey = $node->hasAttribute('targetNamespace') ? $this->getNamespaceSpecificFileIndex($file, $node->getAttribute('targetNamespace')) : $file;
         self::setLoadedFile($fileKey, $rootSchema = new Schema());
