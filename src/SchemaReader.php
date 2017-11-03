@@ -213,8 +213,8 @@ class SchemaReader
                 $childNode
             );
         }
-        if (is_int($max) && (bool) $max) {
-            $element->setMax($max);
+        if ($max > 1) {
+            $element->setMax((int) $max);
         }
         $elementContainer->addElement($element);
     }
