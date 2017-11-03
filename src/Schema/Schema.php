@@ -485,20 +485,4 @@ class Schema
 
         return $out;
     }
-
-    public function setSchemaThingsFromNode(
-        DOMElement $node,
-        self $parent = null
-    ) {
-        $this->setDoc(SchemaReader::getDocumentation($node));
-
-        if ($node->hasAttribute('targetNamespace')) {
-            $this->setTargetNamespace($node->getAttribute('targetNamespace'));
-        } elseif ($parent) {
-            $this->setTargetNamespace($parent->getTargetNamespace());
-        }
-        $this->setElementsQualification($node->getAttribute('elementFormDefault') == 'qualified');
-        $this->setAttributesQualification($node->getAttribute('attributeFormDefault') == 'qualified');
-        $this->setDoc(SchemaReader::getDocumentation($node));
-    }
 }

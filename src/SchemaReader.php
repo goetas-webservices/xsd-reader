@@ -1010,7 +1010,7 @@ class SchemaReader
      *
      * @return string
      */
-    public static function getDocumentation(DOMElement $node)
+    private static function getDocumentation(DOMElement $node)
     {
         $doc = '';
         static::againstDOMNodeList(
@@ -1068,7 +1068,7 @@ class SchemaReader
      */
     private function schemaNode(Schema $schema, DOMElement $node, Schema $parent = null)
     {
-        $schema->setSchemaThingsFromNode($node, $parent);
+        $this->setSchemaThingsFromNode($schema, $node, $parent);
         $functions = array();
 
         $thisMethods = [
@@ -1860,5 +1860,22 @@ class SchemaReader
         self::$loadedFiles[$key] = $schema;
 
         return $schema;
+    }
+
+    public function setSchemaThingsFromNode(
+        Schema $schema,
+        DOMElement $node,
+        Schema $parent = null
+    ) {
+        $schema->setDoc(self::getDocumentation($node));
+
+        if ($node->hasAttribute('targetNamespace')) {
+            $schema->setTargetNamespace($node->getAttribute('targetNamespace'));
+        } elseif ($parent) {
+            $schema->setTargetNamespace($parent->getTargetNamespace());
+        }
+        $schema->setElementsQualification($node->getAttribute('elementFormDefault') == 'qualified');
+        $schema->setAttributesQualification($node->getAttribute('attributeFormDefault') == 'qualified');
+        $schema->setDoc(self::getDocumentation($node));
     }
 }
