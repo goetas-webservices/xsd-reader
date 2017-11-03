@@ -2,8 +2,6 @@
 
 namespace GoetasWebservices\XML\XSDReader\Schema;
 
-use DOMElement;
-use GoetasWebservices\XML\XSDReader\SchemaReader;
 use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Group;
