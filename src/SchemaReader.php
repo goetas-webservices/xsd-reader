@@ -1267,7 +1267,7 @@ class SchemaReader
     /**
      * @return Schema
      */
-    private function getGlobalSchema()
+    public function getGlobalSchema()
     {
         if (!$this->globalSchema) {
             $callbacks = array();
@@ -1862,7 +1862,7 @@ class SchemaReader
         return $schema;
     }
 
-    public function setSchemaThingsFromNode(
+    private function setSchemaThingsFromNode(
         Schema $schema,
         DOMElement $node,
         Schema $parent = null
