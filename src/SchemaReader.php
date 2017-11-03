@@ -1237,7 +1237,7 @@ class SchemaReader
     {
         $globalSchemas = array();
         foreach (self::$globalSchemaInfo as $namespace => $uri) {
-            Schema::setLoadedFile(
+            self::setLoadedFile(
                 $uri,
                 $globalSchemas[$namespace] = $schema = new Schema()
             );
@@ -1305,7 +1305,7 @@ class SchemaReader
     public function readNode(DOMElement $node, $file = 'schema.xsd')
     {
         $fileKey = $node->hasAttribute('targetNamespace') ? $this->getNamespaceSpecificFileIndex($file, $node->getAttribute('targetNamespace')) : $file;
-        Schema::setLoadedFile($fileKey, $rootSchema = new Schema());
+        self::setLoadedFile($fileKey, $rootSchema = new Schema());
 
         $rootSchema->addSchema($this->getGlobalSchema());
         $callbacks = $this->schemaNode($rootSchema, $node);
@@ -1512,9 +1512,9 @@ class SchemaReader
         $keys = $this->loadImportFreshKeys($namespace, $file);
 
         if (
-            Schema::hasLoadedFile(...$keys)
+            self::hasLoadedFile(...$keys)
         ) {
-            $schema->addSchema(Schema::getLoadedFile(...$keys));
+            $schema->addSchema(self::getLoadedFile(...$keys));
 
             return function () {
             };
@@ -1565,7 +1565,7 @@ class SchemaReader
         /**
          * @var Schema $newSchema
          */
-        $newSchema = Schema::setLoadedFile(
+        $newSchema = self::setLoadedFile(
             $file,
             ($namespace ? new Schema() : $schema)
         );
@@ -1804,5 +1804,56 @@ class SchemaReader
          */
         $attribute = $this->findSomething('findAttributeGroup', $schema, $node, $childNode->getAttribute('ref'));
         $addToThis->addAttribute($attribute);
+    }
+
+    /**
+     * @var Schema[]
+     */
+    protected static $loadedFiles = array();
+
+    /**
+     * @param string ...$keys
+     *
+     * @return bool
+     */
+    public static function hasLoadedFile(...$keys)
+    {
+        foreach ($keys as $key) {
+            if (isset(self::$loadedFiles[$key])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string ...$keys
+     *
+     * @return Schema
+     *
+     * @throws RuntimeException if loaded file not found
+     */
+    public static function getLoadedFile(...$keys)
+    {
+        foreach ($keys as $key) {
+            if (isset(self::$loadedFiles[$key])) {
+                return self::$loadedFiles[$key];
+            }
+        }
+
+        throw new RuntimeException('Loaded file was not found!');
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return Schema
+     */
+    public static function setLoadedFile($key, Schema $schema)
+    {
+        self::$loadedFiles[$key] = $schema;
+
+        return $schema;
     }
 }

@@ -488,57 +488,6 @@ class Schema
         return $out;
     }
 
-    /**
-     * @var Schema[]
-     */
-    protected static $loadedFiles = array();
-
-    /**
-     * @param string ...$keys
-     *
-     * @return bool
-     */
-    public static function hasLoadedFile(...$keys)
-    {
-        foreach ($keys as $key) {
-            if (isset(self::$loadedFiles[$key])) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @param string ...$keys
-     *
-     * @return Schema
-     *
-     * @throws RuntimeException if loaded file not found
-     */
-    public static function getLoadedFile(...$keys)
-    {
-        foreach ($keys as $key) {
-            if (isset(self::$loadedFiles[$key])) {
-                return self::$loadedFiles[$key];
-            }
-        }
-
-        throw new RuntimeException('Loaded file was not found!');
-    }
-
-    /**
-     * @param string $key
-     *
-     * @return Schema
-     */
-    public static function setLoadedFile($key, self $schema)
-    {
-        self::$loadedFiles[$key] = $schema;
-
-        return $schema;
-    }
-
     public function setSchemaThingsFromNode(
         DOMElement $node,
         self $parent = null
