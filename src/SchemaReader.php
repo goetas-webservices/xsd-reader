@@ -144,38 +144,32 @@ class SchemaReader
         DOMElement $childNode,
         $max
     ) {
-        $commonMethods = [
-            [
-                ['sequence', 'choice', 'all'],
-                [$this, 'loadSequenceChildNodeLoadSequence'],
-                [
+        switch ($childNode->localName) {
+            case 'sequence':
+            case 'choice':
+            case 'all':
+                $this->loadSequenceChildNodeLoadSequence(
                     $elementContainer,
                     $childNode,
                     $max,
-                ],
-            ],
-        ];
-        $methods = [
-            'element' => [
-                [$this, 'loadSequenceChildNodeLoadElement'],
-                [
+                );
+                break;
+            case 'element':
+                $this->loadSequenceChildNodeLoadElement(
                     $elementContainer,
                     $node,
                     $childNode,
                     $max,
-                ],
-            ],
-            'group' => [
-                [$this, 'loadSequenceChildNodeLoadGroup'],
-                [
+                );
+                break;
+            case 'group':
+                $this->loadSequenceChildNodeLoadGroup(
                     $elementContainer,
                     $node,
                     $childNode,
-                ],
-            ],
-        ];
-
-        $this->maybeCallCallableWithArgs($childNode, $commonMethods, $methods);
+                );
+                break;
+        }
     }
 
     /**
