@@ -380,10 +380,12 @@ class SchemaReader
             case 'sequence':
             case 'choice':
             case 'all':
-                $this->maybeLoadSequenceFromElementContainer(
+                if ($type instanceof ElementContainer) {
+                    $this->loadSequence(
                     $type,
                     $childNode
-                );
+                    );
+                }
                 break;
             case 'attribute':
                 $this->addAttributeFromAttributeOrRef(
@@ -507,10 +509,12 @@ class SchemaReader
                     case 'sequence':
                     case 'choice':
                     case 'all':
-                        $this->maybeLoadSequenceFromElementContainer(
+                        if ($type instanceof ElementContainer) {
+                        $this->loadSequence(
                             $type,
                             $childNode
                         );
+                        }
                         break;
                     case 'attribute':
                         $this->addAttributeFromAttributeOrRef(
@@ -790,18 +794,6 @@ class SchemaReader
 
             return call_user_func_array($callable, $args);
         }
-    }
-
-    private function maybeLoadSequenceFromElementContainer(
-        BaseComplexType $type,
-        DOMElement $childNode
-    ) {
-        $this->maybeLoadThingFromThing(
-            $type,
-            $childNode,
-            ElementContainer::class,
-            'loadSequence'
-        );
     }
 
     /**
