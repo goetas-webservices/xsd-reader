@@ -503,42 +503,32 @@ class SchemaReader
             ) use (
                 $type
             ) {
-                $commonMethods = [
-                    [
-                        ['sequence', 'choice', 'all'],
-                        [$this, 'maybeLoadSequenceFromElementContainer'],
-                        [
+                switch ($childNode->localName) {
+                    case 'sequence':
+                    case 'choice':
+                    case 'all':
+                        $this->maybeLoadSequenceFromElementContainer(
                             $type,
                             $childNode,
-                        ],
-                    ],
-                ];
-                $methods = [
-                    'attribute' => [
-                        [$this, 'addAttributeFromAttributeOrRef'],
-                        [
+                        );
+                        break;
+                    case 'attribute':
+                        $this->addAttributeFromAttributeOrRef(
                             $type,
                             $childNode,
                             $type->getSchema(),
                             $node,
-                        ],
-                    ],
-                    'attributeGroup' => [
-                        [$this, 'findSomethingLikeAttributeGroup'],
-                        [
+                        );
+                        break;
+                    case 'attributeGroup':
+                        $this->findSomethingLikeAttributeGroup(
                             $type->getSchema(),
                             $node,
                             $childNode,
                             $type,
-                        ],
-                    ],
-                ];
-
-                $this->maybeCallCallableWithArgs(
-                    $childNode,
-                    $commonMethods,
-                    $methods
-                );
+                        );
+                        break;
+                }
             }
         );
     }
