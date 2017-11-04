@@ -402,16 +402,16 @@ class SchemaReader
                 );
                 break;
             case 'group':
-        if (
-            $type instanceof ComplexType
-        ) {
+                if (
+                    $type instanceof ComplexType
+                ) {
                     $this->addGroupAsElement(
-                    $schema,
-                    $node,
-                    $childNode,
-                    $type
+                        $schema,
+                        $node,
+                        $childNode,
+                        $type
                     );
-        }
+                }
                 break;
         }
     }
