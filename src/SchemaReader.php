@@ -577,34 +577,34 @@ class SchemaReader
             ) use (
                 $restriction
             ) {
-        if (
-            in_array(
-                $childNode->localName,
-                [
-                    'enumeration',
-                    'pattern',
-                    'length',
-                    'minLength',
-                    'maxLength',
-                    'minInclusive',
-                    'maxInclusive',
-                    'minExclusive',
-                    'maxExclusive',
-                    'fractionDigits',
-                    'totalDigits',
-                    'whiteSpace',
-                ],
-                true
-            )
-        ) {
-        $restriction->addCheck(
-            $childNode->localName,
-            [
-                'value' => $childNode->getAttribute('value'),
-                'doc' => self::getDocumentation($childNode),
-            ]
-        );
-        }
+                if (
+                    in_array(
+                        $childNode->localName,
+                        [
+                            'enumeration',
+                            'pattern',
+                            'length',
+                            'minLength',
+                            'maxLength',
+                            'minInclusive',
+                            'maxInclusive',
+                            'minExclusive',
+                            'maxExclusive',
+                            'fractionDigits',
+                            'totalDigits',
+                            'whiteSpace',
+                        ],
+                        true
+                    )
+                ) {
+                    $restriction->addCheck(
+                        $childNode->localName,
+                        [
+                            'value' => $childNode->getAttribute('value'),
+                            'doc' => self::getDocumentation($childNode),
+                        ]
+                    );
+                }
             }
         );
     }
