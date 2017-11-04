@@ -382,8 +382,8 @@ class SchemaReader
             case 'all':
                 if ($type instanceof ElementContainer) {
                     $this->loadSequence(
-                    $type,
-                    $childNode
+                        $type,
+                        $childNode
                     );
                 }
                 break;
@@ -510,10 +510,10 @@ class SchemaReader
                     case 'choice':
                     case 'all':
                         if ($type instanceof ElementContainer) {
-                        $this->loadSequence(
-                            $type,
-                            $childNode
-                        );
+                            $this->loadSequence(
+                                $type,
+                                $childNode
+                            );
                         }
                         break;
                     case 'attribute':
