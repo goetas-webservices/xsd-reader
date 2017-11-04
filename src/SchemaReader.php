@@ -376,51 +376,44 @@ class SchemaReader
         DOMElement $childNode,
         Schema $schema
     ) {
-        $commonMethods = [
-            [
-                ['sequence', 'choice', 'all'],
-                [$this, 'maybeLoadSequenceFromElementContainer'],
-                [
+        switch ($childNode->localName) {
+            case 'sequence':
+            case 'choice':
+            case 'all':
+                $this->maybeLoadSequenceFromElementContainer(
                     $type,
                     $childNode,
-                ],
-            ],
-        ];
-        $methods = [
-            'attribute' => [
-                [$this, 'addAttributeFromAttributeOrRef'],
-                [
+                );
+                break;
+            case 'attribute':
+                $this->addAttributeFromAttributeOrRef(
                     $type,
                     $childNode,
                     $schema,
                     $node,
-                ],
-            ],
-            'attributeGroup' => [
-                [$this, 'findSomethingLikeAttributeGroup'],
-                [
+                );
+                break;
+            case 'attributeGroup':
+                $this->findSomethingLikeAttributeGroup(
                     $schema,
                     $node,
                     $childNode,
                     $type,
-                ],
-            ],
-        ];
+                );
+                break;
+            case 'group':
         if (
             $type instanceof ComplexType
         ) {
-            $methods['group'] = [
-                [$this, 'addGroupAsElement'],
-                [
+                    $this->addGroupAsElement(
                     $schema,
                     $node,
                     $childNode,
                     $type,
-                ],
-            ];
+                    );
         }
-
-        $this->maybeCallCallableWithArgs($childNode, $commonMethods, $methods);
+                break;
+        }
     }
 
     /**
