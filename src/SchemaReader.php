@@ -163,10 +163,11 @@ class SchemaReader
                 );
                 break;
             case 'group':
-                $this->loadSequenceChildNodeLoadGroup(
-                    $elementContainer,
+                $this->addGroupAsElement(
+                    $elementContainer->getSchema(),
                     $node,
-                    $childNode
+                    $childNode,
+                    $elementContainer
                 );
                 break;
         }
@@ -205,19 +206,6 @@ class SchemaReader
             $element->setMax((int) $max);
         }
         $elementContainer->addElement($element);
-    }
-
-    private function loadSequenceChildNodeLoadGroup(
-        ElementContainer $elementContainer,
-        DOMElement $node,
-        DOMElement $childNode
-    ) {
-        $this->addGroupAsElement(
-            $elementContainer->getSchema(),
-            $node,
-            $childNode,
-            $elementContainer
-        );
     }
 
     private function addGroupAsElement(
