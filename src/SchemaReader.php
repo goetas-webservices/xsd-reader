@@ -148,7 +148,7 @@ class SchemaReader
             case 'sequence':
             case 'choice':
             case 'all':
-                $this->loadSequenceChildNodeLoadSequence(
+                $this->loadSequence(
                     $elementContainer,
                     $childNode,
                     $max
@@ -170,17 +170,6 @@ class SchemaReader
                 );
                 break;
         }
-    }
-
-    /**
-     * @param int|null $max
-     */
-    private function loadSequenceChildNodeLoadSequence(
-        ElementContainer $elementContainer,
-        DOMElement $childNode,
-        $max
-    ) {
-        $this->loadSequence($elementContainer, $childNode, $max);
     }
 
     /**
