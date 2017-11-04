@@ -151,7 +151,7 @@ class SchemaReader
                 $this->loadSequenceChildNodeLoadSequence(
                     $elementContainer,
                     $childNode,
-                    $max,
+                    $max
                 );
                 break;
             case 'element':
@@ -159,14 +159,14 @@ class SchemaReader
                     $elementContainer,
                     $node,
                     $childNode,
-                    $max,
+                    $max
                 );
                 break;
             case 'group':
                 $this->loadSequenceChildNodeLoadGroup(
                     $elementContainer,
                     $node,
-                    $childNode,
+                    $childNode
                 );
                 break;
         }
