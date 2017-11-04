@@ -577,18 +577,6 @@ class SchemaReader
             ) use (
                 $restriction
             ) {
-                static::maybeLoadRestrictionOnChildNode(
-                    $restriction,
-                    $childNode
-                );
-            }
-        );
-    }
-
-    private static function maybeLoadRestrictionOnChildNode(
-        Restriction $restriction,
-        DOMElement $childNode
-    ) {
         if (
             in_array(
                 $childNode->localName,
@@ -609,23 +597,15 @@ class SchemaReader
                 true
             )
         ) {
-            static::definitelyLoadRestrictionOnChildNode(
-                $restriction,
-                $childNode
-            );
-        }
-    }
-
-    private static function definitelyLoadRestrictionOnChildNode(
-        Restriction $restriction,
-        DOMElement $childNode
-    ) {
         $restriction->addCheck(
             $childNode->localName,
             [
                 'value' => $childNode->getAttribute('value'),
                 'doc' => self::getDocumentation($childNode),
             ]
+        );
+        }
+            }
         );
     }
 
