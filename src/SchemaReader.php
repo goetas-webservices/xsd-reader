@@ -1017,17 +1017,6 @@ class SchemaReader
         $this->setSchemaThingsFromNode($schema, $node, $parent);
         $functions = array();
 
-        $thisMethods = [
-            'attributeGroup' => [$this, 'loadAttributeGroup'],
-            'include' => [$this, 'loadImport'],
-            'import' => [$this, 'loadImport'],
-            'element' => [$this, 'loadElementDef'],
-            'attribute' => [$this, 'loadAttributeDef'],
-            'group' => [$this, 'loadGroup'],
-            'complexType' => [$this, 'loadComplexType'],
-            'simpleType' => [$this, 'loadSimpleType'],
-        ];
-
         static::againstDOMNodeList(
             $node,
             function (
@@ -1035,26 +1024,34 @@ class SchemaReader
                 DOMElement $childNode
             ) use (
                 $schema,
-                $thisMethods,
                 &$functions
             ) {
-                /**
-                 * @var Closure|null
-                 */
-                $callback = $this->maybeCallCallableWithArgs(
-                    $childNode,
-                    [],
-                    [],
-                    [
-                        [
-                            $thisMethods,
-                            [
-                                $schema,
-                                $childNode,
-                            ],
-                        ],
-                    ]
-                );
+                $callback = null;
+
+                switch ($childNode->localName) {
+                    case 'attributeGroup':
+                        $callback = $this->loadAttributeGroup($schema, $childNode);
+                        break;
+                    case 'include':
+                    case 'import':
+                        $callback = $this->loadImport($schema, $childNode);
+                        break;
+                    case 'element':
+                        $callback = $this->loadElementDef($schema, $childNode);
+                        break;
+                    case 'attribute':
+                        $callback = $this->loadAttributeDef($schema, $childNode);
+                        break;
+                    case 'group':
+                        $callback = $this->loadGroup($schema, $childNode);
+                        break;
+                    case 'complexType':
+                        $callback = $this->loadComplexType($schema, $childNode);
+                        break;
+                    case 'simpleType':
+                        $callback = $this->loadSimpleType($schema, $childNode);
+                        break;
+                }
 
                 if ($callback instanceof Closure) {
                     $functions[] = $callback;
