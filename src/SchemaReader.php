@@ -509,7 +509,7 @@ class SchemaReader
                     case 'all':
                         $this->maybeLoadSequenceFromElementContainer(
                             $type,
-                            $childNode,
+                            $childNode
                         );
                         break;
                     case 'attribute':
@@ -517,7 +517,7 @@ class SchemaReader
                             $type,
                             $childNode,
                             $type->getSchema(),
-                            $node,
+                            $node
                         );
                         break;
                     case 'attributeGroup':
@@ -525,7 +525,7 @@ class SchemaReader
                             $type->getSchema(),
                             $node,
                             $childNode,
-                            $type,
+                            $type
                         );
                         break;
                 }
