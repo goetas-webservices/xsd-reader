@@ -702,39 +702,6 @@ class SchemaReader
     }
 
     /**
-     * @param string $instanceof
-     * @param string $passTo
-     */
-    private function maybeLoadThingFromThing(
-        Type $type,
-        DOMElement $childNode,
-        $instanceof,
-        $passTo
-    ) {
-        if (!is_a($type, $instanceof, true)) {
-            /**
-             * @var string
-             */
-            $class = static::class;
-            throw new RuntimeException(
-                'Argument 1 passed to '.
-                __METHOD__.
-                ' needs to be an instance of '.
-                $instanceof.
-                ' when passed onto '.
-                $class.
-                '::'.
-                $passTo.
-                '(), '.
-                (string) get_class($type).
-                ' given.'
-            );
-        }
-
-        $this->$passTo($type, $childNode);
-    }
-
-    /**
      * @param Closure|null $callback
      *
      * @return Closure
@@ -783,12 +750,9 @@ class SchemaReader
         Type $type,
         DOMElement $childNode
     ) {
-        $this->maybeLoadThingFromThing(
-            $type,
-            $childNode,
-            BaseComplexType::class,
-            'loadExtension'
-        );
+        if ($type instanceof BaseComplexType) {
+            $this->loadExtension($type, $childNode);
+        }
     }
 
     const XSD_NS = 'http://www.w3.org/2001/XMLSchema';
