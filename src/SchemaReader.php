@@ -248,13 +248,13 @@ class SchemaReader
              * @var string[]
              */
             $methods = $methods;
-        static::againstDOMNodeList(
-            $node,
-            $this->CallbackGeneratorMaybeCallMethodAgainstDOMNodeList(
-                $group,
-                $methods
-            )
-        );
+            static::againstDOMNodeList(
+                $node,
+                $this->CallbackGeneratorMaybeCallMethodAgainstDOMNodeList(
+                    $group,
+                    $methods
+                )
+            );
         };
     }
 
