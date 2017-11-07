@@ -840,32 +840,6 @@ class SchemaReader
     }
 
     /**
-     * @param string[] $methods
-     * @param string   $key
-     *
-     * @return Closure|null
-     */
-    private function maybeCallMethod(
-        array $methods,
-        $key,
-        DOMNode $childNode,
-        ...$args
-    ) {
-        if ($childNode instanceof DOMElement && isset($methods[$key])) {
-            $method = $methods[$key];
-
-            /**
-             * @var Closure|null
-             */
-            $append = $this->$method(...$args);
-
-            if ($append instanceof Closure) {
-                return $append;
-            }
-        }
-    }
-
-    /**
      * @param Schema     $schema
      * @param DOMElement $node
      * @param Schema     $parent
@@ -1227,14 +1201,11 @@ class SchemaReader
              * @var string[]
              */
             $methods = $methods;
+            if ($childNode instanceof DOMElement && isset($methods[$childNode->localName])) {
+                $method = $methods[$childNode->localName];
 
-            $this->maybeCallMethod(
-                $methods,
-                $childNode->localName,
-                $childNode,
-                $type,
-                $childNode
-            );
+                $this->$method($type, $childNode);
+            }
         };
     }
 
@@ -1272,16 +1243,18 @@ class SchemaReader
         ];
 
         /**
-         * @var Closure|null
+         * @var Closure|null $func
          */
-        $func = $this->maybeCallMethod(
-            $methods,
-            $childNode->localName,
-            $childNode,
-            $schema,
-            $childNode,
-            $callback
-        );
+        $func = null;
+
+        switch ($childNode->localName) {
+            case 'complexType':
+                $func = $this->loadComplexType($schema, $childNode, $callback);
+                break;
+            case 'simpleType':
+                $func = $this->loadSimpleType($schema, $childNode, $callback);
+                break;
+        }
 
         if ($func instanceof Closure) {
             call_user_func($func);
