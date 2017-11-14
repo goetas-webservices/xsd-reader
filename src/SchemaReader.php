@@ -356,21 +356,21 @@ class SchemaReader
 
             static::againstDOMNodeList(
                 $node,
-            function (
-                DOMElement $node,
-                DOMElement $childNode
-            ) use (
-                $schema,
-                $type
-            ) {
-                $this->loadComplexTypeFromChildNode(
-                    $type,
-                    $node,
-                    $childNode,
-                    $schema
-                );
-            }
-        );
+                function (
+                    DOMElement $node,
+                    DOMElement $childNode
+                ) use (
+                    $schema,
+                    $type
+                ) {
+                    $this->loadComplexTypeFromChildNode(
+                        $type,
+                        $node,
+                        $childNode,
+                        $schema
+                    );
+                }
+            );
 
             if ($callback) {
                 call_user_func($callback, $type);
@@ -444,13 +444,13 @@ class SchemaReader
 
             static::againstDOMNodeList(
                 $node,
-            $this->CallbackGeneratorMaybeCallMethodAgainstDOMNodeList(
-                $type,
-                [
-                    'union' => 'loadUnion',
-                    'list' => 'loadList',
-                ]
-            )
+                $this->CallbackGeneratorMaybeCallMethodAgainstDOMNodeList(
+                    $type,
+                    [
+                        'union' => 'loadUnion',
+                        'list' => 'loadList',
+                    ]
+                )
             );
 
             if ($callback) {
