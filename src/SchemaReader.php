@@ -300,12 +300,12 @@ class SchemaReader
     }
 
     /**
-     * @return BaseComplexType
+     * @param Closure|null $callback
+     *
+     * @return Closure
      */
-    private function loadComplexTypeBeforeCallbackCallback(
-        Schema $schema,
-        DOMElement $node
-    ) {
+    private function loadComplexType(Schema $schema, DOMElement $node, $callback = null)
+    {
         /**
          * @var bool
          */
@@ -334,18 +334,6 @@ class SchemaReader
         if ($node->getAttribute('name')) {
             $schema->addType($type);
         }
-
-        return $type;
-    }
-
-    /**
-     * @param Closure|null $callback
-     *
-     * @return Closure
-     */
-    private function loadComplexType(Schema $schema, DOMElement $node, $callback = null)
-    {
-        $type = $this->loadComplexTypeBeforeCallbackCallback($schema, $node);
 
         return function () use ($type, $node, $schema, $callback) {
             $this->fillTypeNode($type, $node, true);
