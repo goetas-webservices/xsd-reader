@@ -1174,11 +1174,6 @@ class SchemaReader
         DOMElement $childNode,
         Closure $callback
     ) {
-        $methods = [
-            'complexType' => 'loadComplexType',
-            'simpleType' => 'loadSimpleType',
-        ];
-
         /**
          * @var Closure|null $func
          */
