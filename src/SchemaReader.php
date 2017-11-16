@@ -166,6 +166,9 @@ class SchemaReader
                 case 'import':
                     $functions[] = $this->loadImport($schema, $childNode);
                     break;
+                case 'redefine':
+                    $functions[] = $this->loadRedefine($schema, $childNode);
+                    break;
                 case 'element':
                     $functions[] = $this->loadElementDef($schema, $childNode);
                     break;
@@ -643,6 +646,41 @@ class SchemaReader
 
             $element->setType($type);
         }
+    }
+
+    private function loadRedefine(Schema $schema, DOMElement $node)
+    {
+        $base = urldecode($node->ownerDocument->documentURI);
+        $file = UrlUtils::resolveRelativeUrl($base, $node->getAttribute("schemaLocation"));
+
+        if (isset($this->loadedFiles[$file])) {
+            /* @var $redefined Schema */
+            $redefined = clone $this->loadedFiles[$file];
+
+            if($schema->getTargetNamespace() != $redefined->getTargetNamespace()){
+                $redefined->setTargetNamespace($schema->getTargetNamespace());
+            }
+
+            $schema->addSchema($redefined);
+
+            $callbacks = $this->schemaNode($redefined, $node, $schema);
+        }
+        else{
+            $redefined = new Schema();
+            $redefined->addSchema($this->getGlobalSchema());
+
+            $xml = $this->getDOM(isset($this->knownLocationSchemas[$file]) ? $this->knownLocationSchemas[$file] : $file);
+
+            $callbacks = $this->schemaNode($redefined, $xml->documentElement, $schema);
+
+            $schema->addSchema($redefined);
+        }
+
+        return function () use ($callbacks) {
+            foreach ($callbacks as $callback) {
+                call_user_func($callback);
+            }
+        };
     }
 
     private function loadImport(Schema $schema, DOMElement $node)
