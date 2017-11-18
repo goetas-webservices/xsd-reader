@@ -5,6 +5,8 @@ namespace GoetasWebservices\XML\XSDReader;
 use DOMDocument;
 use DOMElement;
 use DOMNode;
+use GoetasWebservices\XML\XSDReader\Documentation\DocumentationReader;
+use GoetasWebservices\XML\XSDReader\Documentation\StandardDocumentationReader;
 use GoetasWebservices\XML\XSDReader\Exception\IOException;
 use GoetasWebservices\XML\XSDReader\Exception\TypeException;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Attribute;
@@ -36,6 +38,11 @@ class SchemaReader
 
     const XML_NS = 'http://www.w3.org/XML/1998/namespace';
 
+    /**
+     * @var DocumentationReader
+     */
+    private $documentationReader;
+
     private $loadedFiles = array();
 
     private $knownLocationSchemas = array();
@@ -45,8 +52,13 @@ class SchemaReader
         self::XSD_NS => 'http://www.w3.org/2001/XMLSchema.xsd',
     );
 
-    public function __construct()
+    public function __construct(DocumentationReader $documentationReader = null)
     {
+        if (null === $documentationReader) {
+            $documentationReader = new StandardDocumentationReader();
+        }
+        $this->documentationReader = $documentationReader;
+
         $this->addKnownSchemaLocation('http://www.w3.org/2001/xml.xsd', __DIR__.'/Resources/xml.xsd');
         $this->addKnownSchemaLocation('http://www.w3.org/2001/XMLSchema.xsd', __DIR__.'/Resources/XMLSchema.xsd');
         $this->addKnownSchemaLocation('http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd', __DIR__.'/Resources/oasis-200401-wss-wssecurity-secext-1.0.xsd');
@@ -124,19 +136,7 @@ class SchemaReader
      */
     private function getDocumentation(DOMElement $node)
     {
-        $doc = '';
-        foreach ($node->childNodes as $childNode) {
-            if ($childNode->localName == 'annotation') {
-                foreach ($childNode->childNodes as $subChildNode) {
-                    if ($subChildNode->localName == 'documentation') {
-                        $doc .= ($subChildNode->nodeValue);
-                    }
-                }
-            }
-        }
-        $doc = preg_replace('/[\t ]+/', ' ', $doc);
-
-        return trim($doc);
+        return $this->documentationReader->get($node);
     }
 
     /**

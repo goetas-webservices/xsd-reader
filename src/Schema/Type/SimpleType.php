@@ -36,7 +36,7 @@ class SimpleType extends Type
         return $this;
     }
 
-    public function addUnion(SimpleType $type)
+    public function addUnion(self $type)
     {
         $this->unions[] = $type;
 
@@ -56,7 +56,7 @@ class SimpleType extends Type
         return $this->list;
     }
 
-    public function setList(SimpleType $list)
+    public function setList(self $list)
     {
         $this->list = $list;
 

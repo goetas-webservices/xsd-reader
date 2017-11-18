@@ -111,7 +111,7 @@ class Schema
         $this->elements[$element->getName()] = $element;
     }
 
-    public function addSchema(Schema $schema, $namespace = null)
+    public function addSchema(self $schema, $namespace = null)
     {
         if ($namespace !== null && $schema->getTargetNamespace() !== $namespace) {
             throw new SchemaException(sprintf("The target namespace ('%s') for schema, does not match the declared namespace '%s'", $schema->getTargetNamespace(), $namespace));
