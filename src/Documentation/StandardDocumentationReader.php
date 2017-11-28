@@ -7,7 +7,7 @@ use DOMElement;
 class StandardDocumentationReader implements DocumentationReader
 {
     /**
-    * {@inheritdoc}
+    * @return string
     */
     public function get(DOMElement $node)
     {

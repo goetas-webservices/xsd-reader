@@ -10,7 +10,7 @@ interface SchemaItem
     public function getSchema();
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDoc();
 }

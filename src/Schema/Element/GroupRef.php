@@ -82,6 +82,9 @@ class GroupRef extends Group implements InterfaceSetMinMax
     {
         $elements = $this->wrapped->getElements();
         if ($this->getMax() > 0 || $this->getMax() === -1) {
+            /**
+            * @var string $k
+            */
             foreach ($elements as $k => $element) {
                 /**
                  * @var Element|ElementRef|ElementSingle|GroupRef $e

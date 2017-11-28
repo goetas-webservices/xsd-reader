@@ -1050,9 +1050,6 @@ class SchemaReader
     }
 
     /**
-     * @param string $file
-     * @param string $namespace
-     *
      * @return Closure
      */
     private function loadImport(
@@ -1194,27 +1191,6 @@ class SchemaReader
     protected $globalSchema;
 
     /**
-     * @return Schema[]
-     */
-    private function setupGlobalSchemas(array &$callbacks)
-    {
-        $globalSchemas = array();
-        foreach (self::$globalSchemaInfo as $namespace => $uri) {
-            $this->setLoadedFile(
-                $uri,
-                $globalSchemas[$namespace] = $schema = new Schema()
-            );
-            if ($namespace === self::XSD_NS) {
-                $this->globalSchema = $schema;
-            }
-            $xml = $this->getDOM($this->knownLocationSchemas[$uri]);
-            $callbacks = array_merge($callbacks, $this->schemaNode($schema, $xml->documentElement));
-        }
-
-        return $globalSchemas;
-    }
-
-    /**
      * @return string[]
      */
     public function getGlobalSchemaInfo()
@@ -1229,17 +1205,31 @@ class SchemaReader
     {
         if (!$this->globalSchema) {
             $callbacks = array();
-            $globalSchemas = $this->setupGlobalSchemas($callbacks);
+            $globalSchemas = array();
+            /**
+            * @var string $namespace
+            */
+            foreach (self::$globalSchemaInfo as $namespace => $uri) {
+                $this->setLoadedFile(
+                    $uri,
+                    $globalSchemas[$namespace] = $schema = new Schema()
+                );
+                if ($namespace === self::XSD_NS) {
+                    $this->globalSchema = $schema;
+                }
+                $xml = $this->getDOM($this->knownLocationSchemas[$uri]);
+                $callbacks = array_merge($callbacks, $this->schemaNode($schema, $xml->documentElement));
+            }
 
-            $globalSchemas[static::XSD_NS]->addType(new SimpleType($globalSchemas[static::XSD_NS], 'anySimpleType'));
-            $globalSchemas[static::XSD_NS]->addType(new SimpleType($globalSchemas[static::XSD_NS], 'anyType'));
+            $globalSchemas[(string) static::XSD_NS]->addType(new SimpleType($globalSchemas[(string) static::XSD_NS], 'anySimpleType'));
+            $globalSchemas[(string) static::XSD_NS]->addType(new SimpleType($globalSchemas[(string) static::XSD_NS], 'anyType'));
 
-            $globalSchemas[static::XML_NS]->addSchema(
-                $globalSchemas[static::XSD_NS],
+            $globalSchemas[(string) static::XML_NS]->addSchema(
+                $globalSchemas[(string) static::XSD_NS],
                 (string) static::XSD_NS
             );
-            $globalSchemas[static::XSD_NS]->addSchema(
-                $globalSchemas[static::XML_NS],
+            $globalSchemas[(string) static::XSD_NS]->addSchema(
+                $globalSchemas[(string) static::XML_NS],
                 (string) static::XML_NS
             );
 

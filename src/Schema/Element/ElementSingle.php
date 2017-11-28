@@ -5,7 +5,7 @@ namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 interface ElementSingle extends ElementItem, InterfaceSetMinMax
 {
     /**
-     * @return \GoetasWebservices\XML\XSDReader\Schema\Type\Type
+     * @return \GoetasWebservices\XML\XSDReader\Schema\Type\Type|null
      */
     public function getType();
 

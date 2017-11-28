@@ -11,7 +11,7 @@ interface AttributeSingle extends AttributeItem
     const USE_REQUIRED = 'required';
 
     /**
-     * @return \GoetasWebservices\XML\XSDReader\Schema\Type\Type
+     * @return \GoetasWebservices\XML\XSDReader\Schema\Type\Type|null
      */
     public function getType();
 

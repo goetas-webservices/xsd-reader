@@ -63,7 +63,6 @@ class Schema
      * @param string   $name
      * @param string   $namespace
      * @param bool[]   $calling
-     * @param bool     $throw
      *
      * @return SchemaItem|null
      */
@@ -94,7 +93,6 @@ class Schema
      * @param string $name
      * @param string $namespace
      * @param bool[] $calling
-     * @param bool   $throw
      *
      * @throws TypeNotFoundException
      *
