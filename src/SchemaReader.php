@@ -34,7 +34,6 @@ use GoetasWebservices\XML\XSDReader\Schema\Type\ComplexTypeSimpleContent;
 use GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType;
 use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
 use GoetasWebservices\XML\XSDReader\Utils\UrlUtils;
-use RuntimeException;
 
 class SchemaReader
 {
@@ -335,7 +334,6 @@ class SchemaReader
 
         return $ref;
     }
-
 
     /**
      * @return ElementRef
