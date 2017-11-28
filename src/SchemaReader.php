@@ -1101,13 +1101,13 @@ class SchemaReader
 
         $keys = $this->loadImportFreshKeys($namespace, $file);
 
-        if (
-            self::hasLoadedFile(...$keys)
-        ) {
-            $schema->addSchema(self::getLoadedFile(...$keys));
+        foreach ($keys as $key) {
+            if (isset(self::$loadedFiles[$key])) {
+                $schema->addSchema(self::$loadedFiles[$key]);
 
             return function () {
             };
+            }
         }
 
         return $this->loadImportFresh($namespace, $schema, $file);
@@ -1117,7 +1117,7 @@ class SchemaReader
      * @param string $namespace
      * @param string $file
      *
-     * @return mixed[]
+     * @return string[]
      */
     private function loadImportFreshKeys(
         $namespace,
@@ -1481,40 +1481,6 @@ class SchemaReader
          */
         $attribute = $this->findSomething('findAttributeGroup', $schema, $node, $childNode->getAttribute('ref'));
         $addToThis->addAttribute($attribute);
-    }
-
-    /**
-     * @param string ...$keys
-     *
-     * @return bool
-     */
-    private static function hasLoadedFile(...$keys)
-    {
-        foreach ($keys as $key) {
-            if (isset(self::$loadedFiles[$key])) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @param string ...$keys
-     *
-     * @return Schema
-     *
-     * @throws RuntimeException if loaded file not found
-     */
-    public static function getLoadedFile(...$keys)
-    {
-        foreach ($keys as $key) {
-            if (isset(self::$loadedFiles[$key])) {
-                return self::$loadedFiles[$key];
-            }
-        }
-
-        throw new RuntimeException('Loaded file was not found!');
     }
 
     /**
