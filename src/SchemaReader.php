@@ -95,7 +95,7 @@ class SchemaReader
         DOMElement $node
     ) {
         $attGroup = new AttributeGroup($schema, $node->getAttribute('name'));
-        $attGroup->setDoc(self::getDocumentation($node));
+        $attGroup->setDoc($this->getDocumentation($node));
         $schema->addAttributeGroup($attGroup);
 
         return function () use ($schema, $node, $attGroup) {
@@ -162,7 +162,7 @@ class SchemaReader
         DOMElement $node
     ) {
         $attribute = new Attribute($schema, $node->getAttribute('name'));
-        $attribute->setDoc(self::getDocumentation($node));
+        $attribute->setDoc($this->getDocumentation($node));
         $this->fillItem($attribute, $node);
 
         if ($node->hasAttribute('nillable')) {
@@ -215,7 +215,7 @@ class SchemaReader
      *
      * @return string
      */
-    private static function getDocumentation(DOMElement $node)
+    private function getDocumentation(DOMElement $node)
     {
         $doc = '';
         static::againstDOMNodeList(
@@ -227,7 +227,7 @@ class SchemaReader
                 &$doc
             ) {
                 if ($childNode->localName == 'annotation') {
-                    $doc .= static::getDocumentation($childNode);
+                    $doc .= $this->getDocumentation($childNode);
                 } elseif ($childNode->localName == 'documentation') {
                     $doc .= $childNode->nodeValue;
                 }
@@ -301,7 +301,7 @@ class SchemaReader
     private function loadGroupRef(Group $referenced, DOMElement $node)
     {
         $ref = new GroupRef($referenced);
-        $ref->setDoc(self::getDocumentation($node));
+        $ref->setDoc($this->getDocumentation($node));
 
         self::maybeSetMax($ref, $node);
         self::maybeSetMin($ref, $node);
@@ -330,28 +330,6 @@ class SchemaReader
     {
         if ($node->hasAttribute('minOccurs')) {
             $ref->setMin((int) $node->getAttribute('minOccurs'));
-        }
-
-        return $ref;
-    }
-
-    /**
-     * @return ElementRef
-     */
-    private static function loadElementRef(
-        ElementDef $referenced,
-        DOMElement $node
-    ) {
-        $ref = new ElementRef($referenced);
-        $ref->setDoc(self::getDocumentation($node));
-
-        self::maybeSetMax($ref, $node);
-        self::maybeSetMin($ref, $node);
-        if ($node->hasAttribute('nillable')) {
-            $ref->setNil($node->getAttribute('nillable') == 'true');
-        }
-        if ($node->hasAttribute('form')) {
-            $ref->setQualified($node->getAttribute('form') == 'qualified');
         }
 
         return $ref;
@@ -442,10 +420,17 @@ class SchemaReader
              * @var ElementDef $referencedElement
              */
             $referencedElement = $this->findSomething('findElement', $elementContainer->getSchema(), $node, $childNode->getAttribute('ref'));
-            $element = static::loadElementRef(
-                $referencedElement,
-                $childNode
-            );
+            $element = new ElementRef($referencedElement);
+            $element->setDoc($this->getDocumentation($childNode));
+
+            self::maybeSetMax($element, $childNode);
+            self::maybeSetMin($element, $childNode);
+            if ($childNode->hasAttribute('nillable')) {
+                $element->setNil($childNode->getAttribute('nillable') == 'true');
+            }
+            if ($childNode->hasAttribute('form')) {
+                $element->setQualified($childNode->getAttribute('form') == 'qualified');
+            }
         } else {
             $element = $this->loadElement(
                 $elementContainer->getSchema(),
@@ -488,36 +473,8 @@ class SchemaReader
      */
     private function loadGroup(Schema $schema, DOMElement $node)
     {
-        $group = static::loadGroupBeforeCheckingChildNodes(
-            $schema,
-            $node
-        );
-
-        return function () use ($group, $node) {
-            static::againstDOMNodeList(
-                $node,
-                function (DOMelement $node, DOMElement $childNode) use ($group) {
-                    switch ($childNode->localName) {
-                        case 'sequence':
-                        case 'choice':
-                        case 'all':
-                            $this->loadSequence($group, $childNode);
-                            break;
-                    }
-                }
-            );
-        };
-    }
-
-    /**
-     * @return Group|GroupRef
-     */
-    private static function loadGroupBeforeCheckingChildNodes(
-        Schema $schema,
-        DOMElement $node
-    ) {
         $group = new Group($schema, $node->getAttribute('name'));
-        $group->setDoc(self::getDocumentation($node));
+        $group->setDoc($this->getDocumentation($node));
 
         if ($node->hasAttribute('maxOccurs')) {
             /**
@@ -537,7 +494,20 @@ class SchemaReader
 
         $schema->addGroup($group);
 
-        return $group;
+        return function () use ($group, $node) {
+            static::againstDOMNodeList(
+                $node,
+                function (DOMelement $node, DOMElement $childNode) use ($group) {
+                    switch ($childNode->localName) {
+                        case 'sequence':
+                        case 'choice':
+                        case 'all':
+                            $this->loadSequence($group, $childNode);
+                            break;
+                    }
+                }
+            );
+        };
     }
 
     /**
@@ -571,7 +541,7 @@ class SchemaReader
 
         $type = $isSimple ? new ComplexTypeSimpleContent($schema, $node->getAttribute('name')) : new ComplexType($schema, $node->getAttribute('name'));
 
-        $type->setDoc(static::getDocumentation($node));
+        $type->setDoc($this->getDocumentation($node));
         if ($node->getAttribute('name')) {
             $schema->addType($type);
         }
@@ -659,7 +629,7 @@ class SchemaReader
     private function loadSimpleType(Schema $schema, DOMElement $node, $callback = null)
     {
         $type = new SimpleType($schema, $node->getAttribute('name'));
-        $type->setDoc(static::getDocumentation($node));
+        $type->setDoc($this->getDocumentation($node));
         if ($node->getAttribute('name')) {
             $schema->addType($type);
         }
@@ -950,7 +920,7 @@ class SchemaReader
                         $childNode->localName,
                         [
                             'value' => $childNode->getAttribute('value'),
-                            'doc' => self::getDocumentation($childNode),
+                            'doc' => $this->getDocumentation($childNode),
                         ]
                     );
                 }
@@ -1429,7 +1399,7 @@ class SchemaReader
         DOMElement $node
     ) {
         $element = new Element($schema, $node->getAttribute('name'));
-        $element->setDoc(self::getDocumentation($node));
+        $element->setDoc($this->getDocumentation($node));
 
         $this->fillItem($element, $node);
 
@@ -1498,7 +1468,7 @@ class SchemaReader
         DOMElement $node,
         Schema $parent = null
     ) {
-        $schema->setDoc(self::getDocumentation($node));
+        $schema->setDoc($this->getDocumentation($node));
 
         if ($node->hasAttribute('targetNamespace')) {
             $schema->setTargetNamespace($node->getAttribute('targetNamespace'));
@@ -1507,6 +1477,6 @@ class SchemaReader
         }
         $schema->setElementsQualification($node->getAttribute('elementFormDefault') == 'qualified');
         $schema->setAttributesQualification($node->getAttribute('attributeFormDefault') == 'qualified');
-        $schema->setDoc(self::getDocumentation($node));
+        $schema->setDoc($this->getDocumentation($node));
     }
 }
