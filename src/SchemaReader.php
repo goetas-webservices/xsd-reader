@@ -6,6 +6,8 @@ use Closure;
 use DOMDocument;
 use DOMElement;
 use DOMNode;
+use GoetasWebservices\XML\XSDReader\Documentation\DocumentationReader;
+use GoetasWebservices\XML\XSDReader\Documentation\StandardDocumentationReader;
 use GoetasWebservices\XML\XSDReader\Exception\IOException;
 use GoetasWebservices\XML\XSDReader\Exception\TypeException;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Attribute;
@@ -40,6 +42,11 @@ class SchemaReader
     const XSD_NS = 'http://www.w3.org/2001/XMLSchema';
 
     const XML_NS = 'http://www.w3.org/XML/1998/namespace';
+
+    /**
+     * @var DocumentationReader
+     */
+    private $documentationReader;
 
     /**
      * @var Schema[]
@@ -77,6 +84,14 @@ class SchemaReader
         self::XML_NS => 'http://www.w3.org/2001/xml.xsd',
         self::XSD_NS => 'http://www.w3.org/2001/XMLSchema.xsd',
     );
+
+    public function __construct(DocumentationReader $documentationReader = null)
+    {
+        if (null === $documentationReader) {
+            $documentationReader = new StandardDocumentationReader();
+        }
+        $this->documentationReader = $documentationReader;
+    }
 
     /**
      * @param string $remote
@@ -217,25 +232,7 @@ class SchemaReader
      */
     private function getDocumentation(DOMElement $node)
     {
-        $doc = '';
-        static::againstDOMNodeList(
-            $node,
-            function (
-                DOMElement $node,
-                DOMElement $childNode
-            ) use (
-                &$doc
-            ) {
-                if ($childNode->localName == 'annotation') {
-                    $doc .= $this->getDocumentation($childNode);
-                } elseif ($childNode->localName == 'documentation') {
-                    $doc .= $childNode->nodeValue;
-                }
-            }
-        );
-        $doc = preg_replace('/[\t ]+/', ' ', $doc);
-
-        return trim($doc);
+        return $this->documentationReader->get($node);
     }
 
     /**
