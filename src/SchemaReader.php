@@ -1105,8 +1105,8 @@ class SchemaReader
             if (isset(self::$loadedFiles[$key])) {
                 $schema->addSchema(self::$loadedFiles[$key]);
 
-            return function () {
-            };
+                return function () {
+                };
             }
         }
 
