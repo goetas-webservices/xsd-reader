@@ -7,20 +7,20 @@ use DOMElement;
 class StandardDocumentationReader implements DocumentationReader
 {
     /**
-    * @return string
-    */
+     * @return string
+     */
     public function get(DOMElement $node)
     {
         $doc = '';
 
         /**
-        * @var \DOMNode $childNode
-        */
+         * @var \DOMNode $childNode
+         */
         foreach ($node->childNodes as $childNode) {
             if ($childNode instanceof DOMElement && $childNode->localName == 'annotation') {
                 /**
-                * @var \DOMNode $subChildNode
-                */
+                 * @var \DOMNode $subChildNode
+                 */
                 foreach ($childNode->childNodes as $subChildNode) {
                     if ($subChildNode instanceof DOMElement && $subChildNode->localName == 'documentation') {
                         $doc .= ($subChildNode->nodeValue);

@@ -7,7 +7,7 @@ use DOMElement;
 interface DocumentationReader
 {
     /**
-    * @return string
-    */
+     * @return string
+     */
     public function get(DOMElement $node);
 }

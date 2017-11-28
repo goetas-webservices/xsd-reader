@@ -1207,8 +1207,8 @@ class SchemaReader
             $callbacks = array();
             $globalSchemas = array();
             /**
-            * @var string $namespace
-            */
+             * @var string $namespace
+             */
             foreach (self::$globalSchemaInfo as $namespace => $uri) {
                 $this->setLoadedFile(
                     $uri,
