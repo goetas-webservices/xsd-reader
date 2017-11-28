@@ -780,26 +780,6 @@ class SchemaReader
     }
 
     /**
-     * @param string $remote
-     *
-     * @return bool
-     */
-    private function hasKnownSchemaLocation($remote)
-    {
-        return isset($this->knownLocationSchemas[$remote]);
-    }
-
-    /**
-     * @param string $remote
-     *
-     * @return string
-     */
-    private function getKnownSchemaLocation($remote)
-    {
-        return $this->knownLocationSchemas[$remote];
-    }
-
-    /**
      * @param DOMElement $node
      *
      * @return string
@@ -1302,8 +1282,8 @@ class SchemaReader
                 $file
             ),
             $this->getDOM(
-                $this->hasKnownSchemaLocation($file)
-                    ? $this->getKnownSchemaLocation($file)
+                isset($this->knownLocationSchemas[$file])
+                    ? $this->knownLocationSchemas[$file]
                     : $file
             )->documentElement,
             $schema
