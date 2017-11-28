@@ -45,7 +45,7 @@ class SchemaReader
     /**
      * @var Schema[]
      */
-    protected static $loadedFiles = array();
+    private $loadedFiles = array();
 
     /**
      * @var string[]
@@ -1102,8 +1102,8 @@ class SchemaReader
         $keys = $this->loadImportFreshKeys($namespace, $file);
 
         foreach ($keys as $key) {
-            if (isset(self::$loadedFiles[$key])) {
-                $schema->addSchema(self::$loadedFiles[$key]);
+            if (isset($this->loadedFiles[$key])) {
+                $schema->addSchema($this->loadedFiles[$key]);
 
                 return function () {
                 };
@@ -1155,7 +1155,7 @@ class SchemaReader
         /**
          * @var Schema $newSchema
          */
-        $newSchema = self::setLoadedFile(
+        $newSchema = $this->setLoadedFile(
             $file,
             ($namespace ? new Schema() : $schema)
         );
@@ -1235,7 +1235,7 @@ class SchemaReader
     {
         $globalSchemas = array();
         foreach (self::$globalSchemaInfo as $namespace => $uri) {
-            self::setLoadedFile(
+            $this->setLoadedFile(
                 $uri,
                 $globalSchemas[$namespace] = $schema = new Schema()
             );
@@ -1303,7 +1303,7 @@ class SchemaReader
     private function readNode(DOMElement $node, $file = 'schema.xsd')
     {
         $fileKey = $node->hasAttribute('targetNamespace') ? $this->getNamespaceSpecificFileIndex($file, $node->getAttribute('targetNamespace')) : $file;
-        self::setLoadedFile($fileKey, $rootSchema = new Schema());
+        $this->setLoadedFile($fileKey, $rootSchema = new Schema());
 
         $rootSchema->addSchema($this->getGlobalSchema());
         $callbacks = $this->schemaNode($rootSchema, $node);
@@ -1488,9 +1488,9 @@ class SchemaReader
      *
      * @return Schema
      */
-    private static function setLoadedFile($key, Schema $schema)
+    private function setLoadedFile($key, Schema $schema)
     {
-        self::$loadedFiles[$key] = $schema;
+        $this->loadedFiles[$key] = $schema;
 
         return $schema;
     }
