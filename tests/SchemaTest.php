@@ -37,7 +37,7 @@ class SchemaTest extends BaseTest
     {
         $schema = $this->reader->readString('<xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema"/>');
 
-        $this->setExpectedException('GoetasWebservices\XML\XSDReader\Schema\Exception\TypeNotFoundException');
+        $this->expectException('GoetasWebservices\XML\XSDReader\Schema\Exception\TypeNotFoundException');
         $schema->$find('foo');
     }
 
@@ -118,7 +118,7 @@ class SchemaTest extends BaseTest
                 <xs:complexType>
                     <xs:group ref="myGroup"/>
                 </xs:complexType>
-            </xs:element>            
+            </xs:element>
             <xs:group name="myGroup">
                 <xs:choice>
                     <xs:element name="groupElement" type="xs:string"/>

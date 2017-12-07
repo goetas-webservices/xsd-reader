@@ -3,8 +3,9 @@
 namespace GoetasWebservices\XML\XSDReader\Tests\Documentation;
 
 use GoetasWebservices\XML\XSDReader\Documentation\StandardDocumentationReader;
+use PHPUnit\Framework\TestCase;
 
-class StandardDocumentationReaderTest extends \PHPUnit_Framework_TestCase
+class StandardDocumentationReaderTest extends TestCase
 {
     /**
      * @var StandardDocumentationReader

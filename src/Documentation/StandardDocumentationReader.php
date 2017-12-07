@@ -6,13 +6,23 @@ use DOMElement;
 
 class StandardDocumentationReader implements DocumentationReader
 {
+    /**
+     * @return string
+     */
     public function get(DOMElement $node)
     {
         $doc = '';
+
+        /**
+         * @var \DOMNode $childNode
+         */
         foreach ($node->childNodes as $childNode) {
-            if ($childNode->localName == 'annotation') {
+            if ($childNode instanceof DOMElement && $childNode->localName == 'annotation') {
+                /**
+                 * @var \DOMNode $subChildNode
+                 */
                 foreach ($childNode->childNodes as $subChildNode) {
-                    if ($subChildNode->localName == 'documentation') {
+                    if ($subChildNode instanceof DOMElement && $subChildNode->localName == 'documentation') {
                         $doc .= ($subChildNode->nodeValue);
                     }
                 }

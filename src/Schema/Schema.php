@@ -14,88 +14,260 @@ use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
 
 class Schema
 {
+    /**
+     * @param string $getter
+     * @param string $name
+     * @param string $namespace
+     * @param bool[] $calling
+     *
+     * @return SchemaItem|null
+     */
+    protected function findSomethingNoThrow(
+        $getter,
+        $name,
+        $namespace = null,
+        array &$calling = array()
+    ) {
+        $calling[spl_object_hash($this)] = true;
+        $cid = "$getter, $name, $namespace";
+
+        if (isset($this->typeCache[$cid])) {
+            return $this->typeCache[$cid];
+        } elseif (
+            $this->getTargetNamespace() === $namespace
+        ) {
+            /**
+             * @var SchemaItem|null
+             */
+            $item = $this->$getter($name);
+
+            if ($item instanceof SchemaItem) {
+                return $this->typeCache[$cid] = $item;
+            }
+        }
+
+        return $this->findSomethingNoThrowSchemas(
+            $this->getSchemas(),
+            $cid,
+            $getter,
+            $name,
+            $namespace,
+            $calling
+        );
+    }
+
+    /**
+     * @param Schema[] $schemas
+     * @param string   $cid
+     * @param string   $getter
+     * @param string   $name
+     * @param string   $namespace
+     * @param bool[]   $calling
+     *
+     * @return SchemaItem|null
+     */
+    protected function findSomethingNoThrowSchemas(
+        array $schemas,
+        $cid,
+        $getter,
+        $name,
+        $namespace = null,
+        array &$calling = array()
+    ) {
+        foreach ($schemas as $childSchema) {
+            if (!isset($calling[spl_object_hash($childSchema)])) {
+                /**
+                 * @var SchemaItem|null
+                 */
+                $in = $childSchema->findSomethingNoThrow($getter, $name, $namespace, $calling);
+
+                if ($in instanceof SchemaItem) {
+                    return $this->typeCache[$cid] = $in;
+                }
+            }
+        }
+    }
+
+    /**
+     * @param string $getter
+     * @param string $name
+     * @param string $namespace
+     * @param bool[] $calling
+     *
+     * @throws TypeNotFoundException
+     *
+     * @return SchemaItem
+     */
+    protected function findSomething($getter, $name, $namespace = null, &$calling = array())
+    {
+        $in = $this->findSomethingNoThrow(
+            $getter,
+            $name,
+            $namespace,
+            $calling
+        );
+
+        if ($in instanceof SchemaItem) {
+            return $in;
+        }
+
+        throw new TypeNotFoundException(sprintf("Can't find the %s named {%s}#%s.", substr($getter, 3), $namespace, $name));
+    }
+
+    /**
+     * @var bool
+     */
     protected $elementsQualification = false;
 
+    /**
+     * @var bool
+     */
     protected $attributesQualification = false;
 
+    /**
+     * @var string|null
+     */
     protected $targetNamespace;
 
+    /**
+     * @var Schema[]
+     */
     protected $schemas = array();
 
+    /**
+     * @var Type[]
+     */
     protected $types = array();
 
+    /**
+     * @var ElementDef[]
+     */
     protected $elements = array();
 
+    /**
+     * @var Group[]
+     */
     protected $groups = array();
 
+    /**
+     * @var AttributeGroup[]
+     */
     protected $attributeGroups = array();
 
+    /**
+     * @var AttributeDef[]
+     */
     protected $attributes = array();
 
+    /**
+     * @var string|null
+     */
     protected $doc;
 
-    private $typeCache = array();
+    /**
+     * @var \GoetasWebservices\XML\XSDReader\Schema\SchemaItem[]
+     */
+    protected $typeCache = array();
 
+    /**
+     * @return bool
+     */
     public function getElementsQualification()
     {
         return $this->elementsQualification;
     }
 
+    /**
+     * @param bool $elementsQualification
+     */
     public function setElementsQualification($elementsQualification)
     {
         $this->elementsQualification = $elementsQualification;
     }
 
+    /**
+     * @return bool
+     */
     public function getAttributesQualification()
     {
         return $this->attributesQualification;
     }
 
+    /**
+     * @param bool $attributesQualification
+     */
     public function setAttributesQualification($attributesQualification)
     {
         $this->attributesQualification = $attributesQualification;
     }
 
+    /**
+     * @return string|null
+     */
     public function getTargetNamespace()
     {
         return $this->targetNamespace;
     }
 
+    /**
+     * @param string|null $targetNamespace
+     */
     public function setTargetNamespace($targetNamespace)
     {
         $this->targetNamespace = $targetNamespace;
     }
 
+    /**
+     * @return Type[]
+     */
     public function getTypes()
     {
         return $this->types;
     }
 
+    /**
+     * @return ElementDef[]
+     */
     public function getElements()
     {
         return $this->elements;
     }
 
+    /**
+     * @return Schema[]
+     */
     public function getSchemas()
     {
         return $this->schemas;
     }
 
+    /**
+     * @return AttributeDef[]
+     */
     public function getAttributes()
     {
         return $this->attributes;
     }
 
+    /**
+     * @return Group[]
+     */
     public function getGroups()
     {
         return $this->groups;
     }
 
+    /**
+     * @return string|null
+     */
     public function getDoc()
     {
         return $this->doc;
     }
 
+    /**
+     * @param string $doc
+     */
     public function setDoc($doc)
     {
         $this->doc = $doc;
@@ -111,13 +283,21 @@ class Schema
         $this->elements[$element->getName()] = $element;
     }
 
+    /**
+     * @param string|null $namespace
+     */
     public function addSchema(self $schema, $namespace = null)
     {
-        if ($namespace !== null && $schema->getTargetNamespace() !== $namespace) {
-            throw new SchemaException(sprintf("The target namespace ('%s') for schema, does not match the declared namespace '%s'", $schema->getTargetNamespace(), $namespace));
-        }
-
         if ($namespace !== null) {
+            if ($schema->getTargetNamespace() !== $namespace) {
+                throw new SchemaException(
+                    sprintf(
+                        "The target namespace ('%s') for schema, does not match the declared namespace '%s'",
+                        $schema->getTargetNamespace(),
+                        $namespace
+                    )
+                );
+            }
             $this->schemas[$namespace] = $schema;
         } else {
             $this->schemas[] = $schema;
@@ -139,6 +319,9 @@ class Schema
         $this->attributeGroups[$group->getName()] = $group;
     }
 
+    /**
+     * @return AttributeGroup[]
+     */
     public function getAttributeGroups()
     {
         return $this->attributeGroups;
@@ -220,40 +403,6 @@ class Schema
     }
 
     /**
-     * @param string $getter
-     * @param string $name
-     * @param string $namespace
-     *
-     * @throws TypeNotFoundException
-     *
-     * @return \GoetasWebservices\XML\XSDReader\Schema\SchemaItem
-     */
-    protected function findSomething($getter, $name, $namespace = null, &$calling = array())
-    {
-        $calling[spl_object_hash($this)] = true;
-        $cid = "$getter, $name, $namespace";
-
-        if (isset($this->typeCache[$cid])) {
-            return $this->typeCache[$cid];
-        }
-
-        if (null === $namespace || $this->getTargetNamespace() === $namespace) {
-            if ($item = $this->$getter($name)) {
-                return $this->typeCache[$cid] = $item;
-            }
-        }
-        foreach ($this->getSchemas() as $childSchema) {
-            if (!isset($calling[spl_object_hash($childSchema)])) {
-                try {
-                    return $this->typeCache[$cid] = $childSchema->findSomething($getter, $name, $namespace, $calling);
-                } catch (TypeNotFoundException $e) {
-                }
-            }
-        }
-        throw new TypeNotFoundException(sprintf("Can't find the %s named {%s}#%s.", substr($getter, 3), $namespace, $name));
-    }
-
-    /**
      * @param string $name
      * @param string $namespace
      *
@@ -261,7 +410,12 @@ class Schema
      */
     public function findType($name, $namespace = null)
     {
-        return $this->findSomething('getType', $name, $namespace);
+        /**
+         * @var Type
+         */
+        $out = $this->findSomething('getType', $name, $namespace);
+
+        return $out;
     }
 
     /**
@@ -272,7 +426,12 @@ class Schema
      */
     public function findGroup($name, $namespace = null)
     {
-        return $this->findSomething('getGroup', $name, $namespace);
+        /**
+         * @var Group
+         */
+        $out = $this->findSomething('getGroup', $name, $namespace);
+
+        return $out;
     }
 
     /**
@@ -283,18 +442,28 @@ class Schema
      */
     public function findElement($name, $namespace = null)
     {
-        return $this->findSomething('getElement', $name, $namespace);
+        /**
+         * @var ElementDef
+         */
+        $out = $this->findSomething('getElement', $name, $namespace);
+
+        return $out;
     }
 
     /**
      * @param string $name
      * @param string $namespace
      *
-     * @return AttributeReal
+     * @return AttributeItem
      */
     public function findAttribute($name, $namespace = null)
     {
-        return $this->findSomething('getAttribute', $name, $namespace);
+        /**
+         * @var AttributeItem
+         */
+        $out = $this->findSomething('getAttribute', $name, $namespace);
+
+        return $out;
     }
 
     /**
@@ -305,6 +474,11 @@ class Schema
      */
     public function findAttributeGroup($name, $namespace = null)
     {
-        return $this->findSomething('getAttributeGroup', $name, $namespace);
+        /**
+         * @var AttributeGroup
+         */
+        $out = $this->findSomething('getAttributeGroup', $name, $namespace);
+
+        return $out;
     }
 }
