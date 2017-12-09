@@ -6,23 +6,11 @@ namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
 interface InterfaceSetMinMax
 {
-    /**
-     * @return int
-     */
-    public function getMin();
+    public function getMin() : int;
 
-    /**
-     * @param int $min
-     */
-    public function setMin($min);
+    public function setMin(int $min);
 
-    /**
-     * @return int
-     */
-    public function getMax();
+    public function getMax() : int;
 
-    /**
-     * @param int $max
-     */
-    public function setMax($max);
+    public function setMax(int $max);
 }

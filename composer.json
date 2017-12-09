@@ -48,7 +48,6 @@
         "tests": [
             "php ./vendor/phpunit/phpunit/phpunit -v",
             "php ./vendor/phpstan/phpstan/bin/phpstan analyse -c ./phpstan.neon src",
-            "psalm",
             "php ./vendor/sebastian/phpcpd/phpcpd ./src/"
         ]
     }

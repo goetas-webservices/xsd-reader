@@ -10,5 +10,8 @@ interface AttributeContainer extends SchemaItem
 {
     public function addAttribute(AttributeItem $attribute);
 
-    public function getAttributes();
+    /**
+     * @return AttributeItem[]
+     */
+    public function getAttributes() : array;
 }

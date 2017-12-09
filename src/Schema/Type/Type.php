@@ -34,10 +34,7 @@ abstract class Type implements SchemaItem
      */
     protected $extension;
 
-    /**
-     * @param string|null $name
-     */
-    public function __construct(Schema $schema, $name = null)
+    public function __construct(Schema $schema, string $name = null)
     {
         $this->name = $name ?: null;
         $this->schema = $schema;
@@ -51,25 +48,20 @@ abstract class Type implements SchemaItem
         return $this->name;
     }
 
-    public function __toString()
+    public function __toString() : string
     {
         return strval($this->name);
     }
 
-    /**
-     * @return bool
-     */
-    public function isAbstract()
+    public function isAbstract() : bool
     {
         return $this->abstract;
     }
 
     /**
-     * @param bool $abstract
-     *
      * @return $this
      */
-    public function setAbstract($abstract)
+    public function setAbstract(bool $abstract) : Type
     {
         $this->abstract = $abstract;
 
@@ -95,7 +87,7 @@ abstract class Type implements SchemaItem
     /**
      * @return $this
      */
-    public function setRestriction(Restriction $restriction)
+    public function setRestriction(Restriction $restriction) : Type
     {
         $this->restriction = $restriction;
 
@@ -113,7 +105,7 @@ abstract class Type implements SchemaItem
     /**
      * @return $this
      */
-    public function setExtension(Extension $extension)
+    public function setExtension(Extension $extension) : Type
     {
         $this->extension = $extension;
 

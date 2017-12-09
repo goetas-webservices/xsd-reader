@@ -11,20 +11,15 @@ trait NamedItemTrait
      */
     protected $name;
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName() : string
     {
         return $this->name;
     }
 
     /**
-     * @param string $name
-     *
      * @return $this
      */
-    public function setName($name)
+    public function setName(string $name)
     {
         $this->name = $name;
 

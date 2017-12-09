@@ -8,8 +8,5 @@ use DOMElement;
 
 interface DocumentationReader
 {
-    /**
-     * @return string
-     */
-    public function get(DOMElement $node);
+    public function get(DOMElement $node) : string;
 }

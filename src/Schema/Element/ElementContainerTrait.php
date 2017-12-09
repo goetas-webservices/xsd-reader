@@ -14,7 +14,7 @@ trait ElementContainerTrait
     /**
      * @return ElementItem[]
      */
-    public function getElements()
+    public function getElements() : array
     {
         return $this->elements;
     }

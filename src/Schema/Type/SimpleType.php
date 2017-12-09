@@ -34,7 +34,7 @@ class SimpleType extends Type
     /**
      * @return $this
      */
-    public function setRestriction(Restriction $restriction)
+    public function setRestriction(Restriction $restriction) : Type
     {
         $this->restriction = $restriction;
 
@@ -44,7 +44,7 @@ class SimpleType extends Type
     /**
      * @return $this
      */
-    public function addUnion(self $type)
+    public function addUnion(self $type) : SimpleType
     {
         $this->unions[] = $type;
 
@@ -54,7 +54,7 @@ class SimpleType extends Type
     /**
      * @return SimpleType[]
      */
-    public function getUnions()
+    public function getUnions() : array
     {
         return $this->unions;
     }
@@ -70,7 +70,7 @@ class SimpleType extends Type
     /**
      * @return $this
      */
-    public function setList(self $list)
+    public function setList(self $list) : SimpleType
     {
         $this->list = $list;
 

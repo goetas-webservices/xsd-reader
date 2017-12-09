@@ -20,7 +20,7 @@ class ElementRef extends AbstractElementSingle
     /**
      * @return ElementDef
      */
-    public function getReferencedElement()
+    public function getReferencedElement() : ElementDef
     {
         return $this->wrapped;
     }

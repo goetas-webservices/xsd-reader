@@ -27,11 +27,9 @@ abstract class AbstractAttributeItem extends Item implements AttributeItem
     }
 
     /**
-     * @param string $fixed
-     *
      * @return $this
      */
-    public function setFixed($fixed)
+    public function setFixed(string $fixed) : AbstractAttributeItem
     {
         $this->fixed = $fixed;
 
@@ -47,11 +45,9 @@ abstract class AbstractAttributeItem extends Item implements AttributeItem
     }
 
     /**
-     * @param string $default
-     *
      * @return $this
      */
-    public function setDefault($default)
+    public function setDefault(string $default) : AbstractAttributeItem
     {
         $this->default = $default;
 

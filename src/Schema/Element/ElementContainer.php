@@ -10,5 +10,8 @@ interface ElementContainer extends SchemaItem
 {
     public function addElement(ElementItem $element);
 
-    public function getElements();
+    /**
+     * @return ElementItem[]
+     */
+    public function getElements() : array;
 }

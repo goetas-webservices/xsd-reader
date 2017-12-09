@@ -16,10 +16,7 @@ abstract class Item implements SchemaItem
      */
     protected $type;
 
-    /**
-     * @param string $name
-     */
-    public function __construct(Schema $schema, $name)
+    public function __construct(Schema $schema, string $name)
     {
         $this->schema = $schema;
         $this->name = $name;
@@ -36,7 +33,7 @@ abstract class Item implements SchemaItem
     /**
      * @return $this
      */
-    public function setType(Type $type)
+    public function setType(Type $type) : Item
     {
         $this->type = $type;
 

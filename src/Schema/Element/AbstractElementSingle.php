@@ -28,80 +28,60 @@ class AbstractElementSingle extends Item implements ElementSingle
      */
     protected $nil = false;
 
-    /**
-     * @return bool
-     */
-    public function isQualified()
+    public function isQualified() : bool
     {
         return $this->qualified;
     }
 
     /**
-     * @param bool $qualified
-     *
      * @return $this
      */
-    public function setQualified($qualified)
+    public function setQualified(bool $qualified) : AbstractElementSingle
     {
         $this->qualified = is_bool($qualified) ? $qualified : (bool) $qualified;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isNil()
+    public function isNil() : bool
     {
         return $this->nil;
     }
 
     /**
-     * @param bool $nil
-     *
      * @return $this
      */
-    public function setNil($nil)
+    public function setNil(bool $nil) : AbstractElementSingle
     {
         $this->nil = is_bool($nil) ? $nil : (bool) $nil;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getMin()
+    public function getMin() : int
     {
         return $this->min;
     }
 
     /**
-     * @param int $min
-     *
      * @return $this
      */
-    public function setMin($min)
+    public function setMin(int $min) : AbstractElementSingle
     {
         $this->min = $min;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getMax()
+    public function getMax() : int
     {
         return $this->max;
     }
 
     /**
-     * @param int $max
-     *
      * @return $this
      */
-    public function setMax($max)
+    public function setMax(int $max) : AbstractElementSingle
     {
         $this->max = $max;
 

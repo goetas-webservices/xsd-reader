@@ -8,10 +8,7 @@ use DOMElement;
 
 class StandardDocumentationReader implements DocumentationReader
 {
-    /**
-     * @return string
-     */
-    public function get(DOMElement $node)
+    public function get(DOMElement $node) : string
     {
         $doc = '';
 

@@ -18,10 +18,7 @@ abstract class AbstractNamedGroupItem
      */
     protected $doc;
 
-    /**
-     * @param string $name
-     */
-    public function __construct(Schema $schema, $name)
+    public function __construct(Schema $schema, string $name)
     {
         $this->schema = $schema;
         $this->name = $name;
@@ -36,21 +33,16 @@ abstract class AbstractNamedGroupItem
     }
 
     /**
-     * @param string $doc
-     *
      * @return $this
      */
-    public function setDoc($doc)
+    public function setDoc(string $doc) : AbstractNamedGroupItem
     {
         $this->doc = $doc;
 
         return $this;
     }
 
-    /**
-     * @return Schema
-     */
-    public function getSchema()
+    public function getSchema() : Schema
     {
         return $this->schema;
     }

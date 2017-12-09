@@ -17,7 +17,7 @@ class Restriction extends Base
      *
      * @return $this
      */
-    public function addCheck($type, $value)
+    public function addCheck(string $type, array $value)
     {
         $this->checks[$type][] = $value;
 
@@ -27,7 +27,7 @@ class Restriction extends Base
     /**
      * @return mixed[][]
      */
-    public function getChecks()
+    public function getChecks() : array
     {
         return $this->checks;
     }
@@ -37,7 +37,7 @@ class Restriction extends Base
      *
      * @return mixed[]
      */
-    public function getChecksByType($type)
+    public function getChecksByType(string $type) : array
     {
         return isset($this->checks[$type]) ? $this->checks[$type] : array();
     }

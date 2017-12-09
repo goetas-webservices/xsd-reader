@@ -17,17 +17,14 @@ use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
 class Schema
 {
     /**
-     * @param string $getter
-     * @param string $name
-     * @param string $namespace
      * @param bool[] $calling
      *
      * @return SchemaItem|null
      */
     protected function findSomethingNoThrow(
-        $getter,
-        $name,
-        $namespace = null,
+        string $getter,
+        string $name,
+        string $namespace = null,
         array &$calling = array()
     ) {
         $calling[spl_object_hash($this)] = true;
@@ -60,20 +57,16 @@ class Schema
 
     /**
      * @param Schema[] $schemas
-     * @param string   $cid
-     * @param string   $getter
-     * @param string   $name
-     * @param string   $namespace
      * @param bool[]   $calling
      *
      * @return SchemaItem|null
      */
     protected function findSomethingNoThrowSchemas(
         array $schemas,
-        $cid,
-        $getter,
-        $name,
-        $namespace = null,
+        string $cid,
+        string $getter,
+        string $name,
+        string $namespace = null,
         array &$calling = array()
     ) {
         foreach ($schemas as $childSchema) {
@@ -91,16 +84,9 @@ class Schema
     }
 
     /**
-     * @param string $getter
-     * @param string $name
-     * @param string $namespace
-     * @param bool[] $calling
-     *
      * @throws TypeNotFoundException
-     *
-     * @return SchemaItem
      */
-    protected function findSomething($getter, $name, $namespace = null, &$calling = array())
+    protected function findSomething(string $getter, string $name, string $namespace = null, array &$calling = array()) : SchemaItem
     {
         $in = $this->findSomethingNoThrow(
             $getter,
@@ -171,34 +157,22 @@ class Schema
      */
     protected $typeCache = array();
 
-    /**
-     * @return bool
-     */
-    public function getElementsQualification()
+    public function getElementsQualification() : bool
     {
         return $this->elementsQualification;
     }
 
-    /**
-     * @param bool $elementsQualification
-     */
-    public function setElementsQualification($elementsQualification)
+    public function setElementsQualification(bool $elementsQualification)
     {
         $this->elementsQualification = $elementsQualification;
     }
 
-    /**
-     * @return bool
-     */
-    public function getAttributesQualification()
+    public function getAttributesQualification() : bool
     {
         return $this->attributesQualification;
     }
 
-    /**
-     * @param bool $attributesQualification
-     */
-    public function setAttributesQualification($attributesQualification)
+    public function setAttributesQualification(bool $attributesQualification)
     {
         $this->attributesQualification = $attributesQualification;
     }
@@ -222,7 +196,7 @@ class Schema
     /**
      * @return Type[]
      */
-    public function getTypes()
+    public function getTypes() : array
     {
         return $this->types;
     }
@@ -230,7 +204,7 @@ class Schema
     /**
      * @return ElementDef[]
      */
-    public function getElements()
+    public function getElements() : array
     {
         return $this->elements;
     }
@@ -238,7 +212,7 @@ class Schema
     /**
      * @return Schema[]
      */
-    public function getSchemas()
+    public function getSchemas() : array
     {
         return $this->schemas;
     }
@@ -246,7 +220,7 @@ class Schema
     /**
      * @return AttributeDef[]
      */
-    public function getAttributes()
+    public function getAttributes() : array
     {
         return $this->attributes;
     }
@@ -254,7 +228,7 @@ class Schema
     /**
      * @return Group[]
      */
-    public function getGroups()
+    public function getGroups() : array
     {
         return $this->groups;
     }
@@ -267,10 +241,7 @@ class Schema
         return $this->doc;
     }
 
-    /**
-     * @param string $doc
-     */
-    public function setDoc($doc)
+    public function setDoc(string $doc)
     {
         $this->doc = $doc;
     }
@@ -285,10 +256,7 @@ class Schema
         $this->elements[$element->getName()] = $element;
     }
 
-    /**
-     * @param string|null $namespace
-     */
-    public function addSchema(self $schema, $namespace = null)
+    public function addSchema(self $schema, string $namespace = null)
     {
         if ($namespace !== null) {
             if ($schema->getTargetNamespace() !== $namespace) {
@@ -324,17 +292,15 @@ class Schema
     /**
      * @return AttributeGroup[]
      */
-    public function getAttributeGroups()
+    public function getAttributeGroups() : array
     {
         return $this->attributeGroups;
     }
 
     /**
-     * @param string $name
-     *
      * @return Group|false
      */
-    public function getGroup($name)
+    public function getGroup(string $name)
     {
         if (isset($this->groups[$name])) {
             return $this->groups[$name];
@@ -344,11 +310,9 @@ class Schema
     }
 
     /**
-     * @param string $name
-     *
      * @return ElementItem|false
      */
-    public function getElement($name)
+    public function getElement(string $name)
     {
         if (isset($this->elements[$name])) {
             return $this->elements[$name];
@@ -358,11 +322,9 @@ class Schema
     }
 
     /**
-     * @param string $name
-     *
      * @return Type|false
      */
-    public function getType($name)
+    public function getType(string $name)
     {
         if (isset($this->types[$name])) {
             return $this->types[$name];
@@ -372,11 +334,9 @@ class Schema
     }
 
     /**
-     * @param string $name
-     *
      * @return AttributeItem|false
      */
-    public function getAttribute($name)
+    public function getAttribute(string $name)
     {
         if (isset($this->attributes[$name])) {
             return $this->attributes[$name];
@@ -386,11 +346,9 @@ class Schema
     }
 
     /**
-     * @param string $name
-     *
      * @return AttributeGroup|false
      */
-    public function getAttributeGroup($name)
+    public function getAttributeGroup(string $name)
     {
         if (isset($this->attributeGroups[$name])) {
             return $this->attributeGroups[$name];
@@ -399,18 +357,12 @@ class Schema
         return false;
     }
 
-    public function __toString()
+    public function __toString() : string
     {
         return sprintf('Target namespace %s', $this->getTargetNamespace());
     }
 
-    /**
-     * @param string $name
-     * @param string $namespace
-     *
-     * @return Type
-     */
-    public function findType($name, $namespace = null)
+    public function findType(string $name, string $namespace = null) : Type
     {
         /**
          * @var Type
@@ -420,13 +372,7 @@ class Schema
         return $out;
     }
 
-    /**
-     * @param string $name
-     * @param string $namespace
-     *
-     * @return Group
-     */
-    public function findGroup($name, $namespace = null)
+    public function findGroup(string $name, string $namespace = null) : Group
     {
         /**
          * @var Group
@@ -436,13 +382,7 @@ class Schema
         return $out;
     }
 
-    /**
-     * @param string $name
-     * @param string $namespace
-     *
-     * @return ElementDef
-     */
-    public function findElement($name, $namespace = null)
+    public function findElement(string $name, string $namespace = null) : ElementDef
     {
         /**
          * @var ElementDef
@@ -452,13 +392,7 @@ class Schema
         return $out;
     }
 
-    /**
-     * @param string $name
-     * @param string $namespace
-     *
-     * @return AttributeItem
-     */
-    public function findAttribute($name, $namespace = null)
+    public function findAttribute(string $name, string $namespace = null) : AttributeItem
     {
         /**
          * @var AttributeItem
@@ -468,13 +402,7 @@ class Schema
         return $out;
     }
 
-    /**
-     * @param string $name
-     * @param string $namespace
-     *
-     * @return AttributeGroup
-     */
-    public function findAttributeGroup($name, $namespace = null)
+    public function findAttributeGroup(string $name, string $namespace = null) : AttributeGroup
     {
         /**
          * @var AttributeGroup

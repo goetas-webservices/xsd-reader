@@ -21,60 +21,45 @@ class Attribute extends AbstractAttributeItem implements AttributeSingle
      */
     protected $use = self::USE_OPTIONAL;
 
-    /**
-     * @return bool
-     */
-    public function isQualified()
+    public function isQualified() : bool
     {
         return $this->qualified;
     }
 
     /**
-     * @param bool $qualified
-     *
      * @return $this
      */
-    public function setQualified($qualified)
+    public function setQualified(bool $qualified) : Attribute
     {
         $this->qualified = $qualified;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isNil()
+    public function isNil() : bool
     {
         return $this->nil;
     }
 
     /**
-     * @param bool $nil
-     *
      * @return $this
      */
-    public function setNil($nil)
+    public function setNil(bool $nil) : Attribute
     {
         $this->nil = $nil;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getUse()
+    public function getUse() : string
     {
         return $this->use;
     }
 
     /**
-     * @param string $use
-     *
      * @return $this
      */
-    public function setUse($use)
+    public function setUse(string $use) : Attribute
     {
         $this->use = $use;
 
