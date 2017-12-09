@@ -22,8 +22,10 @@
         "php": "^7.0"
     },
     "require-dev" : {
+        "friendsofphp/php-cs-fixer": "^2.9",
         "phpstan/phpstan": "^0.9.1",
-        "phpunit/phpunit": "^6.5"
+        "phpunit/phpunit": "^6.5",
+        "sebastian/phpcpd": "^3.0"
     },
     "autoload" : {
         "psr-4" : {
@@ -42,12 +44,12 @@
         }
     },
     "scripts": {
-        "php-cs-fixer": "php-cs-fixer fix --verbose --dry-run",
+        "php-cs-fixer": "php ./vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix --verbose --dry-run",
         "tests": [
             "php ./vendor/phpunit/phpunit/phpunit -v",
             "php ./vendor/phpstan/phpstan/bin/phpstan analyse -c ./phpstan.neon src",
             "psalm",
-            "phpcpd ./src/"
+            "php ./vendor/sebastian/phpcpd/phpcpd ./src/"
         ]
     }
 }
