@@ -8,7 +8,7 @@ class UrlUtils
 {
     public static function resolveRelativeUrl(string $base, string $rel): string
     {
-        if (!$rel) {
+        if ('' === trim($rel)) {
             return $base;
         } elseif (
         /* return if already absolute URL */
@@ -23,7 +23,8 @@ class UrlUtils
                 [
                     '#',
                     '?',
-                ]
+                ],
+                true
             )
         ) {
             return $base.$rel;

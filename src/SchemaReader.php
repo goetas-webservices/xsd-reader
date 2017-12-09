@@ -506,7 +506,7 @@ class SchemaReader
                 }
             );
 
-            if ($callback) {
+            if ($callback instanceof Closure) {
                 call_user_func($callback, $type);
             }
         };
@@ -585,7 +585,7 @@ class SchemaReader
                 }
             );
 
-            if ($callback) {
+            if ($callback instanceof Closure) {
                 call_user_func($callback, $type);
             }
         };
@@ -1015,7 +1015,8 @@ class SchemaReader
                         [
                             'complexType',
                             'simpleType',
-                        ]
+                        ],
+                        true
                     )
                 ) {
                     $this->loadTypeWithCallback(
@@ -1114,10 +1115,10 @@ class SchemaReader
          */
         $newSchema = $this->setLoadedFile(
             $file,
-            ($namespace ? new Schema() : $schema)
+            (('' !== trim($namespace)) ? new Schema() : $schema)
         );
 
-        if ($namespace) {
+        if ('' !== trim($namespace)) {
             $newSchema->addSchema($this->getGlobalSchema());
             $schema->addSchema($newSchema);
         }
@@ -1189,7 +1190,7 @@ class SchemaReader
      */
     public function getGlobalSchema(): Schema
     {
-        if (!$this->globalSchema) {
+        if (!($this->globalSchema instanceof Schema)) {
             $callbacks = array();
             $globalSchemas = array();
             /**
@@ -1409,7 +1410,7 @@ class SchemaReader
 
         if ($node->hasAttribute('targetNamespace')) {
             $schema->setTargetNamespace($node->getAttribute('targetNamespace'));
-        } elseif ($parent) {
+        } elseif ($parent instanceof Schema) {
             $schema->setTargetNamespace($parent->getTargetNamespace());
         }
         $schema->setElementsQualification($node->getAttribute('elementFormDefault') == 'qualified');

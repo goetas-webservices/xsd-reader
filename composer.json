@@ -24,6 +24,7 @@
     "require-dev" : {
         "friendsofphp/php-cs-fixer": "^2.9",
         "phpstan/phpstan": "^0.9.1",
+        "phpstan/phpstan-strict-rules": "^0.9.0",
         "phpunit/phpunit": "^6.5",
         "sebastian/phpcpd": "^3.0"
     },
