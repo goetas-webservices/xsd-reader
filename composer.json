@@ -22,6 +22,7 @@
         "php": "^7.0"
     },
     "require-dev" : {
+        "phpstan/phpstan": "^0.9.1",
         "phpunit/phpunit": "^6.5"
     },
     "autoload" : {
@@ -44,7 +45,7 @@
         "php-cs-fixer": "php-cs-fixer fix --verbose --dry-run",
         "tests": [
             "php ./vendor/phpunit/phpunit/phpunit -v",
-            "phpstan analyse -l7 src",
+            "php ./vendor/phpstan/phpstan/bin/phpstan analyse -l7 src",
             "psalm",
             "phpcpd ./src/"
         ]
