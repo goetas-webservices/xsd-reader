@@ -147,10 +147,7 @@ class SchemaReader
         DOMElement $node
     ) : AttributeItem {
         if ($childNode->hasAttribute('ref')) {
-            /**
-             * @var AttributeItem
-             */
-            $attribute = $this->findSomething('findAttribute', $schema, $node, $childNode->getAttribute('ref'));
+            $attribute = $this->findAttributeItem($schema, $node, $childNode->getAttribute('ref'));
         } else {
             /**
              * @var Attribute
@@ -373,10 +370,7 @@ class SchemaReader
         $max
     ) {
         if ($childNode->hasAttribute('ref')) {
-            /**
-             * @var ElementDef $referencedElement
-             */
-            $referencedElement = $this->findSomething('findElement', $elementContainer->getSchema(), $node, $childNode->getAttribute('ref'));
+            $referencedElement = $this->findElement($elementContainer->getSchema(), $node, $childNode->getAttribute('ref'));
             $element = new ElementRef($referencedElement);
             $element->setDoc($this->getDocumentation($childNode));
 
@@ -411,11 +405,7 @@ class SchemaReader
         DOMElement $childNode,
         ElementContainer $elementContainer
     ) {
-        /**
-         * @var Group
-         */
-        $referencedGroup = $this->findSomething(
-            'findGroup',
+        $referencedGroup = $this->findGroup(
             $schema,
             $node,
             $childNode->getAttribute('ref')
@@ -647,11 +637,7 @@ class SchemaReader
         DOMElement $node,
         string $attributeName
     ) : SchemaItem {
-        /**
-         * @var SchemaItem
-         */
-        $out = $this->findSomething(
-            'findType',
+        $out = $this->findType(
             $fromThis->getSchema(),
             $node,
             $attributeName
@@ -879,29 +865,123 @@ class SchemaReader
         );
     }
 
-    /**
-     * @throws TypeException
-     *
-     * @return ElementItem|Group|AttributeItem|AttributeGroup|Type
-     */
-    private function findSomething(string $finder, Schema $schema, DOMElement $node, string $typeName)
+    private function findAttributeItem(Schema $schema, DOMElement $node, string $typeName) : AttributeItem
     {
         list($name, $namespace) = static::splitParts($node, $typeName);
 
-        /**
-         * @var string|null
-         */
         $namespace = $namespace ?: $schema->getTargetNamespace();
 
         try {
-            /**
-             * @var ElementItem|Group|AttributeItem|AttributeGroup|Type
-             */
-            $out = $schema->$finder($name, $namespace);
-
-            return $out;
+            return $schema->findAttribute($name, $namespace);
         } catch (TypeNotFoundException $e) {
-            throw new TypeException(sprintf("Can't find %s named {%s}#%s, at line %d in %s ", strtolower(substr($finder, 4)), $namespace, $name, $node->getLineNo(), $node->ownerDocument->documentURI), 0, $e);
+            throw new TypeException(
+                sprintf(
+                    "Can't find %s named {%s}#%s, at line %d in %s ",
+                    'attribute',
+                    $namespace,
+                    $name,
+                    $node->getLineNo(),
+                    $node->ownerDocument->documentURI
+                ),
+                0,
+                $e
+            );
+        }
+    }
+
+    private function findAttributeGroup(Schema $schema, DOMElement $node, string $typeName) : AttributeGroup
+    {
+        list($name, $namespace) = static::splitParts($node, $typeName);
+
+        $namespace = $namespace ?: $schema->getTargetNamespace();
+
+        try {
+            return $schema->findAttributeGroup($name, $namespace);
+        } catch (TypeNotFoundException $e) {
+            throw new TypeException(
+                sprintf(
+                    "Can't find %s named {%s}#%s, at line %d in %s ",
+                    'attributegroup',
+                    $namespace,
+                    $name,
+                    $node->getLineNo(),
+                    $node->ownerDocument->documentURI
+                ),
+                0,
+                $e
+            );
+        }
+    }
+
+    private function findElement(Schema $schema, DOMElement $node, string $typeName) : ElementDef
+    {
+        list($name, $namespace) = static::splitParts($node, $typeName);
+
+        $namespace = $namespace ?: $schema->getTargetNamespace();
+
+        try {
+            return $schema->findElement($name, $namespace);
+        } catch (TypeNotFoundException $e) {
+            throw new TypeException(
+                sprintf(
+                    "Can't find %s named {%s}#%s, at line %d in %s ",
+                    'element',
+                    $namespace,
+                    $name,
+                    $node->getLineNo(),
+                    $node->ownerDocument->documentURI
+                ),
+                0,
+                $e
+            );
+        }
+    }
+
+    private function findGroup(Schema $schema, DOMElement $node, string $typeName) : Group
+    {
+        list($name, $namespace) = static::splitParts($node, $typeName);
+
+        $namespace = $namespace ?: $schema->getTargetNamespace();
+
+        try {
+            return $schema->findGroup($name, $namespace);
+        } catch (TypeNotFoundException $e) {
+            throw new TypeException(
+                sprintf(
+                    "Can't find %s named {%s}#%s, at line %d in %s ",
+                    'group',
+                    $namespace,
+                    $name,
+                    $node->getLineNo(),
+                    $node->ownerDocument->documentURI
+                ),
+                0,
+                $e
+            );
+        }
+    }
+
+    private function findType(Schema $schema, DOMElement $node, string $typeName) : SchemaItem
+    {
+        list($name, $namespace) = static::splitParts($node, $typeName);
+
+        $namespace = $namespace ?: $schema->getTargetNamespace();
+
+        try {
+            return $schema->findType($name, $namespace);
+        } catch (TypeNotFoundException $e) {
+            throw new TypeException(
+                sprintf(
+                    "Can't find %s named {%s}#%s, at line %d in %s ",
+                    'type',
+                    $namespace,
+                    $name,
+                    $node->getLineNo(),
+                    $node->ownerDocument->documentURI
+                ),
+                0,
+                $e
+            );
         }
     }
 
@@ -1309,10 +1389,7 @@ class SchemaReader
         DOMElement $childNode,
         AttributeContainer $addToThis
     ) {
-        /**
-         * @var AttributeItem
-         */
-        $attribute = $this->findSomething('findAttributeGroup', $schema, $node, $childNode->getAttribute('ref'));
+        $attribute = $this->findAttributeGroup($schema, $node, $childNode->getAttribute('ref'));
         $addToThis->addAttribute($attribute);
     }
 
