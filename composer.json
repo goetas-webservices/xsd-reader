@@ -45,7 +45,7 @@
         "php-cs-fixer": "php-cs-fixer fix --verbose --dry-run",
         "tests": [
             "php ./vendor/phpunit/phpunit/phpunit -v",
-            "php ./vendor/phpstan/phpstan/bin/phpstan analyse -l7 src",
+            "php ./vendor/phpstan/phpstan/bin/phpstan analyse -c ./phpstan.neon src",
             "psalm",
             "phpcpd ./src/"
         ]
