@@ -370,8 +370,9 @@ class SchemaReader
         $max
     ) {
         if ($childNode->hasAttribute('ref')) {
-            $referencedElement = $this->findElement($elementContainer->getSchema(), $node, $childNode->getAttribute('ref'));
-            $element = new ElementRef($referencedElement);
+            $element = new ElementRef(
+                $this->findElement($elementContainer->getSchema(), $node, $childNode->getAttribute('ref'))
+            );
             $element->setDoc($this->getDocumentation($childNode));
 
             self::maybeSetMax($element, $childNode);
