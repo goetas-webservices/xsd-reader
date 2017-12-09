@@ -1233,6 +1233,10 @@ class SchemaReader
          */
         $out = $this->globalSchema;
 
+        if (!($out instanceof Schema)) {
+            throw new TypeException('Globa schema not discoverd');
+        }
+
         return $out;
     }
 
