@@ -6,5 +6,5 @@ namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
 interface ElementItem
 {
-    public function getName() : string;
+    public function getName(): string;
 }

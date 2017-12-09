@@ -35,14 +35,14 @@ abstract class AbstractNamedGroupItem
     /**
      * @return $this
      */
-    public function setDoc(string $doc) : AbstractNamedGroupItem
+    public function setDoc(string $doc): self
     {
         $this->doc = $doc;
 
         return $this;
     }
 
-    public function getSchema() : Schema
+    public function getSchema(): Schema
     {
         return $this->schema;
     }

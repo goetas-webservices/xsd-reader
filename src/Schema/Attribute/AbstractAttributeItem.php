@@ -29,7 +29,7 @@ abstract class AbstractAttributeItem extends Item implements AttributeItem
     /**
      * @return $this
      */
-    public function setFixed(string $fixed) : AbstractAttributeItem
+    public function setFixed(string $fixed): self
     {
         $this->fixed = $fixed;
 
@@ -47,7 +47,7 @@ abstract class AbstractAttributeItem extends Item implements AttributeItem
     /**
      * @return $this
      */
-    public function setDefault(string $default) : AbstractAttributeItem
+    public function setDefault(string $default): self
     {
         $this->default = $default;
 

@@ -17,15 +17,15 @@ interface AttributeSingle extends AttributeItem
      */
     public function getType();
 
-    public function isQualified() : bool;
+    public function isQualified(): bool;
 
     public function setQualified(bool $qualified);
 
-    public function isNil() : bool;
+    public function isNil(): bool;
 
     public function setNil(bool $nil);
 
-    public function getUse() : string;
+    public function getUse(): string;
 
     public function setUse(string $use);
 }

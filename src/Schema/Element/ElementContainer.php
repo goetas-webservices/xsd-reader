@@ -13,5 +13,5 @@ interface ElementContainer extends SchemaItem
     /**
      * @return ElementItem[]
      */
-    public function getElements() : array;
+    public function getElements(): array;
 }

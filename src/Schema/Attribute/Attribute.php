@@ -21,7 +21,7 @@ class Attribute extends AbstractAttributeItem implements AttributeSingle
      */
     protected $use = self::USE_OPTIONAL;
 
-    public function isQualified() : bool
+    public function isQualified(): bool
     {
         return $this->qualified;
     }
@@ -29,14 +29,14 @@ class Attribute extends AbstractAttributeItem implements AttributeSingle
     /**
      * @return $this
      */
-    public function setQualified(bool $qualified) : Attribute
+    public function setQualified(bool $qualified): self
     {
         $this->qualified = $qualified;
 
         return $this;
     }
 
-    public function isNil() : bool
+    public function isNil(): bool
     {
         return $this->nil;
     }
@@ -44,14 +44,14 @@ class Attribute extends AbstractAttributeItem implements AttributeSingle
     /**
      * @return $this
      */
-    public function setNil(bool $nil) : Attribute
+    public function setNil(bool $nil): self
     {
         $this->nil = $nil;
 
         return $this;
     }
 
-    public function getUse() : string
+    public function getUse(): string
     {
         return $this->use;
     }
@@ -59,7 +59,7 @@ class Attribute extends AbstractAttributeItem implements AttributeSingle
     /**
      * @return $this
      */
-    public function setUse(string $use) : Attribute
+    public function setUse(string $use): self
     {
         $this->use = $use;
 

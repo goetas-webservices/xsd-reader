@@ -20,7 +20,6 @@ use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Element;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementContainer;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
-use GoetasWebservices\XML\XSDReader\Schema\Element\ElementItem;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementRef;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Group;
 use GoetasWebservices\XML\XSDReader\Schema\Element\InterfaceSetMinMax;
@@ -103,7 +102,7 @@ class SchemaReader
     private function loadAttributeGroup(
         Schema $schema,
         DOMElement $node
-    ) : Closure {
+    ): Closure {
         $attGroup = new AttributeGroup($schema, $node->getAttribute('name'));
         $attGroup->setDoc($this->getDocumentation($node));
         $schema->addAttributeGroup($attGroup);
@@ -145,7 +144,7 @@ class SchemaReader
         DOMElement $childNode,
         Schema $schema,
         DOMElement $node
-    ) : AttributeItem {
+    ): AttributeItem {
         if ($childNode->hasAttribute('ref')) {
             $attribute = $this->findAttributeItem($schema, $node, $childNode->getAttribute('ref'));
         } else {
@@ -161,7 +160,7 @@ class SchemaReader
     private function loadAttribute(
         Schema $schema,
         DOMElement $node
-    ) : Attribute {
+    ): Attribute {
         $attribute = new Attribute($schema, $node->getAttribute('name'));
         $attribute->setDoc($this->getDocumentation($node));
         $this->fillItem($attribute, $node);
@@ -183,7 +182,7 @@ class SchemaReader
         Schema $schema,
         DOMElement $node,
         bool $attributeDef
-    ) : Closure {
+    ): Closure {
         $name = $node->getAttribute('name');
         if ($attributeDef) {
             $attribute = new AttributeDef($schema, $name);
@@ -198,12 +197,12 @@ class SchemaReader
         };
     }
 
-    private function loadAttributeDef(Schema $schema, DOMElement $node) : Closure
+    private function loadAttributeDef(Schema $schema, DOMElement $node): Closure
     {
         return $this->loadAttributeOrElementDef($schema, $node, true);
     }
 
-    private function getDocumentation(DOMElement $node) : string
+    private function getDocumentation(DOMElement $node): string
     {
         return $this->documentationReader->get($node);
     }
@@ -211,7 +210,7 @@ class SchemaReader
     /**
      * @return Closure[]
      */
-    private function schemaNode(Schema $schema, DOMElement $node, Schema $parent = null) : array
+    private function schemaNode(Schema $schema, DOMElement $node, Schema $parent = null): array
     {
         $this->setSchemaThingsFromNode($schema, $node, $parent);
         $functions = array();
@@ -261,7 +260,7 @@ class SchemaReader
         return $functions;
     }
 
-    private function loadGroupRef(Group $referenced, DOMElement $node) : GroupRef
+    private function loadGroupRef(Group $referenced, DOMElement $node): GroupRef
     {
         $ref = new GroupRef($referenced);
         $ref->setDoc($this->getDocumentation($node));
@@ -272,7 +271,7 @@ class SchemaReader
         return $ref;
     }
 
-    private static function maybeSetMax(InterfaceSetMinMax $ref, DOMElement $node) : InterfaceSetMinMax
+    private static function maybeSetMax(InterfaceSetMinMax $ref, DOMElement $node): InterfaceSetMinMax
     {
         if (
             $node->hasAttribute('maxOccurs')
@@ -283,7 +282,7 @@ class SchemaReader
         return $ref;
     }
 
-    private static function maybeSetMin(InterfaceSetMinMax $ref, DOMElement $node) : InterfaceSetMinMax
+    private static function maybeSetMin(InterfaceSetMinMax $ref, DOMElement $node): InterfaceSetMinMax
     {
         if ($node->hasAttribute('minOccurs')) {
             $ref->setMin((int) $node->getAttribute('minOccurs'));
@@ -416,7 +415,7 @@ class SchemaReader
         $elementContainer->addElement($group);
     }
 
-    private function loadGroup(Schema $schema, DOMElement $node) : Closure
+    private function loadGroup(Schema $schema, DOMElement $node): Closure
     {
         $group = new Group($schema, $node->getAttribute('name'));
         $group->setDoc($this->getDocumentation($node));
@@ -455,7 +454,7 @@ class SchemaReader
         };
     }
 
-    private function loadComplexType(Schema $schema, DOMElement $node, Closure $callback = null) : Closure
+    private function loadComplexType(Schema $schema, DOMElement $node, Closure $callback = null): Closure
     {
         /**
          * @var bool
@@ -561,7 +560,7 @@ class SchemaReader
         }
     }
 
-    private function loadSimpleType(Schema $schema, DOMElement $node, Closure $callback = null) : Closure
+    private function loadSimpleType(Schema $schema, DOMElement $node, Closure $callback = null): Closure
     {
         $type = new SimpleType($schema, $node->getAttribute('name'));
         $type->setDoc($this->getDocumentation($node));
@@ -625,7 +624,7 @@ class SchemaReader
         SchemaItem $fromThis,
         DOMElement $node,
         string $attributeName
-    ) : SchemaItem {
+    ): SchemaItem {
         return $this->findSomeTypeFromAttribute(
             $fromThis,
             $node,
@@ -637,7 +636,7 @@ class SchemaReader
         SchemaItem $fromThis,
         DOMElement $node,
         string $attributeName
-    ) : SchemaItem {
+    ): SchemaItem {
         $out = $this->findType(
             $fromThis->getSchema(),
             $node,
@@ -849,7 +848,7 @@ class SchemaReader
     /**
      * @return mixed[]
      */
-    private static function splitParts(DOMElement $node, string $typeName) : array
+    private static function splitParts(DOMElement $node, string $typeName): array
     {
         $prefix = null;
         $name = $typeName;
@@ -866,7 +865,7 @@ class SchemaReader
         );
     }
 
-    private function findAttributeItem(Schema $schema, DOMElement $node, string $typeName) : AttributeItem
+    private function findAttributeItem(Schema $schema, DOMElement $node, string $typeName): AttributeItem
     {
         list($name, $namespace) = static::splitParts($node, $typeName);
 
@@ -890,7 +889,7 @@ class SchemaReader
         }
     }
 
-    private function findAttributeGroup(Schema $schema, DOMElement $node, string $typeName) : AttributeGroup
+    private function findAttributeGroup(Schema $schema, DOMElement $node, string $typeName): AttributeGroup
     {
         list($name, $namespace) = static::splitParts($node, $typeName);
 
@@ -914,7 +913,7 @@ class SchemaReader
         }
     }
 
-    private function findElement(Schema $schema, DOMElement $node, string $typeName) : ElementDef
+    private function findElement(Schema $schema, DOMElement $node, string $typeName): ElementDef
     {
         list($name, $namespace) = static::splitParts($node, $typeName);
 
@@ -938,7 +937,7 @@ class SchemaReader
         }
     }
 
-    private function findGroup(Schema $schema, DOMElement $node, string $typeName) : Group
+    private function findGroup(Schema $schema, DOMElement $node, string $typeName): Group
     {
         list($name, $namespace) = static::splitParts($node, $typeName);
 
@@ -962,7 +961,7 @@ class SchemaReader
         }
     }
 
-    private function findType(Schema $schema, DOMElement $node, string $typeName) : SchemaItem
+    private function findType(Schema $schema, DOMElement $node, string $typeName): SchemaItem
     {
         list($name, $namespace) = static::splitParts($node, $typeName);
 
@@ -1060,7 +1059,7 @@ class SchemaReader
     private function loadImport(
         Schema $schema,
         DOMElement $node
-    ) : Closure {
+    ): Closure {
         $base = urldecode($node->ownerDocument->documentURI);
         $file = UrlUtils::resolveRelativeUrl($base, $node->getAttribute('schemaLocation'));
 
@@ -1086,7 +1085,7 @@ class SchemaReader
     private function loadImportFreshKeys(
         string $namespace,
         string $file
-    ) : array {
+    ): array {
         $globalSchemaInfo = $this->getGlobalSchemaInfo();
 
         $keys = [];
@@ -1109,7 +1108,7 @@ class SchemaReader
         string $namespace,
         Schema $schema,
         string $file
-    ) : Schema {
+    ): Schema {
         /**
          * @var Schema $newSchema
          */
@@ -1127,13 +1126,13 @@ class SchemaReader
     }
 
     /**
-    * @return Closure[]
-    */
+     * @return Closure[]
+     */
     private function loadImportFreshCallbacks(
         string $namespace,
         Schema $schema,
         string $file
-    ) : array {
+    ): array {
         /**
          * @var string
          */
@@ -1158,7 +1157,7 @@ class SchemaReader
         string $namespace,
         Schema $schema,
         string $file
-    ) : Closure {
+    ): Closure {
         return function () use ($namespace, $schema, $file) {
             foreach (
                 $this->loadImportFreshCallbacks(
@@ -1180,7 +1179,7 @@ class SchemaReader
     /**
      * @return string[]
      */
-    public function getGlobalSchemaInfo() : array
+    public function getGlobalSchemaInfo(): array
     {
         return self::$globalSchemaInfo;
     }
@@ -1188,7 +1187,7 @@ class SchemaReader
     /**
      * @return Schema
      */
-    public function getGlobalSchema() : Schema
+    public function getGlobalSchema(): Schema
     {
         if (!$this->globalSchema) {
             $callbacks = array();
@@ -1236,7 +1235,7 @@ class SchemaReader
         return $out;
     }
 
-    private function readNode(DOMElement $node, string $file = 'schema.xsd') : Schema
+    private function readNode(DOMElement $node, string $file = 'schema.xsd'): Schema
     {
         $fileKey = $node->hasAttribute('targetNamespace') ? $this->getNamespaceSpecificFileIndex($file, $node->getAttribute('targetNamespace')) : $file;
         $this->setLoadedFile($fileKey, $rootSchema = new Schema());
@@ -1257,7 +1256,7 @@ class SchemaReader
      * Each of these  <xsd:schema/> nodes typically target a specific namespace. Append the target namespace to the
      * file to distinguish between multiple schemas in a single file.
      */
-    private function getNamespaceSpecificFileIndex(string $file, string $targetNamespace) : string
+    private function getNamespaceSpecificFileIndex(string $file, string $targetNamespace): string
     {
         return $file.'#'.$targetNamespace;
     }
@@ -1265,7 +1264,7 @@ class SchemaReader
     /**
      * @throws IOException
      */
-    public function readString(string $content, string $file = 'schema.xsd') : Schema
+    public function readString(string $content, string $file = 'schema.xsd'): Schema
     {
         $xml = new DOMDocument('1.0', 'UTF-8');
         if (!$xml->loadXML($content)) {
@@ -1276,7 +1275,7 @@ class SchemaReader
         return $this->readNode($xml->documentElement, $file);
     }
 
-    public function readFile(string $file) : Schema
+    public function readFile(string $file): Schema
     {
         $xml = $this->getDOM($file);
 
@@ -1286,7 +1285,7 @@ class SchemaReader
     /**
      * @throws IOException
      */
-    private function getDOM(string $file) : DOMDocument
+    private function getDOM(string $file): DOMDocument
     {
         $xml = new DOMDocument('1.0', 'UTF-8');
         if (!$xml->load($file)) {
@@ -1343,7 +1342,7 @@ class SchemaReader
     private function loadElement(
         Schema $schema,
         DOMElement $node
-    ) : Element {
+    ): Element {
         $element = new Element($schema, $node->getAttribute('name'));
         $element->setDoc($this->getDocumentation($node));
 
@@ -1394,7 +1393,7 @@ class SchemaReader
         $addToThis->addAttribute($attribute);
     }
 
-    private function setLoadedFile(string $key, Schema $schema) : Schema
+    private function setLoadedFile(string $key, Schema $schema): Schema
     {
         $this->loadedFiles[$key] = $schema;
 

@@ -24,7 +24,7 @@ abstract class Base
     /**
      * @return $this
      */
-    public function setBase(Type $base) : Base
+    public function setBase(Type $base): self
     {
         $this->base = $base;
 

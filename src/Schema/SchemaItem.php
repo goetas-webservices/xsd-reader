@@ -6,7 +6,7 @@ namespace GoetasWebservices\XML\XSDReader\Schema;
 
 interface SchemaItem
 {
-    public function getSchema() : Schema;
+    public function getSchema(): Schema;
 
     /**
      * @return string|null

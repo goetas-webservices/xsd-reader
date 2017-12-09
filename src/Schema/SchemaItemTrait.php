@@ -16,12 +16,12 @@ trait SchemaItemTrait
      */
     protected $doc = '';
 
-    public function getSchema() : Schema
+    public function getSchema(): Schema
     {
         return $this->schema;
     }
 
-    public function getDoc() : string
+    public function getDoc(): string
     {
         return $this->doc;
     }

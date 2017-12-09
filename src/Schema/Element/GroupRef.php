@@ -29,7 +29,7 @@ class GroupRef extends Group implements InterfaceSetMinMax
         $this->wrapped = $group;
     }
 
-    public function getMin() : int
+    public function getMin(): int
     {
         return $this->min;
     }
@@ -37,14 +37,14 @@ class GroupRef extends Group implements InterfaceSetMinMax
     /**
      * @return $this
      */
-    public function setMin(int $min) : GroupRef
+    public function setMin(int $min): self
     {
         $this->min = $min;
 
         return $this;
     }
 
-    public function getMax() : int
+    public function getMax(): int
     {
         return $this->max;
     }
@@ -52,14 +52,14 @@ class GroupRef extends Group implements InterfaceSetMinMax
     /**
      * @return $this
      */
-    public function setMax(int $max) : GroupRef
+    public function setMax(int $max): self
     {
         $this->max = $max;
 
         return $this;
     }
 
-    public function getName() : string
+    public function getName(): string
     {
         return $this->wrapped->getName();
     }
@@ -67,7 +67,7 @@ class GroupRef extends Group implements InterfaceSetMinMax
     /**
      * @return ElementItem[]
      */
-    public function getElements() : array
+    public function getElements(): array
     {
         $elements = $this->wrapped->getElements();
         if ($this->getMax() > 0 || $this->getMax() === -1) {

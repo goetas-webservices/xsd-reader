@@ -6,7 +6,7 @@ namespace GoetasWebservices\XML\XSDReader\Utils;
 
 class UrlUtils
 {
-    public static function resolveRelativeUrl(string $base, string $rel) : string
+    public static function resolveRelativeUrl(string $base, string $rel): string
     {
         if (!$rel) {
             return $base;
@@ -38,7 +38,7 @@ class UrlUtils
      *
      * @return string
      */
-    protected static function resolveRelativeUrlAfterEarlyChecks(string $base, string $rel) : string
+    protected static function resolveRelativeUrlAfterEarlyChecks(string $base, string $rel): string
     {
         /* fix url file for Windows */
         $base = preg_replace('#^file:\/\/([^/])#', 'file:///\1', $base);
@@ -74,7 +74,7 @@ class UrlUtils
         string $rel,
         string $path,
         array $parts
-    ) : string {
+    ): string {
         /* Build absolute URL */
         $abs = '';
 
@@ -103,7 +103,7 @@ class UrlUtils
      * /./
      * /foo/../.
      */
-    protected static function replaceSuperfluousSlashes(string $abs) : string
+    protected static function replaceSuperfluousSlashes(string $abs): string
     {
         $n = 1;
         do {

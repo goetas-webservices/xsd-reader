@@ -86,7 +86,7 @@ class Schema
     /**
      * @throws TypeNotFoundException
      */
-    protected function findSomething(string $getter, string $name, string $namespace = null, array &$calling = array()) : SchemaItem
+    protected function findSomething(string $getter, string $name, string $namespace = null, array &$calling = array()): SchemaItem
     {
         $in = $this->findSomethingNoThrow(
             $getter,
@@ -157,7 +157,7 @@ class Schema
      */
     protected $typeCache = array();
 
-    public function getElementsQualification() : bool
+    public function getElementsQualification(): bool
     {
         return $this->elementsQualification;
     }
@@ -167,7 +167,7 @@ class Schema
         $this->elementsQualification = $elementsQualification;
     }
 
-    public function getAttributesQualification() : bool
+    public function getAttributesQualification(): bool
     {
         return $this->attributesQualification;
     }
@@ -196,7 +196,7 @@ class Schema
     /**
      * @return Type[]
      */
-    public function getTypes() : array
+    public function getTypes(): array
     {
         return $this->types;
     }
@@ -204,7 +204,7 @@ class Schema
     /**
      * @return ElementDef[]
      */
-    public function getElements() : array
+    public function getElements(): array
     {
         return $this->elements;
     }
@@ -212,7 +212,7 @@ class Schema
     /**
      * @return Schema[]
      */
-    public function getSchemas() : array
+    public function getSchemas(): array
     {
         return $this->schemas;
     }
@@ -220,7 +220,7 @@ class Schema
     /**
      * @return AttributeDef[]
      */
-    public function getAttributes() : array
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
@@ -228,7 +228,7 @@ class Schema
     /**
      * @return Group[]
      */
-    public function getGroups() : array
+    public function getGroups(): array
     {
         return $this->groups;
     }
@@ -292,7 +292,7 @@ class Schema
     /**
      * @return AttributeGroup[]
      */
-    public function getAttributeGroups() : array
+    public function getAttributeGroups(): array
     {
         return $this->attributeGroups;
     }
@@ -357,12 +357,12 @@ class Schema
         return false;
     }
 
-    public function __toString() : string
+    public function __toString(): string
     {
         return sprintf('Target namespace %s', $this->getTargetNamespace());
     }
 
-    public function findType(string $name, string $namespace = null) : Type
+    public function findType(string $name, string $namespace = null): Type
     {
         /**
          * @var Type
@@ -372,7 +372,7 @@ class Schema
         return $out;
     }
 
-    public function findGroup(string $name, string $namespace = null) : Group
+    public function findGroup(string $name, string $namespace = null): Group
     {
         /**
          * @var Group
@@ -382,7 +382,7 @@ class Schema
         return $out;
     }
 
-    public function findElement(string $name, string $namespace = null) : ElementDef
+    public function findElement(string $name, string $namespace = null): ElementDef
     {
         /**
          * @var ElementDef
@@ -392,7 +392,7 @@ class Schema
         return $out;
     }
 
-    public function findAttribute(string $name, string $namespace = null) : AttributeItem
+    public function findAttribute(string $name, string $namespace = null): AttributeItem
     {
         /**
          * @var AttributeItem
@@ -402,7 +402,7 @@ class Schema
         return $out;
     }
 
-    public function findAttributeGroup(string $name, string $namespace = null) : AttributeGroup
+    public function findAttributeGroup(string $name, string $namespace = null): AttributeGroup
     {
         /**
          * @var AttributeGroup

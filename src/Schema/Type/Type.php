@@ -48,12 +48,12 @@ abstract class Type implements SchemaItem
         return $this->name;
     }
 
-    public function __toString() : string
+    public function __toString(): string
     {
         return strval($this->name);
     }
 
-    public function isAbstract() : bool
+    public function isAbstract(): bool
     {
         return $this->abstract;
     }
@@ -61,7 +61,7 @@ abstract class Type implements SchemaItem
     /**
      * @return $this
      */
-    public function setAbstract(bool $abstract) : Type
+    public function setAbstract(bool $abstract): self
     {
         $this->abstract = $abstract;
 
@@ -87,7 +87,7 @@ abstract class Type implements SchemaItem
     /**
      * @return $this
      */
-    public function setRestriction(Restriction $restriction) : Type
+    public function setRestriction(Restriction $restriction): self
     {
         $this->restriction = $restriction;
 
@@ -105,7 +105,7 @@ abstract class Type implements SchemaItem
     /**
      * @return $this
      */
-    public function setExtension(Extension $extension) : Type
+    public function setExtension(Extension $extension): self
     {
         $this->extension = $extension;
 

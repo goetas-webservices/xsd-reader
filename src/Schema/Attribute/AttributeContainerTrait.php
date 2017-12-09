@@ -19,7 +19,7 @@ trait AttributeContainerTrait
     /**
      * @return AttributeItem[]
      */
-    public function getAttributes() : array
+    public function getAttributes(): array
     {
         return $this->attributes;
     }

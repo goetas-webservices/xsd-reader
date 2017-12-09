@@ -13,5 +13,5 @@ interface AttributeContainer extends SchemaItem
     /**
      * @return AttributeItem[]
      */
-    public function getAttributes() : array;
+    public function getAttributes(): array;
 }

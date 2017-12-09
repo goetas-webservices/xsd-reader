@@ -8,5 +8,5 @@ use GoetasWebservices\XML\XSDReader\Schema\SchemaItem;
 
 interface AttributeItem extends SchemaItem
 {
-    public function getName() : string;
+    public function getName(): string;
 }

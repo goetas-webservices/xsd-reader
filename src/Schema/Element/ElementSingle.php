@@ -11,14 +11,14 @@ interface ElementSingle extends ElementItem, InterfaceSetMinMax
      */
     public function getType();
 
-    public function isQualified() : bool;
+    public function isQualified(): bool;
 
     /**
      * @param bool $qualified
      */
     public function setQualified(bool $qualified);
 
-    public function isNil() : bool;
+    public function isNil(): bool;
 
     public function setNil(bool $nil);
 }

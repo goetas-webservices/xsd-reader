@@ -33,7 +33,7 @@ abstract class Item implements SchemaItem
     /**
      * @return $this
      */
-    public function setType(Type $type) : Item
+    public function setType(Type $type): self
     {
         $this->type = $type;
 
