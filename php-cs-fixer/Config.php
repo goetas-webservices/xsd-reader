@@ -1,7 +1,10 @@
 <?php
+
+declare(strict_types=1);
 /**
-* @author SignpostMarv
-*/
+ * @author SignpostMarv
+ */
+
 namespace GoetasWebservices\CS;
 
 use PhpCsFixer\Config as BaseConfig;
@@ -11,6 +14,8 @@ class Config extends BaseConfig
 {
     const DEFAULT_RULES = [
         '@Symfony' => true,
+        '@PHP70Migration' => true,
+        'declare_strict_types' => true,
         'yoda_style' => false,
         'phpdoc_to_comment' => false, // required for type hinting
         'phpdoc_var_without_name' => false, // required for type hinting
@@ -34,8 +39,8 @@ class Config extends BaseConfig
         $this->setRules(static::DEFAULT_RULES);
 
         /**
-        * @var DefaultFinder $finder
-        */
+         * @var DefaultFinder $finder
+         */
         $finder = $this->getFinder();
         $this->setFinder(array_reduce(
             $inPaths,
@@ -43,6 +48,7 @@ class Config extends BaseConfig
                 if (is_file($directory) === true) {
                     return $finder->append([$directory]);
                 }
+
                 return $finder->in($directory);
             },
             $finder->ignoreUnreadableDirs()
@@ -50,8 +56,8 @@ class Config extends BaseConfig
     }
 
     /**
-    * Resolve rules at runtime.
-    */
+     * Resolve rules at runtime.
+     */
     protected static function RuntimeResolveRules()
     {
         return static::DEFAULT_RULES;

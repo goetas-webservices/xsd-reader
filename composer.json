@@ -44,7 +44,7 @@
         }
     },
     "scripts": {
-        "php-cs-fixer": "php ./vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix --verbose --dry-run",
+        "php-cs-fixer": "php ./vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix --verbose --allow-risky=yes --dry-run",
         "tests": [
             "php ./vendor/phpunit/phpunit/phpunit -v",
             "php ./vendor/phpstan/phpstan/bin/phpstan analyse -c ./phpstan.neon src",

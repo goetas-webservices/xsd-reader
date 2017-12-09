@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace GoetasWebservices\XML\XSDReader\Tests\Documentation;
 
 use GoetasWebservices\XML\XSDReader\Documentation\StandardDocumentationReader;
