@@ -99,7 +99,14 @@ class Schema
             return $in;
         }
 
-        throw new TypeNotFoundException(sprintf("Can't find the %s named {%s}#%s.", substr($getter, 3), $namespace, $name));
+        throw new TypeNotFoundException(
+            sprintf(
+                "Can't find the %s named {%s}#%s.",
+                substr($getter, 3),
+                $namespace,
+                $name
+            )
+        );
     }
 
     /**
