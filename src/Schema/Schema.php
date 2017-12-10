@@ -364,50 +364,55 @@ class Schema
 
     public function findType(string $name, string $namespace = null): Type
     {
-        /**
-         * @var Type
-         */
         $out = $this->findSomething('getType', $name, $namespace);
+
+        if (!($out instanceof Type)) {
+            throw new TypeNotFoundException(sprintf("Can't find the %s named {%s}#%s.", 'Type', $namespace, $name));
+        }
 
         return $out;
     }
 
     public function findGroup(string $name, string $namespace = null): Group
     {
-        /**
-         * @var Group
-         */
         $out = $this->findSomething('getGroup', $name, $namespace);
+
+        if (!($out instanceof Group)) {
+            throw new TypeNotFoundException(sprintf("Can't find the %s named {%s}#%s.", 'Group', $namespace, $name));
+        }
 
         return $out;
     }
 
     public function findElement(string $name, string $namespace = null): ElementDef
     {
-        /**
-         * @var ElementDef
-         */
         $out = $this->findSomething('getElement', $name, $namespace);
+
+        if (!($out instanceof ElementDef)) {
+            throw new TypeNotFoundException(sprintf("Can't find the %s named {%s}#%s.", 'Element', $namespace, $name));
+        }
 
         return $out;
     }
 
     public function findAttribute(string $name, string $namespace = null): AttributeItem
     {
-        /**
-         * @var AttributeItem
-         */
         $out = $this->findSomething('getAttribute', $name, $namespace);
+
+        if (!($out instanceof AttributeItem)) {
+            throw new TypeNotFoundException(sprintf("Can't find the %s named {%s}#%s.", 'Attribute', $namespace, $name));
+        }
 
         return $out;
     }
 
     public function findAttributeGroup(string $name, string $namespace = null): AttributeGroup
     {
-        /**
-         * @var AttributeGroup
-         */
         $out = $this->findSomething('getAttributeGroup', $name, $namespace);
+
+        if (!($out instanceof AttributeGroup)) {
+            throw new TypeNotFoundException(sprintf("Can't find the %s named {%s}#%s.", 'AttributeGroup', $namespace, $name));
+        }
 
         return $out;
     }
