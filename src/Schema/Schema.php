@@ -102,7 +102,7 @@ class Schema
         throw new TypeNotFoundException(
             sprintf(
                 "Can't find the %s named {%s}#%s.",
-                substr($getter, 3),
+                (string) substr($getter, 3),
                 $namespace,
                 $name
             )
