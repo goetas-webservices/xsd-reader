@@ -8,11 +8,11 @@ use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
 
 interface AttributeSingle extends AttributeItem
 {
-    const USE_OPTIONAL = 'optional';
+    public const USE_OPTIONAL = 'optional';
 
-    const USE_PROHIBITED = 'prohibited';
+    public const USE_PROHIBITED = 'prohibited';
 
-    const USE_REQUIRED = 'required';
+    public const USE_REQUIRED = 'required';
 
     public function getType(): ?Type;
 

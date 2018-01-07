@@ -40,9 +40,9 @@ use GoetasWebservices\XML\XSDReader\Utils\UrlUtils;
 
 class SchemaReader
 {
-    const XSD_NS = 'http://www.w3.org/2001/XMLSchema';
+    public const XSD_NS = 'http://www.w3.org/2001/XMLSchema';
 
-    const XML_NS = 'http://www.w3.org/XML/1998/namespace';
+    public const XML_NS = 'http://www.w3.org/XML/1998/namespace';
 
     /**
      * @var DocumentationReader

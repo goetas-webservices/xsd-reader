@@ -53,7 +53,6 @@ class AbstractElementSingle extends Item implements ElementSingle
         return $this->min;
     }
 
-
     public function setMin(int $min): void
     {
         $this->min = $min;

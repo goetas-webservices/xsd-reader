@@ -57,7 +57,7 @@ class Schema
 
     /**
      * @param Schema[] $schemas
-     * @param bool[] $calling
+     * @param bool[]   $calling
      *
      * @return SchemaItem|null
      */
@@ -102,7 +102,7 @@ class Schema
         throw new TypeNotFoundException(
             sprintf(
                 "Can't find the %s named {%s}#%s.",
-                (string)substr($getter, 3),
+                (string) substr($getter, 3),
                 $namespace,
                 $name
             )
@@ -330,7 +330,6 @@ class Schema
 
         return null;
     }
-
 
     public function getAttribute(string $name): ? AttributeItem
     {

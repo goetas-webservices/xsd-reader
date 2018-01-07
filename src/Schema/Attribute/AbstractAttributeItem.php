@@ -33,7 +33,6 @@ abstract class AbstractAttributeItem extends Item implements AttributeItem
         return $this->default;
     }
 
-
     public function setDefault(string $default): void
     {
         $this->default = $default;

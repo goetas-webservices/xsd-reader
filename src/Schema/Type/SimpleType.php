@@ -31,7 +31,6 @@ class SimpleType extends Type
     public function setRestriction(Restriction $restriction): void
     {
         $this->restriction = $restriction;
-
     }
 
     public function addUnion(self $type): void
@@ -47,11 +46,10 @@ class SimpleType extends Type
         return $this->unions;
     }
 
-    public function getList(): ?SimpleType
+    public function getList(): ?self
     {
         return $this->list;
     }
-
 
     public function setList(self $list): void
     {
