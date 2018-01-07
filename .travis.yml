@@ -4,26 +4,20 @@ sudo: false
 php:
   - 7.1
   - 7.2
-  - hhvm
-
-matrix:
-  allow_failures:
-    - php: hhvm
-
 cache:
   directories:
     - vendor
     - $HOME/.composer/cache
 
 before_script:
-  - if [[ $TRAVIS_PHP_VERSION != 'hhvm' ]]; then phpenv config-rm xdebug.ini; fi
+  - phpenv config-rm xdebug.ini
   - travis_retry composer self-update
   - travis_retry composer update $COMPOSER_FLAGS
 
 script:
   - vendor/bin/phpunit $PHPUNIT_FLAGS
   - vendor/phpstan/phpstan/bin/phpstan analyse -c ./phpstan.neon src
-  - if [[ $TRAVIS_PHP_VERSION != 'hhvm' ]]; then php ./vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix --verbose --allow-risky=yes --dry-run; fi
+  - php ./vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix --verbose --allow-risky=yes --dry-run
 
 after_script:
   - wget https://scrutinizer-ci.com/ocular.phar
