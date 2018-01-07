@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace GoetasWebservices\XML\XSDReader\Schema;
 
-use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItem;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
-use GoetasWebservices\XML\XSDReader\Schema\Element\Group;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementItem;
-use GoetasWebservices\XML\XSDReader\Schema\Exception\TypeNotFoundException;
+use GoetasWebservices\XML\XSDReader\Schema\Element\Group;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
-use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItem;
-use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
+use GoetasWebservices\XML\XSDReader\Schema\Exception\TypeNotFoundException;
+use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
 
 class Schema
 {
@@ -57,7 +57,7 @@ class Schema
 
     /**
      * @param Schema[] $schemas
-     * @param bool[]   $calling
+     * @param bool[] $calling
      *
      * @return SchemaItem|null
      */
@@ -102,7 +102,7 @@ class Schema
         throw new TypeNotFoundException(
             sprintf(
                 "Can't find the %s named {%s}#%s.",
-                (string) substr($getter, 3),
+                (string)substr($getter, 3),
                 $namespace,
                 $name
             )
@@ -304,64 +304,50 @@ class Schema
         return $this->attributeGroups;
     }
 
-    /**
-     * @return Group|false
-     */
-    public function getGroup(string $name)
+    public function getGroup(string $name): ?Group
     {
         if (isset($this->groups[$name])) {
             return $this->groups[$name];
         }
 
-        return false;
+        return null;
     }
 
-    /**
-     * @return ElementItem|false
-     */
-    public function getElement(string $name)
+    public function getElement(string $name): ?ElementItem
     {
         if (isset($this->elements[$name])) {
             return $this->elements[$name];
         }
 
-        return false;
+        return null;
     }
 
-    /**
-     * @return Type|false
-     */
-    public function getType(string $name)
+    public function getType(string $name): ?Type
     {
         if (isset($this->types[$name])) {
             return $this->types[$name];
         }
 
-        return false;
+        return null;
     }
 
-    /**
-     * @return AttributeItem|false
-     */
-    public function getAttribute(string $name)
+
+    public function getAttribute(string $name): ? AttributeItem
     {
         if (isset($this->attributes[$name])) {
             return $this->attributes[$name];
         }
 
-        return false;
+        return null;
     }
 
-    /**
-     * @return AttributeGroup|false
-     */
-    public function getAttributeGroup(string $name)
+    public function getAttributeGroup(string $name): ?AttributeGroup
     {
         if (isset($this->attributeGroups[$name])) {
             return $this->attributeGroups[$name];
         }
 
-        return false;
+        return null;
     }
 
     public function __toString(): string
