@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
+use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
+
 class ElementRef extends AbstractElementSingle
 {
     /**
@@ -17,6 +19,11 @@ class ElementRef extends AbstractElementSingle
         $this->wrapped = $element;
     }
 
+    public function getName(): string
+    {
+        return $this->wrapped->getName();
+    }
+
     /**
      * @return ElementDef
      */
@@ -25,10 +32,7 @@ class ElementRef extends AbstractElementSingle
         return $this->wrapped;
     }
 
-    /**
-     * @return \GoetasWebservices\XML\XSDReader\Schema\Type\Type|null
-     */
-    public function getType()
+    public function getType(): ?Type
     {
         return $this->wrapped->getType();
     }

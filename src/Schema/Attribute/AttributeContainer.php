@@ -8,7 +8,7 @@ use GoetasWebservices\XML\XSDReader\Schema\SchemaItem;
 
 interface AttributeContainer extends SchemaItem
 {
-    public function addAttribute(AttributeItem $attribute);
+    public function addAttribute(AttributeItem $attribute): void;
 
     /**
      * @return AttributeItem[]

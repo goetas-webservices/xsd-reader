@@ -19,7 +19,7 @@ trait ElementContainerTrait
         return $this->elements;
     }
 
-    public function addElement(ElementItem $element)
+    public function addElement(ElementItem $element): void
     {
         $this->elements[] = $element;
     }

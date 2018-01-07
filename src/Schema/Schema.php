@@ -169,7 +169,7 @@ class Schema
         return $this->elementsQualification;
     }
 
-    public function setElementsQualification(bool $elementsQualification)
+    public function setElementsQualification(bool $elementsQualification): void
     {
         $this->elementsQualification = $elementsQualification;
     }
@@ -179,7 +179,7 @@ class Schema
         return $this->attributesQualification;
     }
 
-    public function setAttributesQualification(bool $attributesQualification)
+    public function setAttributesQualification(bool $attributesQualification): void
     {
         $this->attributesQualification = $attributesQualification;
     }
@@ -187,7 +187,7 @@ class Schema
     /**
      * @return string|null
      */
-    public function getTargetNamespace()
+    public function getTargetNamespace(): ?string
     {
         return $this->targetNamespace;
     }
@@ -195,7 +195,7 @@ class Schema
     /**
      * @param string|null $targetNamespace
      */
-    public function setTargetNamespace($targetNamespace)
+    public function setTargetNamespace($targetNamespace): void
     {
         $this->targetNamespace = $targetNamespace;
     }
@@ -243,27 +243,27 @@ class Schema
     /**
      * @return string|null
      */
-    public function getDoc()
+    public function getDoc(): ?string
     {
         return $this->doc;
     }
 
-    public function setDoc(string $doc)
+    public function setDoc(string $doc): void
     {
         $this->doc = $doc;
     }
 
-    public function addType(Type $type)
+    public function addType(Type $type): void
     {
         $this->types[$type->getName()] = $type;
     }
 
-    public function addElement(ElementDef $element)
+    public function addElement(ElementDef $element): void
     {
         $this->elements[$element->getName()] = $element;
     }
 
-    public function addSchema(self $schema, string $namespace = null)
+    public function addSchema(self $schema, string $namespace = null): void
     {
         if ($namespace !== null) {
             if ($schema->getTargetNamespace() !== $namespace) {
@@ -281,17 +281,17 @@ class Schema
         }
     }
 
-    public function addAttribute(AttributeDef $attribute)
+    public function addAttribute(AttributeDef $attribute): void
     {
         $this->attributes[$attribute->getName()] = $attribute;
     }
 
-    public function addGroup(Group $group)
+    public function addGroup(Group $group): void
     {
         $this->groups[$group->getName()] = $group;
     }
 
-    public function addAttributeGroup(AttributeGroup $group)
+    public function addAttributeGroup(AttributeGroup $group): void
     {
         $this->attributeGroups[$group->getName()] = $group;
     }

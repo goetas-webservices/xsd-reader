@@ -22,21 +22,13 @@ abstract class Item implements SchemaItem
         $this->name = $name;
     }
 
-    /**
-     * @return Type|null
-     */
-    public function getType()
+    public function getType(): ?Type
     {
         return $this->type;
     }
 
-    /**
-     * @return $this
-     */
-    public function setType(Type $type): self
+    public function setType(Type $type): void
     {
         $this->type = $type;
-
-        return $this;
     }
 }

@@ -26,14 +26,9 @@ class Attribute extends AbstractAttributeItem implements AttributeSingle
         return $this->qualified;
     }
 
-    /**
-     * @return $this
-     */
-    public function setQualified(bool $qualified): self
+    public function setQualified(bool $qualified): void
     {
         $this->qualified = $qualified;
-
-        return $this;
     }
 
     public function isNil(): bool
@@ -41,28 +36,18 @@ class Attribute extends AbstractAttributeItem implements AttributeSingle
         return $this->nil;
     }
 
-    /**
-     * @return $this
-     */
-    public function setNil(bool $nil): self
+    public function setNil(bool $nil): void
     {
         $this->nil = $nil;
-
-        return $this;
     }
 
-    public function getUse(): string
+    public function getUse(): ?string
     {
         return $this->use;
     }
 
-    /**
-     * @return $this
-     */
-    public function setUse(string $use): self
+    public function setUse(string $use): void
     {
         $this->use = $use;
-
-        return $this;
     }
 }

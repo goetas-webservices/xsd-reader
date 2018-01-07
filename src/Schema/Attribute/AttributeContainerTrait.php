@@ -11,7 +11,7 @@ trait AttributeContainerTrait
      */
     protected $attributes = array();
 
-    public function addAttribute(AttributeItem $attribute)
+    public function addAttribute(AttributeItem $attribute): void
     {
         $this->attributes[] = $attribute;
     }

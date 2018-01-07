@@ -24,22 +24,14 @@ abstract class AbstractNamedGroupItem
         $this->name = $name;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getDoc()
+    public function getDoc(): ?string
     {
         return $this->doc;
     }
 
-    /**
-     * @return $this
-     */
-    public function setDoc(string $doc): self
+    public function setDoc(string $doc): void
     {
         $this->doc = $doc;
-
-        return $this;
     }
 
     public function getSchema(): Schema

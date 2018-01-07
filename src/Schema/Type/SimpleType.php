@@ -23,32 +23,20 @@ class SimpleType extends Type
      */
     protected $list;
 
-    /**
-     * @return Restriction|null
-     */
-    public function getRestriction()
+    public function getRestriction(): ?Restriction
     {
         return $this->restriction;
     }
 
-    /**
-     * @return $this
-     */
-    public function setRestriction(Restriction $restriction): Type
+    public function setRestriction(Restriction $restriction): void
     {
         $this->restriction = $restriction;
 
-        return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function addUnion(self $type): self
+    public function addUnion(self $type): void
     {
         $this->unions[] = $type;
-
-        return $this;
     }
 
     /**
@@ -59,21 +47,14 @@ class SimpleType extends Type
         return $this->unions;
     }
 
-    /**
-     * @return SimpleType|null
-     */
-    public function getList()
+    public function getList(): ?SimpleType
     {
         return $this->list;
     }
 
-    /**
-     * @return $this
-     */
-    public function setList(self $list): self
+
+    public function setList(self $list): void
     {
         $this->list = $list;
-
-        return $this;
     }
 }

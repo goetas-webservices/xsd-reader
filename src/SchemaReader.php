@@ -94,7 +94,7 @@ class SchemaReader
         $this->documentationReader = $documentationReader;
     }
 
-    public function addKnownSchemaLocation(string $remote, string $local)
+    public function addKnownSchemaLocation(string $remote, string $local): void
     {
         $this->knownLocationSchemas[$remote] = $local;
     }
@@ -291,7 +291,7 @@ class SchemaReader
         return $ref;
     }
 
-    private function loadSequence(ElementContainer $elementContainer, DOMElement $node, int $max = null)
+    private function loadSequence(ElementContainer $elementContainer, DOMElement $node, int $max = null): void
     {
         $max =
         (
@@ -329,7 +329,7 @@ class SchemaReader
         DOMElement $node,
         DOMElement $childNode,
         $max
-    ) {
+    ): void {
         switch ($childNode->localName) {
             case 'sequence':
             case 'choice':
@@ -367,7 +367,7 @@ class SchemaReader
         DOMElement $node,
         DOMElement $childNode,
         $max
-    ) {
+    ): void {
         if ($childNode->hasAttribute('ref')) {
             $element = new ElementRef(
                 $this->findElement($elementContainer->getSchema(), $node, $childNode->getAttribute('ref'))
@@ -404,7 +404,7 @@ class SchemaReader
         DOMElement $node,
         DOMElement $childNode,
         ElementContainer $elementContainer
-    ) {
+    ): void {
         $referencedGroup = $this->findGroup(
             $schema,
             $node,
@@ -517,7 +517,7 @@ class SchemaReader
         DOMElement $node,
         DOMElement $childNode,
         Schema $schema
-    ) {
+    ): void {
         switch ($childNode->localName) {
             case 'sequence':
             case 'choice':
@@ -591,7 +591,7 @@ class SchemaReader
         };
     }
 
-    private function loadList(SimpleType $type, DOMElement $node)
+    private function loadList(SimpleType $type, DOMElement $node): void
     {
         if ($node->hasAttribute('itemType')) {
             /**
@@ -646,7 +646,7 @@ class SchemaReader
         return $out;
     }
 
-    private function loadUnion(SimpleType $type, DOMElement $node)
+    private function loadUnion(SimpleType $type, DOMElement $node): void
     {
         if ($node->hasAttribute('memberTypes')) {
             $types = preg_split('/\s+/', $node->getAttribute('memberTypes'));
@@ -681,7 +681,7 @@ class SchemaReader
         );
     }
 
-    private function fillTypeNode(Type $type, DOMElement $node, bool $checkAbstract = false)
+    private function fillTypeNode(Type $type, DOMElement $node, bool $checkAbstract = false): void
     {
         if ($checkAbstract) {
             $type->setAbstract($node->getAttribute('abstract') === 'true' || $node->getAttribute('abstract') === '1');
@@ -708,7 +708,7 @@ class SchemaReader
         );
     }
 
-    private function loadExtension(BaseComplexType $type, DOMElement $node)
+    private function loadExtension(BaseComplexType $type, DOMElement $node): void
     {
         $extension = new Extension();
         $type->setExtension($extension);
@@ -727,7 +727,7 @@ class SchemaReader
         Type $type,
         Base $setBaseOnThis,
         DOMElement $node
-    ) {
+    ): void {
         /**
          * @var Type
          */
@@ -779,7 +779,7 @@ class SchemaReader
         );
     }
 
-    private function loadRestriction(Type $type, DOMElement $node)
+    private function loadRestriction(Type $type, DOMElement $node): void
     {
         $restriction = new Restriction();
         $type->setRestriction($restriction);
@@ -988,7 +988,7 @@ class SchemaReader
     /**
      * @return Closure
      */
-    private function loadElementDef(Schema $schema, DOMElement $node)
+    private function loadElementDef(Schema $schema, DOMElement $node): Closure
     {
         return $this->loadAttributeOrElementDef($schema, $node, false);
     }
@@ -1036,7 +1036,7 @@ class SchemaReader
         $this->fillItemNonLocalType($element, $node);
     }
 
-    private function fillItemNonLocalType(Item $element, DOMElement $node)
+    private function fillItemNonLocalType(Item $element, DOMElement $node): void
     {
         if ($node->getAttribute('type')) {
             /**
@@ -1378,7 +1378,7 @@ class SchemaReader
         DOMElement $childNode,
         Schema $schema,
         DOMElement $node
-    ) {
+    ): void {
         $attribute = $this->getAttributeFromAttributeOrRef(
             $childNode,
             $schema,
@@ -1393,7 +1393,7 @@ class SchemaReader
         DOMElement $node,
         DOMElement $childNode,
         AttributeContainer $addToThis
-    ) {
+    ): void {
         $attribute = $this->findAttributeGroup($schema, $node, $childNode->getAttribute('ref'));
         $addToThis->addAttribute($attribute);
     }
@@ -1409,7 +1409,7 @@ class SchemaReader
         Schema $schema,
         DOMElement $node,
         Schema $parent = null
-    ) {
+    ): void {
         $schema->setDoc($this->getDocumentation($node));
 
         if ($node->hasAttribute('targetNamespace')) {

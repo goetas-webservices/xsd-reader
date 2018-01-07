@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace GoetasWebservices\XML\XSDReader\Schema\Type;
 
+use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Base;
 use GoetasWebservices\XML\XSDReader\Schema\Schema;
 use GoetasWebservices\XML\XSDReader\Schema\SchemaItem;
 use GoetasWebservices\XML\XSDReader\Schema\SchemaItemTrait;
@@ -43,7 +44,7 @@ abstract class Type implements SchemaItem
     /**
      * @return string|null
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -58,57 +59,39 @@ abstract class Type implements SchemaItem
         return $this->abstract;
     }
 
-    /**
-     * @return $this
-     */
-    public function setAbstract(bool $abstract): self
+    public function setAbstract(bool $abstract): void
     {
         $this->abstract = $abstract;
-
-        return $this;
     }
 
     /**
      * @return Restriction|Extension|null
      */
-    public function getParent()
+    public function getParent(): ?Base
     {
         return $this->restriction ?: $this->extension;
     }
 
-    /**
-     * @return Restriction|null
-     */
-    public function getRestriction()
+    public function getRestriction(): ?Restriction
     {
         return $this->restriction;
     }
 
-    /**
-     * @return $this
-     */
-    public function setRestriction(Restriction $restriction): self
+    public function setRestriction(Restriction $restriction): void
     {
         $this->restriction = $restriction;
-
-        return $this;
     }
 
     /**
      * @return Extension|null
      */
-    public function getExtension()
+    public function getExtension(): ?Extension
     {
         return $this->extension;
     }
 
-    /**
-     * @return $this
-     */
-    public function setExtension(Extension $extension): self
+    public function setExtension(Extension $extension): void
     {
         $this->extension = $extension;
-
-        return $this;
     }
 }
