@@ -33,14 +33,9 @@ class AbstractElementSingle extends Item implements ElementSingle
         return $this->qualified;
     }
 
-    /**
-     * @return $this
-     */
-    public function setQualified(bool $qualified): self
+    public function setQualified(bool $qualified): void
     {
         $this->qualified = is_bool($qualified) ? $qualified : (bool) $qualified;
-
-        return $this;
     }
 
     public function isNil(): bool
@@ -48,14 +43,9 @@ class AbstractElementSingle extends Item implements ElementSingle
         return $this->nil;
     }
 
-    /**
-     * @return $this
-     */
-    public function setNil(bool $nil): self
+    public function setNil(bool $nil): void
     {
         $this->nil = is_bool($nil) ? $nil : (bool) $nil;
-
-        return $this;
     }
 
     public function getMin(): int
@@ -63,14 +53,9 @@ class AbstractElementSingle extends Item implements ElementSingle
         return $this->min;
     }
 
-    /**
-     * @return $this
-     */
-    public function setMin(int $min): self
+    public function setMin(int $min): void
     {
         $this->min = $min;
-
-        return $this;
     }
 
     public function getMax(): int
@@ -78,13 +63,8 @@ class AbstractElementSingle extends Item implements ElementSingle
         return $this->max;
     }
 
-    /**
-     * @return $this
-     */
-    public function setMax(int $max): self
+    public function setMax(int $max): void
     {
         $this->max = $max;
-
-        return $this;
     }
 }

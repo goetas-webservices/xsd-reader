@@ -21,18 +21,13 @@ trait SchemaItemTrait
         return $this->schema;
     }
 
-    public function getDoc(): string
+    public function getDoc(): ?string
     {
         return $this->doc;
     }
 
-    /**
-     * @return $this
-     */
-    public function setDoc(string $doc)
+    public function setDoc(string $doc): void
     {
         $this->doc = $doc;
-
-        return $this;
     }
 }

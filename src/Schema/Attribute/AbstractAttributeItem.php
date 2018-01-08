@@ -18,39 +18,23 @@ abstract class AbstractAttributeItem extends Item implements AttributeItem
      */
     protected $default;
 
-    /**
-     * @return string|null
-     */
-    public function getFixed()
+    public function getFixed(): ?string
     {
         return $this->fixed;
     }
 
-    /**
-     * @return $this
-     */
-    public function setFixed(string $fixed): self
+    public function setFixed(string $fixed): void
     {
         $this->fixed = $fixed;
-
-        return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getDefault()
+    public function getDefault(): ?string
     {
         return $this->default;
     }
 
-    /**
-     * @return $this
-     */
-    public function setDefault(string $default): self
+    public function setDefault(string $default): void
     {
         $this->default = $default;
-
-        return $this;
     }
 }

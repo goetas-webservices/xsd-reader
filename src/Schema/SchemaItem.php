@@ -8,8 +8,5 @@ interface SchemaItem
 {
     public function getSchema(): Schema;
 
-    /**
-     * @return string|null
-     */
-    public function getDoc();
+    public function getDoc(): ?string;
 }

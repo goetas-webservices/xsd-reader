@@ -12,9 +12,9 @@ use PhpCsFixer\Finder as DefaultFinder;
 
 class Config extends BaseConfig
 {
-    const DEFAULT_RULES = [
+    public const DEFAULT_RULES = [
         '@Symfony' => true,
-        '@PHP70Migration' => true,
+        '@PHP71Migration' => true,
         'declare_strict_types' => true,
         'yoda_style' => false,
         'phpdoc_to_comment' => false, // required for type hinting

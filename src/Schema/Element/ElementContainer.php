@@ -8,7 +8,7 @@ use GoetasWebservices\XML\XSDReader\Schema\SchemaItem;
 
 interface ElementContainer extends SchemaItem
 {
-    public function addElement(ElementItem $element);
+    public function addElement(ElementItem $element): void;
 
     /**
      * @return ElementItem[]

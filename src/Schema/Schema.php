@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace GoetasWebservices\XML\XSDReader\Schema;
 
-use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItem;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
-use GoetasWebservices\XML\XSDReader\Schema\Element\Group;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementItem;
-use GoetasWebservices\XML\XSDReader\Schema\Exception\TypeNotFoundException;
+use GoetasWebservices\XML\XSDReader\Schema\Element\Group;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
-use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItem;
-use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
+use GoetasWebservices\XML\XSDReader\Schema\Exception\TypeNotFoundException;
+use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
 
 class Schema
 {
@@ -169,7 +169,7 @@ class Schema
         return $this->elementsQualification;
     }
 
-    public function setElementsQualification(bool $elementsQualification)
+    public function setElementsQualification(bool $elementsQualification): void
     {
         $this->elementsQualification = $elementsQualification;
     }
@@ -179,7 +179,7 @@ class Schema
         return $this->attributesQualification;
     }
 
-    public function setAttributesQualification(bool $attributesQualification)
+    public function setAttributesQualification(bool $attributesQualification): void
     {
         $this->attributesQualification = $attributesQualification;
     }
@@ -187,7 +187,7 @@ class Schema
     /**
      * @return string|null
      */
-    public function getTargetNamespace()
+    public function getTargetNamespace(): ?string
     {
         return $this->targetNamespace;
     }
@@ -195,7 +195,7 @@ class Schema
     /**
      * @param string|null $targetNamespace
      */
-    public function setTargetNamespace($targetNamespace)
+    public function setTargetNamespace($targetNamespace): void
     {
         $this->targetNamespace = $targetNamespace;
     }
@@ -243,27 +243,27 @@ class Schema
     /**
      * @return string|null
      */
-    public function getDoc()
+    public function getDoc(): ?string
     {
         return $this->doc;
     }
 
-    public function setDoc(string $doc)
+    public function setDoc(string $doc): void
     {
         $this->doc = $doc;
     }
 
-    public function addType(Type $type)
+    public function addType(Type $type): void
     {
         $this->types[$type->getName()] = $type;
     }
 
-    public function addElement(ElementDef $element)
+    public function addElement(ElementDef $element): void
     {
         $this->elements[$element->getName()] = $element;
     }
 
-    public function addSchema(self $schema, string $namespace = null)
+    public function addSchema(self $schema, string $namespace = null): void
     {
         if ($namespace !== null) {
             if ($schema->getTargetNamespace() !== $namespace) {
@@ -281,17 +281,17 @@ class Schema
         }
     }
 
-    public function addAttribute(AttributeDef $attribute)
+    public function addAttribute(AttributeDef $attribute): void
     {
         $this->attributes[$attribute->getName()] = $attribute;
     }
 
-    public function addGroup(Group $group)
+    public function addGroup(Group $group): void
     {
         $this->groups[$group->getName()] = $group;
     }
 
-    public function addAttributeGroup(AttributeGroup $group)
+    public function addAttributeGroup(AttributeGroup $group): void
     {
         $this->attributeGroups[$group->getName()] = $group;
     }
@@ -304,64 +304,49 @@ class Schema
         return $this->attributeGroups;
     }
 
-    /**
-     * @return Group|false
-     */
-    public function getGroup(string $name)
+    public function getGroup(string $name): ?Group
     {
         if (isset($this->groups[$name])) {
             return $this->groups[$name];
         }
 
-        return false;
+        return null;
     }
 
-    /**
-     * @return ElementItem|false
-     */
-    public function getElement(string $name)
+    public function getElement(string $name): ?ElementItem
     {
         if (isset($this->elements[$name])) {
             return $this->elements[$name];
         }
 
-        return false;
+        return null;
     }
 
-    /**
-     * @return Type|false
-     */
-    public function getType(string $name)
+    public function getType(string $name): ?Type
     {
         if (isset($this->types[$name])) {
             return $this->types[$name];
         }
 
-        return false;
+        return null;
     }
 
-    /**
-     * @return AttributeItem|false
-     */
-    public function getAttribute(string $name)
+    public function getAttribute(string $name): ? AttributeItem
     {
         if (isset($this->attributes[$name])) {
             return $this->attributes[$name];
         }
 
-        return false;
+        return null;
     }
 
-    /**
-     * @return AttributeGroup|false
-     */
-    public function getAttributeGroup(string $name)
+    public function getAttributeGroup(string $name): ?AttributeGroup
     {
         if (isset($this->attributeGroups[$name])) {
             return $this->attributeGroups[$name];
         }
 
-        return false;
+        return null;
     }
 
     public function __toString(): string

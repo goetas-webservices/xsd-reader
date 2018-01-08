@@ -34,14 +34,9 @@ class GroupRef extends Group implements InterfaceSetMinMax
         return $this->min;
     }
 
-    /**
-     * @return $this
-     */
-    public function setMin(int $min): self
+    public function setMin(int $min): void
     {
         $this->min = $min;
-
-        return $this;
     }
 
     public function getMax(): int
@@ -49,14 +44,9 @@ class GroupRef extends Group implements InterfaceSetMinMax
         return $this->max;
     }
 
-    /**
-     * @return $this
-     */
-    public function setMax(int $max): self
+    public function setMax(int $max): void
     {
         $this->max = $max;
-
-        return $this;
     }
 
     public function getName(): string
@@ -87,7 +77,7 @@ class GroupRef extends Group implements InterfaceSetMinMax
         return $elements;
     }
 
-    public function addElement(ElementItem $element)
+    public function addElement(ElementItem $element): void
     {
         throw new BadMethodCallException("Can't add an element for a ref group");
     }

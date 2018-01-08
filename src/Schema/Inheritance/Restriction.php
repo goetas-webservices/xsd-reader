@@ -14,14 +14,10 @@ class Restriction extends Base
     /**
      * @param string  $type
      * @param mixed[] $value
-     *
-     * @return $this
      */
-    public function addCheck(string $type, array $value)
+    public function addCheck(string $type, array $value): void
     {
         $this->checks[$type][] = $value;
-
-        return $this;
     }
 
     /**

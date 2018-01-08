@@ -8,9 +8,9 @@ interface InterfaceSetMinMax
 {
     public function getMin(): int;
 
-    public function setMin(int $min);
+    public function setMin(int $min): void;
 
     public function getMax(): int;
 
-    public function setMax(int $max);
+    public function setMax(int $max): void;
 }
