@@ -4,7 +4,7 @@
     stopOnFirstError="false"
     useDocblockTypes="true"
     totallyTyped="true"
-    requireVoidReturnType="false"
+    requireVoidReturnType="true"
 >
     <projectFiles>
         <directory name="src" />
