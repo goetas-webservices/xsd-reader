@@ -5,13 +5,18 @@ php:
   - 7.1
   - 7.2
 
+matrix:
+  include:
+    - php: 7.1
+      env: COMPOSER_FLAGS='--prefer-lowest --prefer-stable'
+
 cache:
   directories:
     - vendor
     - $HOME/.composer/cache
 
 before_script:
-  - if [[ $TRAVIS_PHP_VERSION = '7.1' ]] ; then PHPUNIT_FLAGS="--coverage-clover=coverage.clover"; fi
+  - if [[ $TRAVIS_PHP_VERSION = '7.1' ]] ; then PHPUNIT_FLAGS="--coverage-clover=coverage.clover"; else phpenv config-rm xdebug.ini; fi
   - travis_retry composer self-update
   - travis_retry composer update $COMPOSER_FLAGS
 
