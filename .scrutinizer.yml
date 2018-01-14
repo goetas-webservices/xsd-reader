@@ -3,6 +3,9 @@ tools:
 
 checks:
     php:
+        excluded_dependencies:
+          - phpstan/phpstan
+
         code_rating: true
         duplication: true
 filter:
