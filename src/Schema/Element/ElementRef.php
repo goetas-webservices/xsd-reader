@@ -1,20 +1,17 @@
 <?php
+
+declare(strict_types=1);
+
 namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
-use GoetasWebservices\XML\XSDReader\Schema\Item;
+use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
 
-class ElementRef extends Item implements ElementSingle
+class ElementRef extends AbstractElementSingle
 {
-
+    /**
+     * @var ElementDef
+     */
     protected $wrapped;
-
-    protected $min = 1;
-
-    protected $max = 1;
-
-    protected $qualified = true;
-
-    protected $nil = false;
 
     public function __construct(ElementDef $element)
     {
@@ -22,61 +19,21 @@ class ElementRef extends Item implements ElementSingle
         $this->wrapped = $element;
     }
 
+    public function getName(): string
+    {
+        return $this->wrapped->getName();
+    }
+
     /**
-     *
      * @return ElementDef
      */
-    public function getReferencedElement()
+    public function getReferencedElement(): ElementDef
     {
         return $this->wrapped;
     }
 
-    public function getType()
+    public function getType(): ?Type
     {
         return $this->wrapped->getType();
-    }
-
-    public function getMin()
-    {
-        return $this->min;
-    }
-
-    public function setMin($min)
-    {
-        $this->min = $min;
-        return $this;
-    }
-
-    public function getMax()
-    {
-        return $this->max;
-    }
-
-    public function setMax($max)
-    {
-        $this->max = $max;
-        return $this;
-    }
-
-    public function isQualified()
-    {
-        return $this->qualified;
-    }
-
-    public function setQualified($qualified)
-    {
-        $this->qualified = (boolean) $qualified;
-        return $this;
-    }
-
-    public function isNil()
-    {
-        return $this->nil;
-    }
-
-    public function setNil($nil)
-    {
-        $this->nil = (boolean) $nil;
-        return $this;
     }
 }

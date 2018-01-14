@@ -1,6 +1,8 @@
-composer.lock
 coverage.clover
 vendor/
 /.buildpath
 /.project
 /.idea
+/.php_cs.cache
+/phpunit/
+/composer.lock

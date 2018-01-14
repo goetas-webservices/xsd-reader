@@ -1,9 +1,13 @@
 <?php
+
+declare(strict_types=1);
+
 namespace GoetasWebservices\XML\XSDReader\Tests;
+
+use GoetasWebservices\XML\XSDReader\Schema\Element\Element;
 
 class ElementsTest extends BaseTest
 {
-
     public function testBase()
     {
         $schema = $this->reader->readString(
@@ -34,7 +38,7 @@ class ElementsTest extends BaseTest
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef', $myElement);
         //$this->assertEquals('http://www.example.com', $myElement->getSchema()->getTargetNamespace());
         $this->assertEquals('myElement', $myElement->getName());
-        $this->assertEquals("string", $myElement->getType()->getName());
+        $this->assertEquals('string', $myElement->getType()->getName());
 
         $myGroup = $schema->findGroup('myGroup', 'http://www.example.com');
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\Group', $myGroup);
@@ -63,7 +67,6 @@ class ElementsTest extends BaseTest
 
             </xs:schema>');
 
-
         $myElementAnon = $schema->findElement('myElementAnonType', 'http://www.example.com');
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef', $myElementAnon);
         //$this->assertEquals('http://www.example.com', $myElement->getSchema()->getTargetNamespace());
@@ -75,7 +78,6 @@ class ElementsTest extends BaseTest
         $this->assertEquals('http://www.example.com', $base2->getSchema()->getTargetNamespace());
         $this->assertTrue(!$base2->getName());
 
-
         $restriction1 = $base2->getRestriction();
         $base3 = $restriction1->getBase();
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType', $base3);
@@ -83,4 +85,46 @@ class ElementsTest extends BaseTest
         $this->assertEquals('string', $base3->getName());
     }
 
+    public function testElementSimpleTypeDocs()
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                 <xs:element name="myElementType" id="myElementType">
+                    <xs:simpleType>
+                        <xs:annotation>
+                            <xs:documentation>Element type description</xs:documentation>
+                        </xs:annotation>
+                    </xs:simpleType>
+                 </xs:element>
+            </xs:schema>');
+
+        $myElement = $schema->findElement('myElementType', 'http://www.example.com');
+        $this->assertSame(
+            'Element type description',
+            $myElement->getType()->getDoc()
+        );
+    }
+
+    public function testSequenceElementDocs()
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xs:group name="myGroup">
+                    <xs:sequence>
+                        <xs:element name="alone" type="xs:string">
+                            <xs:annotation>
+                                <xs:documentation>Alone description</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:group>
+            </xs:schema>');
+
+        $myGroup = $schema->findGroup('myGroup', 'http://www.example.com');
+        /** @var Element $aloneElement */
+        $aloneElement = $myGroup->getElements()[0];
+        $this->assertSame('Alone description', $aloneElement->getDoc());
+    }
 }

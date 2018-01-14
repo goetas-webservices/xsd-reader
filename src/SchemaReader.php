@@ -1,27 +1,36 @@
 <?php
+
+declare(strict_types=1);
+
 namespace GoetasWebservices\XML\XSDReader;
 
+use Closure;
 use DOMDocument;
 use DOMElement;
 use DOMNode;
+use GoetasWebservices\XML\XSDReader\Documentation\DocumentationReader;
+use GoetasWebservices\XML\XSDReader\Documentation\StandardDocumentationReader;
 use GoetasWebservices\XML\XSDReader\Exception\IOException;
 use GoetasWebservices\XML\XSDReader\Exception\TypeException;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Attribute;
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeContainer;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
-use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeRef;
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItem;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Element;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementContainer;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
-use GoetasWebservices\XML\XSDReader\Schema\Element\ElementItem;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementRef;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Group;
+use GoetasWebservices\XML\XSDReader\Schema\Element\InterfaceSetMinMax;
 use GoetasWebservices\XML\XSDReader\Schema\Element\GroupRef;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\TypeNotFoundException;
+use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Base;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Extension;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction;
 use GoetasWebservices\XML\XSDReader\Schema\Item;
 use GoetasWebservices\XML\XSDReader\Schema\Schema;
+use GoetasWebservices\XML\XSDReader\Schema\SchemaItem;
 use GoetasWebservices\XML\XSDReader\Schema\Type\BaseComplexType;
 use GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType;
 use GoetasWebservices\XML\XSDReader\Schema\Type\ComplexTypeSimpleContent;
@@ -31,679 +40,1167 @@ use GoetasWebservices\XML\XSDReader\Utils\UrlUtils;
 
 class SchemaReader
 {
+    public const XSD_NS = 'http://www.w3.org/2001/XMLSchema';
 
-    const XSD_NS = "http://www.w3.org/2001/XMLSchema";
+    public const XML_NS = 'http://www.w3.org/XML/1998/namespace';
 
-    const XML_NS = "http://www.w3.org/XML/1998/namespace";
+    /**
+     * @var DocumentationReader
+     */
+    private $documentationReader;
 
+    /**
+     * @var Schema[]
+     */
     private $loadedFiles = array();
 
-    private $knownLocationSchemas = array();
+    /**
+     * @var string[]
+     */
+    protected $knownLocationSchemas = [
+        'http://www.w3.org/2001/xml.xsd' => (
+            __DIR__.'/Resources/xml.xsd'
+        ),
+        'http://www.w3.org/2001/XMLSchema.xsd' => (
+            __DIR__.'/Resources/XMLSchema.xsd'
+        ),
+        'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd' => (
+            __DIR__.'/Resources/oasis-200401-wss-wssecurity-secext-1.0.xsd'
+        ),
+        'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd' => (
+            __DIR__.'/Resources/oasis-200401-wss-wssecurity-utility-1.0.xsd'
+        ),
+        'https://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd' => (
+            __DIR__.'/Resources/xmldsig-core-schema.xsd'
+        ),
+        'http://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd' => (
+            __DIR__.'/Resources/xmldsig-core-schema.xsd'
+        ),
+    ];
 
-    private static $globalSchemaInfo = array(
+    /**
+     * @var string[]
+     */
+    protected static $globalSchemaInfo = array(
         self::XML_NS => 'http://www.w3.org/2001/xml.xsd',
-        self::XSD_NS => 'http://www.w3.org/2001/XMLSchema.xsd'
+        self::XSD_NS => 'http://www.w3.org/2001/XMLSchema.xsd',
     );
 
-    public function __construct()
+    public function __construct(DocumentationReader $documentationReader = null)
     {
-        $this->addKnownSchemaLocation('http://www.w3.org/2001/xml.xsd', __DIR__ . '/Resources/xml.xsd');
-        $this->addKnownSchemaLocation('http://www.w3.org/2001/XMLSchema.xsd', __DIR__ . '/Resources/XMLSchema.xsd');
-        $this->addKnownSchemaLocation('http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd', __DIR__ . '/Resources/oasis-200401-wss-wssecurity-secext-1.0.xsd');
-        $this->addKnownSchemaLocation('http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd', __DIR__ . '/Resources/oasis-200401-wss-wssecurity-utility-1.0.xsd');
-        $this->addKnownSchemaLocation('https://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd', __DIR__ . '/Resources/xmldsig-core-schema.xsd');
-        $this->addKnownSchemaLocation('http://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd', __DIR__ . '/Resources/xmldsig-core-schema.xsd');
+        if (null === $documentationReader) {
+            $documentationReader = new StandardDocumentationReader();
+        }
+        $this->documentationReader = $documentationReader;
     }
 
-    public function addKnownSchemaLocation($remote, $local)
+    public function addKnownSchemaLocation(string $remote, string $local): void
     {
         $this->knownLocationSchemas[$remote] = $local;
     }
 
-    private function loadAttributeGroup(Schema $schema, DOMElement $node)
-    {
-        $attGroup = new AttributeGroup($schema, $node->getAttribute("name"));
+    private function loadAttributeGroup(
+        Schema $schema,
+        DOMElement $node
+    ): Closure {
+        $attGroup = new AttributeGroup($schema, $node->getAttribute('name'));
         $attGroup->setDoc($this->getDocumentation($node));
         $schema->addAttributeGroup($attGroup);
 
         return function () use ($schema, $node, $attGroup) {
-            foreach ($node->childNodes as $childNode) {
-                switch ($childNode->localName) {
-                    case 'attribute':
-                        if ($childNode->hasAttribute("ref")) {
-                            $attribute = $this->findSomething('findAttribute', $schema, $node, $childNode->getAttribute("ref"));
-                        } else {
-                            $attribute = $this->loadAttribute($schema, $childNode);
-                        }
-                        $attGroup->addAttribute($attribute);
-                        break;
-                    case 'attributeGroup':
-
-                        $attribute = $this->findSomething('findAttributeGroup', $schema, $node, $childNode->getAttribute("ref"));
-                        $attGroup->addAttribute($attribute);
-                        break;
+            SchemaReader::againstDOMNodeList(
+                $node,
+                function (
+                    DOMElement $node,
+                    DOMElement $childNode
+                ) use (
+                    $schema,
+                    $attGroup
+                ) {
+                    switch ($childNode->localName) {
+                        case 'attribute':
+                            $attribute = $this->getAttributeFromAttributeOrRef(
+                                $childNode,
+                                $schema,
+                                $node
+                            );
+                            $attGroup->addAttribute($attribute);
+                            break;
+                        case 'attributeGroup':
+                            $this->findSomethingLikeAttributeGroup(
+                                $schema,
+                                $node,
+                                $childNode,
+                                $attGroup
+                            );
+                            break;
+                    }
                 }
-            }
+            );
         };
     }
 
-    private function loadAttribute(Schema $schema, DOMElement $node)
-    {
-        $attribute = new Attribute($schema, $node->getAttribute("name"));
-        $attribute->setDoc($this->getDocumentation($node));
-        $this->fillItem($attribute, $node);
+    private function getAttributeFromAttributeOrRef(
+        DOMElement $childNode,
+        Schema $schema,
+        DOMElement $node
+    ): AttributeItem {
+        if ($childNode->hasAttribute('ref')) {
+            $attribute = $this->findAttributeItem($schema, $node, $childNode->getAttribute('ref'));
+        } else {
+            /**
+             * @var Attribute
+             */
+            $attribute = $this->loadAttribute($schema, $childNode);
+        }
 
-        if ($node->hasAttribute("nillable")) {
-            $attribute->setNil($node->getAttribute("nillable") == "true");
-        }
-        if ($node->hasAttribute("form")) {
-            $attribute->setQualified($node->getAttribute("form") == "qualified");
-        }
-        if ($node->hasAttribute("use")) {
-            $attribute->setUse($node->getAttribute("use"));
-        }
         return $attribute;
     }
 
+    private function loadAttribute(
+        Schema $schema,
+        DOMElement $node
+    ): Attribute {
+        $attribute = new Attribute($schema, $node->getAttribute('name'));
+        $attribute->setDoc($this->getDocumentation($node));
+        $this->fillItem($attribute, $node);
 
-    private function loadAttributeDef(Schema $schema, DOMElement $node)
-    {
-        $attribute = new AttributeDef($schema, $node->getAttribute("name"));
+        if ($node->hasAttribute('nillable')) {
+            $attribute->setNil($node->getAttribute('nillable') == 'true');
+        }
+        if ($node->hasAttribute('form')) {
+            $attribute->setQualified($node->getAttribute('form') == 'qualified');
+        }
+        if ($node->hasAttribute('use')) {
+            $attribute->setUse($node->getAttribute('use'));
+        }
 
-        $schema->addAttribute($attribute);
+        return $attribute;
+    }
 
-        return function () use ($attribute, $schema, $node) {
+    private function loadAttributeOrElementDef(
+        Schema $schema,
+        DOMElement $node,
+        bool $attributeDef
+    ): Closure {
+        $name = $node->getAttribute('name');
+        if ($attributeDef) {
+            $attribute = new AttributeDef($schema, $name);
+            $schema->addAttribute($attribute);
+        } else {
+            $attribute = new ElementDef($schema, $name);
+            $schema->addElement($attribute);
+        }
+
+        return function () use ($attribute, $node) {
             $this->fillItem($attribute, $node);
         };
     }
 
-    /**
-     * @param DOMElement $node
-     * @return string
-     */
-    private function getDocumentation(DOMElement $node)
+    private function loadAttributeDef(Schema $schema, DOMElement $node): Closure
     {
-        $doc = '';
-        foreach ($node->childNodes as $childNode) {
-            if ($childNode->localName == "annotation") {
-                foreach ($childNode->childNodes as $subChildNode) {
-                    if ($subChildNode->localName == "documentation") {
-                        $doc .= ($subChildNode->nodeValue);
-                    }
-                }
-            }
-        }
-        $doc = preg_replace('/[\t ]+/', ' ', $doc);
-        return trim($doc);
+        return $this->loadAttributeOrElementDef($schema, $node, true);
+    }
+
+    private function getDocumentation(DOMElement $node): string
+    {
+        return $this->documentationReader->get($node);
     }
 
     /**
-     *
-     * @param Schema $schema
-     * @param DOMElement $node
-     * @param Schema $parent
-     * @return array
+     * @return Closure[]
      */
-    private function schemaNode(Schema $schema, DOMElement $node, Schema $parent = null)
+    private function schemaNode(Schema $schema, DOMElement $node, Schema $parent = null): array
     {
-        $schema->setDoc($this->getDocumentation($node));
-
-        if ($node->hasAttribute("targetNamespace")) {
-            $schema->setTargetNamespace($node->getAttribute("targetNamespace"));
-        } elseif ($parent) {
-            $schema->setTargetNamespace($parent->getTargetNamespace());
-        }
-        $schema->setElementsQualification($node->getAttribute("elementFormDefault") == "qualified");
-        $schema->setAttributesQualification($node->getAttribute("attributeFormDefault") == "qualified");
-        $schema->setDoc($this->getDocumentation($node));
+        $this->setSchemaThingsFromNode($schema, $node, $parent);
         $functions = array();
 
-        foreach ($node->childNodes as $childNode) {
-            switch ($childNode->localName) {
-                case 'include':
-                case 'import':
-                    $functions[] = $this->loadImport($schema, $childNode);
-                    break;
-                case 'element':
-                    $functions[] = $this->loadElementDef($schema, $childNode);
-                    break;
-                case 'attribute':
-                    $functions[] = $this->loadAttributeDef($schema, $childNode);
-                    break;
-                case 'attributeGroup':
-                    $functions[] = $this->loadAttributeGroup($schema, $childNode);
-                    break;
-                case 'group':
-                    $functions[] = $this->loadGroup($schema, $childNode);
-                    break;
-                case 'complexType':
-                    $functions[] = $this->loadComplexType($schema, $childNode);
-                    break;
-                case 'simpleType':
-                    $functions[] = $this->loadSimpleType($schema, $childNode);
-                    break;
+        static::againstDOMNodeList(
+            $node,
+            function (
+                DOMElement $node,
+                DOMElement $childNode
+            ) use (
+                $schema,
+                &$functions
+            ) {
+                $callback = null;
+
+                switch ($childNode->localName) {
+                    case 'attributeGroup':
+                        $callback = $this->loadAttributeGroup($schema, $childNode);
+                        break;
+                    case 'include':
+                    case 'import':
+                        $callback = $this->loadImport($schema, $childNode);
+                        break;
+                    case 'element':
+                        $callback = $this->loadElementDef($schema, $childNode);
+                        break;
+                    case 'attribute':
+                        $callback = $this->loadAttributeDef($schema, $childNode);
+                        break;
+                    case 'group':
+                        $callback = $this->loadGroup($schema, $childNode);
+                        break;
+                    case 'complexType':
+                        $callback = $this->loadComplexType($schema, $childNode);
+                        break;
+                    case 'simpleType':
+                        $callback = $this->loadSimpleType($schema, $childNode);
+                        break;
+                }
+
+                if ($callback instanceof Closure) {
+                    $functions[] = $callback;
+                }
             }
-        }
+        );
 
         return $functions;
     }
 
-    private function loadElement(Schema $schema, DOMElement $node)
-    {
-        $element = new Element($schema, $node->getAttribute("name"));
-        $element->setDoc($this->getDocumentation($node));
-
-        $this->fillItem($element, $node);
-
-        if ($node->hasAttribute("maxOccurs")) {
-            $element->setMax($node->getAttribute("maxOccurs") == "unbounded" ? -1 : (int)$node->getAttribute("maxOccurs"));
-        }
-        if ($node->hasAttribute("minOccurs")) {
-            $element->setMin((int)$node->getAttribute("minOccurs"));
-        }
-
-        $xp = new \DOMXPath($node->ownerDocument);
-        $xp->registerNamespace('xs', 'http://www.w3.org/2001/XMLSchema');
-        
-        if ($xp->query('ancestor::xs:choice', $node)->length) {
-            $element->setMin(0);
-        }
-
-        if ($node->hasAttribute("nillable")) {
-            $element->setNil($node->getAttribute("nillable") == "true");
-        }
-        if ($node->hasAttribute("form")) {
-            $element->setQualified($node->getAttribute("form") == "qualified");
-        }
-        return $element;
-    }
-
-    private function loadGroupRef(Group $referenced, DOMElement $node)
+    private function loadGroupRef(Group $referenced, DOMElement $node): GroupRef
     {
         $ref = new GroupRef($referenced);
         $ref->setDoc($this->getDocumentation($node));
 
-        if ($node->hasAttribute("maxOccurs")) {
-            $ref->setMax($node->getAttribute("maxOccurs") == "unbounded" ? -1 : (int)$node->getAttribute("maxOccurs"));
-        }
-        if ($node->hasAttribute("minOccurs")) {
-            $ref->setMin((int)$node->getAttribute("minOccurs"));
+        self::maybeSetMax($ref, $node);
+        self::maybeSetMin($ref, $node);
+
+        return $ref;
+    }
+
+    private static function maybeSetMax(InterfaceSetMinMax $ref, DOMElement $node): InterfaceSetMinMax
+    {
+        if (
+            $node->hasAttribute('maxOccurs')
+        ) {
+            $ref->setMax($node->getAttribute('maxOccurs') == 'unbounded' ? -1 : (int) $node->getAttribute('maxOccurs'));
         }
 
         return $ref;
     }
 
-    private function loadElementRef(ElementDef $referenced, DOMElement $node)
+    private static function maybeSetMin(InterfaceSetMinMax $ref, DOMElement $node): InterfaceSetMinMax
     {
-        $ref = new ElementRef($referenced);
-        $ref->setDoc($this->getDocumentation($node));
-
-        if ($node->hasAttribute("maxOccurs")) {
-            $ref->setMax($node->getAttribute("maxOccurs") == "unbounded" ? -1 : (int)$node->getAttribute("maxOccurs"));
-        }
-        if ($node->hasAttribute("minOccurs")) {
-            $ref->setMin((int)$node->getAttribute("minOccurs"));
-        }
-        if ($node->hasAttribute("nillable")) {
-            $ref->setNil($node->getAttribute("nillable") == "true");
-        }
-        if ($node->hasAttribute("form")) {
-            $ref->setQualified($node->getAttribute("form") == "qualified");
+        if ($node->hasAttribute('minOccurs')) {
+            $ref->setMin((int) $node->getAttribute('minOccurs'));
         }
 
         return $ref;
     }
 
-
-    private function loadAttributeRef(AttributeDef $referencedAttribiute, DOMElement $node)
+    private function loadSequence(ElementContainer $elementContainer, DOMElement $node, int $max = null): void
     {
-        $attribute = new AttributeRef($referencedAttribiute);
-        $attribute->setDoc($this->getDocumentation($node));
+        $max =
+        (
+            (is_int($max) && (bool) $max) ||
+            $node->getAttribute('maxOccurs') == 'unbounded' ||
+            $node->getAttribute('maxOccurs') > 1
+        )
+            ? 2
+            : null;
 
-        if ($node->hasAttribute("nillable")) {
-            $attribute->setNil($node->getAttribute("nillable") == "true");
-        }
-        if ($node->hasAttribute("form")) {
-            $attribute->setQualified($node->getAttribute("form") == "qualified");
-        }
-        if ($node->hasAttribute("use")) {
-            $attribute->setUse($node->getAttribute("use"));
-        }
-        return $attribute;
-    }
-
-    private function loadSequence(ElementContainer $elementContainer, DOMElement $node, $max = null)
-    {
-        $max = $max || $node->getAttribute("maxOccurs") == "unbounded" || $node->getAttribute("maxOccurs") > 1 ? 2 : null;
-
-        foreach ($node->childNodes as $childNode) {
-
-            switch ($childNode->localName) {
-                case 'choice':
-                case 'sequence':
-                case 'all':
-                    $this->loadSequence($elementContainer, $childNode, $max);
-                    break;
-                case 'element':
-                    if ($childNode->hasAttribute("ref")) {
-                        $referencedElement = $this->findSomething('findElement', $elementContainer->getSchema(), $node, $childNode->getAttribute("ref"));
-                        $element = $this->loadElementRef($referencedElement, $childNode);
-                    } else {
-                        $element = $this->loadElement($elementContainer->getSchema(), $childNode);
-                    }
-                    if ($max) {
-                        $element->setMax($max);
-                    }
-                    $elementContainer->addElement($element);
-                    break;
-                case 'group':
-                    $referencedGroup = $this->findSomething('findGroup', $elementContainer->getSchema(), $node, $childNode->getAttribute("ref"));
-
-                    $group = $this->loadGroupRef($referencedGroup, $childNode);
-                    $elementContainer->addElement($group);
-                    break;
+        static::againstDOMNodeList(
+            $node,
+            function (
+                DOMElement $node,
+                DOMElement $childNode
+            ) use (
+                $elementContainer,
+                $max
+            ) {
+                $this->loadSequenceChildNode(
+                    $elementContainer,
+                    $node,
+                    $childNode,
+                    $max
+                );
             }
+        );
+    }
+
+    /**
+     * @param int|null $max
+     */
+    private function loadSequenceChildNode(
+        ElementContainer $elementContainer,
+        DOMElement $node,
+        DOMElement $childNode,
+        $max
+    ): void {
+        switch ($childNode->localName) {
+            case 'sequence':
+            case 'choice':
+            case 'all':
+                $this->loadSequence(
+                    $elementContainer,
+                    $childNode,
+                    $max
+                );
+                break;
+            case 'element':
+                $this->loadSequenceChildNodeLoadElement(
+                    $elementContainer,
+                    $node,
+                    $childNode,
+                    $max
+                );
+                break;
+            case 'group':
+                $this->addGroupAsElement(
+                    $elementContainer->getSchema(),
+                    $node,
+                    $childNode,
+                    $elementContainer
+                );
+                break;
         }
     }
 
-    private function loadGroup(Schema $schema, DOMElement $node)
+    /**
+     * @param int|null $max
+     */
+    private function loadSequenceChildNodeLoadElement(
+        ElementContainer $elementContainer,
+        DOMElement $node,
+        DOMElement $childNode,
+        $max
+    ): void {
+        if ($childNode->hasAttribute('ref')) {
+            $element = new ElementRef(
+                $this->findElement($elementContainer->getSchema(), $node, $childNode->getAttribute('ref'))
+            );
+            $element->setDoc($this->getDocumentation($childNode));
+
+            self::maybeSetMax($element, $childNode);
+            self::maybeSetMin($element, $childNode);
+            if ($childNode->hasAttribute('nillable')) {
+                $element->setNil($childNode->getAttribute('nillable') == 'true');
+            }
+            if ($childNode->hasAttribute('form')) {
+                $element->setQualified($childNode->getAttribute('form') == 'qualified');
+            }
+        } else {
+            $element = $this->loadElement(
+                $elementContainer->getSchema(),
+                $childNode
+            );
+        }
+        if ($max > 1) {
+            /*
+            * although one might think the typecast is not needed with $max being `? int $max` after passing > 1,
+            * phpstan@a4f89fa still thinks it's possibly null.
+            * see https://github.com/phpstan/phpstan/issues/577 for related issue
+            */
+            $element->setMax((int) $max);
+        }
+        $elementContainer->addElement($element);
+    }
+
+    private function addGroupAsElement(
+        Schema $schema,
+        DOMElement $node,
+        DOMElement $childNode,
+        ElementContainer $elementContainer
+    ): void {
+        $referencedGroup = $this->findGroup(
+            $schema,
+            $node,
+            $childNode->getAttribute('ref')
+        );
+
+        $group = $this->loadGroupRef($referencedGroup, $childNode);
+        $elementContainer->addElement($group);
+    }
+
+    private function loadGroup(Schema $schema, DOMElement $node): Closure
     {
-        $group = new Group($schema, $node->getAttribute("name"));
+        $group = new Group($schema, $node->getAttribute('name'));
         $group->setDoc($this->getDocumentation($node));
 
-        if ($node->hasAttribute("maxOccurs")) {
-            $group->setMax($node->getAttribute("maxOccurs") == "unbounded" ? -1 : (int)$node->getAttribute("maxOccurs"));
+        if ($node->hasAttribute('maxOccurs')) {
+            /**
+             * @var GroupRef
+             */
+            $group = self::maybeSetMax(new GroupRef($group), $node);
         }
-        if ($node->hasAttribute("minOccurs")) {
-            $group->setMin((int)$node->getAttribute("minOccurs"));
+        if ($node->hasAttribute('minOccurs')) {
+            /**
+             * @var GroupRef
+             */
+            $group = self::maybeSetMin(
+                $group instanceof GroupRef ? $group : new GroupRef($group),
+                $node
+            );
         }
 
         $schema->addGroup($group);
 
         return function () use ($group, $node) {
-            foreach ($node->childNodes as $childNode) {
-                switch ($childNode->localName) {
-                    case 'sequence':
-                    case 'choice':
-                    case 'all':
-                        $this->loadSequence($group, $childNode);
-                        break;
+            static::againstDOMNodeList(
+                $node,
+                function (DOMelement $node, DOMElement $childNode) use ($group) {
+                    switch ($childNode->localName) {
+                        case 'sequence':
+                        case 'choice':
+                        case 'all':
+                            $this->loadSequence($group, $childNode);
+                            break;
+                    }
                 }
-            }
+            );
         };
     }
 
-    private function loadComplexType(Schema $schema, DOMElement $node, $callback = null)
+    private function loadComplexType(Schema $schema, DOMElement $node, Closure $callback = null): Closure
     {
+        /**
+         * @var bool
+         */
         $isSimple = false;
 
-        foreach ($node->childNodes as $childNode) {
-            if ($childNode->localName === "simpleContent") {
-                $isSimple = true;
-                break;
+        static::againstDOMNodeList(
+            $node,
+            function (
+                DOMElement $node,
+                DOMElement $childNode
+            ) use (
+                &$isSimple
+            ) {
+                if ($isSimple) {
+                    return;
+                }
+                if ($childNode->localName === 'simpleContent') {
+                    $isSimple = true;
+                }
             }
-        }
+        );
 
-        $type = $isSimple ? new ComplexTypeSimpleContent($schema, $node->getAttribute("name")) : new ComplexType($schema, $node->getAttribute("name"));
+        $type = $isSimple ? new ComplexTypeSimpleContent($schema, $node->getAttribute('name')) : new ComplexType($schema, $node->getAttribute('name'));
 
         $type->setDoc($this->getDocumentation($node));
-        if ($node->getAttribute("name")) {
+        if ($node->getAttribute('name')) {
             $schema->addType($type);
         }
 
         return function () use ($type, $node, $schema, $callback) {
+            $this->fillTypeNode($type, $node, true);
 
-            $this->fillTypeNode($type, $node);
-
-            foreach ($node->childNodes as $childNode) {
-                switch ($childNode->localName) {
-                    case 'sequence':
-                    case 'choice':
-                    case 'all':
-                        $this->loadSequence($type, $childNode);
-                        break;
-                    case 'attribute':
-                        if ($childNode->hasAttribute("ref")) {
-                            $referencedAttribute = $this->findSomething('findAttribute', $schema, $node, $childNode->getAttribute("ref"));
-                            $attribute = $this->loadAttributeRef($referencedAttribute, $childNode);
-                        } else {
-                            $attribute = $this->loadAttribute($schema, $childNode);
-                        }
-
-                        $type->addAttribute($attribute);
-                        break;
-                    case 'group':
-                        $referencedGroup = $this->findSomething('findGroup', $schema, $node, $childNode->getAttribute("ref"));
-                        $group = $this->loadGroupRef($referencedGroup, $childNode);
-                        $type->addElement($group);
-                        break;
-                    case 'attributeGroup':
-                        $attribute = $this->findSomething('findAttributeGroup', $schema, $node, $childNode->getAttribute("ref"));
-                        $type->addAttribute($attribute);
-                        break;
+            static::againstDOMNodeList(
+                $node,
+                function (
+                    DOMElement $node,
+                    DOMElement $childNode
+                ) use (
+                    $schema,
+                    $type
+                ) {
+                    $this->loadComplexTypeFromChildNode(
+                        $type,
+                        $node,
+                        $childNode,
+                        $schema
+                    );
                 }
-            }
+            );
 
-            if ($callback) {
+            if ($callback instanceof Closure) {
                 call_user_func($callback, $type);
             }
         };
     }
 
-    private function loadSimpleType(Schema $schema, DOMElement $node, $callback = null)
+    private function loadComplexTypeFromChildNode(
+        BaseComplexType $type,
+        DOMElement $node,
+        DOMElement $childNode,
+        Schema $schema
+    ): void {
+        switch ($childNode->localName) {
+            case 'sequence':
+            case 'choice':
+            case 'all':
+                if ($type instanceof ElementContainer) {
+                    $this->loadSequence(
+                        $type,
+                        $childNode
+                    );
+                }
+                break;
+            case 'attribute':
+                $this->addAttributeFromAttributeOrRef(
+                    $type,
+                    $childNode,
+                    $schema,
+                    $node
+                );
+                break;
+            case 'attributeGroup':
+                $this->findSomethingLikeAttributeGroup(
+                    $schema,
+                    $node,
+                    $childNode,
+                    $type
+                );
+                break;
+            case 'group':
+                if (
+                    $type instanceof ComplexType
+                ) {
+                    $this->addGroupAsElement(
+                        $schema,
+                        $node,
+                        $childNode,
+                        $type
+                    );
+                }
+                break;
+        }
+    }
+
+    private function loadSimpleType(Schema $schema, DOMElement $node, Closure $callback = null): Closure
     {
-        $type = new SimpleType($schema, $node->getAttribute("name"));
+        $type = new SimpleType($schema, $node->getAttribute('name'));
         $type->setDoc($this->getDocumentation($node));
-        if ($node->getAttribute("name")) {
+        if ($node->getAttribute('name')) {
             $schema->addType($type);
         }
 
         return function () use ($type, $node, $callback) {
-            $this->fillTypeNode($type, $node);
+            $this->fillTypeNode($type, $node, true);
 
-            foreach ($node->childNodes as $childNode) {
-                switch ($childNode->localName) {
-                    case 'union':
-                        $this->loadUnion($type, $childNode);
-                        break;
-                    case 'list':
-                        $this->loadList($type, $childNode);
-                        break;
+            static::againstDOMNodeList(
+                $node,
+                function (DOMElement $node, DOMElement $childNode) use ($type) {
+                    switch ($childNode->localName) {
+                        case 'union':
+                            $this->loadUnion($type, $childNode);
+                            break;
+                        case 'list':
+                            $this->loadList($type, $childNode);
+                            break;
+                    }
                 }
-            }
+            );
 
-            if ($callback) {
+            if ($callback instanceof Closure) {
                 call_user_func($callback, $type);
             }
         };
     }
 
-    private function loadList(SimpleType $type, DOMElement $node)
+    private function loadList(SimpleType $type, DOMElement $node): void
     {
-        if ($node->hasAttribute("itemType")) {
-            $type->setList($this->findSomething('findType', $type->getSchema(), $node, $node->getAttribute("itemType")));
+        if ($node->hasAttribute('itemType')) {
+            /**
+             * @var SimpleType
+             */
+            $listType = $this->findSomeType($type, $node, 'itemType');
+            $type->setList($listType);
         } else {
-            $addCallback = function ($list) use ($type) {
-                $type->setList($list);
-            };
+            self::againstDOMNodeList(
+                $node,
+                function (
+                    DOMElement $node,
+                    DOMElement $childNode
+                ) use (
+                    $type
+                ) {
+                    $this->loadTypeWithCallback(
+                        $type->getSchema(),
+                        $childNode,
+                        function (SimpleType $list) use ($type) {
+                            $type->setList($list);
+                        }
+                    );
+                }
+            );
+        }
+    }
 
-            foreach ($node->childNodes as $childNode) {
+    private function findSomeType(
+        SchemaItem $fromThis,
+        DOMElement $node,
+        string $attributeName
+    ): SchemaItem {
+        return $this->findSomeTypeFromAttribute(
+            $fromThis,
+            $node,
+            $node->getAttribute($attributeName)
+        );
+    }
+
+    private function findSomeTypeFromAttribute(
+        SchemaItem $fromThis,
+        DOMElement $node,
+        string $attributeName
+    ): SchemaItem {
+        $out = $this->findType(
+            $fromThis->getSchema(),
+            $node,
+            $attributeName
+        );
+
+        return $out;
+    }
+
+    private function loadUnion(SimpleType $type, DOMElement $node): void
+    {
+        if ($node->hasAttribute('memberTypes')) {
+            $types = preg_split('/\s+/', $node->getAttribute('memberTypes'));
+            foreach ($types as $typeName) {
+                /**
+                 * @var SimpleType
+                 */
+                $unionType = $this->findSomeTypeFromAttribute(
+                    $type,
+                    $node,
+                    $typeName
+                );
+                $type->addUnion($unionType);
+            }
+        }
+        self::againstDOMNodeList(
+            $node,
+            function (
+                DOMElement $node,
+                DOMElement $childNode
+            ) use (
+                $type
+            ) {
+                $this->loadTypeWithCallback(
+                    $type->getSchema(),
+                    $childNode,
+                    function (SimpleType $unType) use ($type) {
+                        $type->addUnion($unType);
+                    }
+                );
+            }
+        );
+    }
+
+    private function fillTypeNode(Type $type, DOMElement $node, bool $checkAbstract = false): void
+    {
+        if ($checkAbstract) {
+            $type->setAbstract($node->getAttribute('abstract') === 'true' || $node->getAttribute('abstract') === '1');
+        }
+
+        static::againstDOMNodeList(
+            $node,
+            function (DOMElement $node, DOMElement $childNode) use ($type) {
                 switch ($childNode->localName) {
-                    case 'simpleType':
-                        call_user_func($this->loadSimpleType($type->getSchema(), $childNode, $addCallback));
+                    case 'restriction':
+                        $this->loadRestriction($type, $childNode);
+                        break;
+                    case 'extension':
+                        if ($type instanceof BaseComplexType) {
+                            $this->loadExtension($type, $childNode);
+                        }
+                        break;
+                    case 'simpleContent':
+                    case 'complexContent':
+                        $this->fillTypeNode($type, $childNode);
                         break;
                 }
             }
-        }
+        );
     }
 
-    private function loadUnion(SimpleType $type, DOMElement $node)
-    {
-        if ($node->hasAttribute("memberTypes")) {
-            $types = preg_split('/\s+/', $node->getAttribute("memberTypes"));
-            foreach ($types as $typeName) {
-                $type->addUnion($this->findSomething('findType', $type->getSchema(), $node, $typeName));
-            }
-        }
-        $addCallback = function ($unType) use ($type) {
-            $type->addUnion($unType);
-        };
-
-        foreach ($node->childNodes as $childNode) {
-            switch ($childNode->localName) {
-                case 'simpleType':
-                    call_user_func($this->loadSimpleType($type->getSchema(), $childNode, $addCallback));
-                    break;
-            }
-        }
-    }
-
-    private function fillTypeNode(Type $type, DOMElement $node, $checkAbstract = true)
-    {
-
-        if ($checkAbstract) {
-            $type->setAbstract($node->getAttribute("abstract") === "true" || $node->getAttribute("abstract") === "1");
-        }
-
-        foreach ($node->childNodes as $childNode) {
-            switch ($childNode->localName) {
-                case 'restriction':
-                    $this->loadRestriction($type, $childNode);
-                    break;
-                case 'extension':
-                    $this->loadExtension($type, $childNode);
-                    break;
-                case 'simpleContent':
-                case 'complexContent':
-                    $this->fillTypeNode($type, $childNode, false);
-                    break;
-            }
-        }
-    }
-
-    private function loadExtension(BaseComplexType $type, DOMElement $node)
+    private function loadExtension(BaseComplexType $type, DOMElement $node): void
     {
         $extension = new Extension();
         $type->setExtension($extension);
 
-        if ($node->hasAttribute("base")) {
-            $parent = $this->findSomething('findType', $type->getSchema(), $node, $node->getAttribute("base"));
-            $extension->setBase($parent);
+        if ($node->hasAttribute('base')) {
+            $this->findAndSetSomeBase(
+                $type,
+                $extension,
+                $node
+            );
         }
-
-        foreach ($node->childNodes as $childNode) {
-            switch ($childNode->localName) {
-                case 'sequence':
-                case 'choice':
-                case 'all':
-                    $this->loadSequence($type, $childNode);
-                    break;
-                case 'attribute':
-                    if ($childNode->hasAttribute("ref")) {
-                        $attribute = $this->findSomething('findAttribute', $type->getSchema(), $node, $childNode->getAttribute("ref"));
-                    } else {
-                        $attribute = $this->loadAttribute($type->getSchema(), $childNode);
-                    }
-                    $type->addAttribute($attribute);
-                    break;
-                case 'attributeGroup':
-                    $attribute = $this->findSomething('findAttributeGroup', $type->getSchema(), $node, $childNode->getAttribute("ref"));
-                    $type->addAttribute($attribute);
-                    break;
-            }
-        }
+        $this->loadExtensionChildNodes($type, $node);
     }
 
-    private function loadRestriction(Type $type, DOMElement $node)
-    {
-        $restriction = new Restriction();
-        $type->setRestriction($restriction);
-        if ($node->hasAttribute("base")) {
-            $restrictedType = $this->findSomething('findType', $type->getSchema(), $node, $node->getAttribute("base"));
-            $restriction->setBase($restrictedType);
-        } else {
-            $addCallback = function ($restType) use ($restriction) {
-                $restriction->setBase($restType);
-            };
+    private function findAndSetSomeBase(
+        Type $type,
+        Base $setBaseOnThis,
+        DOMElement $node
+    ): void {
+        /**
+         * @var Type
+         */
+        $parent = $this->findSomeType($type, $node, 'base');
+        $setBaseOnThis->setBase($parent);
+    }
 
-            foreach ($node->childNodes as $childNode) {
+    private function loadExtensionChildNodes(
+        BaseComplexType $type,
+        DOMElement $node
+    ) {
+        static::againstDOMNodeList(
+            $node,
+            function (
+                DOMElement $node,
+                DOMElement $childNode
+            ) use (
+                $type
+            ) {
                 switch ($childNode->localName) {
-                    case 'simpleType':
-                        call_user_func($this->loadSimpleType($type->getSchema(), $childNode, $addCallback));
+                    case 'sequence':
+                    case 'choice':
+                    case 'all':
+                        if ($type instanceof ElementContainer) {
+                            $this->loadSequence(
+                                $type,
+                                $childNode
+                            );
+                        }
+                        break;
+                    case 'attribute':
+                        $this->addAttributeFromAttributeOrRef(
+                            $type,
+                            $childNode,
+                            $type->getSchema(),
+                            $node
+                        );
+                        break;
+                    case 'attributeGroup':
+                        $this->findSomethingLikeAttributeGroup(
+                            $type->getSchema(),
+                            $node,
+                            $childNode,
+                            $type
+                        );
                         break;
                 }
             }
-        }
-        foreach ($node->childNodes as $childNode) {
-            if (in_array($childNode->localName,
-                [
-                    'enumeration',
-                    'pattern',
-                    'length',
-                    'minLength',
-                    'maxLength',
-                    'minInclusive',
-                    'maxInclusive',
-                    'minExclusive',
-                    'maxExclusive',
-                    'fractionDigits',
-                    'totalDigits',
-                    'whiteSpace'
-                ], true)) {
-                $restriction->addCheck($childNode->localName,
-                    [
-                        'value' => $childNode->getAttribute("value"),
-                        'doc' => $this->getDocumentation($childNode)
-                    ]);
-            }
-        }
+        );
     }
 
-    private static function splitParts(DOMElement $node, $typeName)
+    private function loadRestriction(Type $type, DOMElement $node): void
     {
-        $namespace = null;
-        $prefix = null;
-        $name = $typeName;
-        if (strpos($typeName, ':') !== false) {
-            list ($prefix, $name) = explode(':', $typeName);
+        $restriction = new Restriction();
+        $type->setRestriction($restriction);
+        if ($node->hasAttribute('base')) {
+            $this->findAndSetSomeBase($type, $restriction, $node);
+        } else {
+            self::againstDOMNodeList(
+                $node,
+                function (
+                    DOMElement $node,
+                    DOMElement $childNode
+                ) use (
+                    $type,
+                    $restriction
+                ) {
+                    $this->loadTypeWithCallback(
+                        $type->getSchema(),
+                        $childNode,
+                        function (Type $restType) use ($restriction) {
+                            $restriction->setBase($restType);
+                        }
+                    );
+                }
+            );
         }
-
-        $namespace = $node->lookupNamespaceURI($prefix ?: null);
-        return array(
-            $name,
-            $namespace,
-            $prefix
+        self::againstDOMNodeList(
+            $node,
+            function (
+                DOMElement $node,
+                DOMElement $childNode
+            ) use (
+                $restriction
+            ) {
+                if (
+                    in_array(
+                        $childNode->localName,
+                        [
+                            'enumeration',
+                            'pattern',
+                            'length',
+                            'minLength',
+                            'maxLength',
+                            'minInclusive',
+                            'maxInclusive',
+                            'minExclusive',
+                            'maxExclusive',
+                            'fractionDigits',
+                            'totalDigits',
+                            'whiteSpace',
+                        ],
+                        true
+                    )
+                ) {
+                    $restriction->addCheck(
+                        $childNode->localName,
+                        [
+                            'value' => $childNode->getAttribute('value'),
+                            'doc' => $this->getDocumentation($childNode),
+                        ]
+                    );
+                }
+            }
         );
     }
 
     /**
-     *
-     * @param string $finder
-     * @param Schema $schema
-     * @param DOMElement $node
-     * @param string $typeName
-     * @throws TypeException
-     * @return ElementItem|Group|AttributeItem|AttribiuteGroup|Type
+     * @return mixed[]
      */
-    private function findSomething($finder, Schema $schema, DOMElement $node, $typeName)
+    private static function splitParts(DOMElement $node, string $typeName): array
     {
-        list ($name, $namespace) = self::splitParts($node, $typeName);
+        $prefix = null;
+        $name = $typeName;
+        if (strpos($typeName, ':') !== false) {
+            list($prefix, $name) = explode(':', $typeName);
+        }
+
+        $namespace = $node->lookupNamespaceUri($prefix ?: '');
+
+        return array(
+            $name,
+            $namespace,
+            $prefix,
+        );
+    }
+
+    private function findAttributeItem(Schema $schema, DOMElement $node, string $typeName): AttributeItem
+    {
+        list($name, $namespace) = static::splitParts($node, $typeName);
 
         $namespace = $namespace ?: $schema->getTargetNamespace();
 
         try {
-            return $schema->$finder($name, $namespace);
+            return $schema->findAttribute($name, $namespace);
         } catch (TypeNotFoundException $e) {
-            throw new TypeException(sprintf("Can't find %s named {%s}#%s, at line %d in %s ", strtolower(substr($finder, 4)), $namespace, $name, $node->getLineNo(), $node->ownerDocument->documentURI), 0, $e);
+            throw new TypeException(
+                sprintf(
+                    "Can't find %s named {%s}#%s, at line %d in %s ",
+                    'attribute',
+                    $namespace,
+                    $name,
+                    $node->getLineNo(),
+                    $node->ownerDocument->documentURI
+                ),
+                0,
+                $e
+            );
         }
     }
 
-    private function loadElementDef(Schema $schema, DOMElement $node)
+    private function findAttributeGroup(Schema $schema, DOMElement $node, string $typeName): AttributeGroup
     {
-        $element = new ElementDef($schema, $node->getAttribute("name"));
-        $schema->addElement($element);
+        list($name, $namespace) = static::splitParts($node, $typeName);
 
-        return function () use ($element, $node) {
-            $this->fillItem($element, $node);
-        };
+        $namespace = $namespace ?: $schema->getTargetNamespace();
+
+        try {
+            return $schema->findAttributeGroup($name, $namespace);
+        } catch (TypeNotFoundException $e) {
+            throw new TypeException(
+                sprintf(
+                    "Can't find %s named {%s}#%s, at line %d in %s ",
+                    'attributegroup',
+                    $namespace,
+                    $name,
+                    $node->getLineNo(),
+                    $node->ownerDocument->documentURI
+                ),
+                0,
+                $e
+            );
+        }
+    }
+
+    private function findElement(Schema $schema, DOMElement $node, string $typeName): ElementDef
+    {
+        list($name, $namespace) = static::splitParts($node, $typeName);
+
+        $namespace = $namespace ?: $schema->getTargetNamespace();
+
+        try {
+            return $schema->findElement($name, $namespace);
+        } catch (TypeNotFoundException $e) {
+            throw new TypeException(
+                sprintf(
+                    "Can't find %s named {%s}#%s, at line %d in %s ",
+                    'element',
+                    $namespace,
+                    $name,
+                    $node->getLineNo(),
+                    $node->ownerDocument->documentURI
+                ),
+                0,
+                $e
+            );
+        }
+    }
+
+    private function findGroup(Schema $schema, DOMElement $node, string $typeName): Group
+    {
+        list($name, $namespace) = static::splitParts($node, $typeName);
+
+        $namespace = $namespace ?: $schema->getTargetNamespace();
+
+        try {
+            return $schema->findGroup($name, $namespace);
+        } catch (TypeNotFoundException $e) {
+            throw new TypeException(
+                sprintf(
+                    "Can't find %s named {%s}#%s, at line %d in %s ",
+                    'group',
+                    $namespace,
+                    $name,
+                    $node->getLineNo(),
+                    $node->ownerDocument->documentURI
+                ),
+                0,
+                $e
+            );
+        }
+    }
+
+    private function findType(Schema $schema, DOMElement $node, string $typeName): SchemaItem
+    {
+        list($name, $namespace) = static::splitParts($node, $typeName);
+
+        $namespace = $namespace ?: $schema->getTargetNamespace();
+
+        try {
+            return $schema->findType($name, $namespace);
+        } catch (TypeNotFoundException $e) {
+            throw new TypeException(
+                sprintf(
+                    "Can't find %s named {%s}#%s, at line %d in %s ",
+                    'type',
+                    $namespace,
+                    $name,
+                    $node->getLineNo(),
+                    $node->ownerDocument->documentURI
+                ),
+                0,
+                $e
+            );
+        }
+    }
+
+    /**
+     * @return Closure
+     */
+    private function loadElementDef(Schema $schema, DOMElement $node): Closure
+    {
+        return $this->loadAttributeOrElementDef($schema, $node, false);
     }
 
     private function fillItem(Item $element, DOMElement $node)
     {
-        $localType = null;
-        foreach ($node->childNodes as $childNode) {
-            switch ($childNode->localName) {
-                case 'complexType':
-                case 'simpleType':
-                    $localType = $childNode;
-                    break 2;
+        /**
+         * @var bool
+         */
+        $skip = false;
+        static::againstDOMNodeList(
+            $node,
+            function (
+                DOMElement $node,
+                DOMElement $childNode
+            ) use (
+                $element,
+                &$skip
+            ) {
+                if (
+                    !$skip &&
+                    in_array(
+                        $childNode->localName,
+                        [
+                            'complexType',
+                            'simpleType',
+                        ],
+                        true
+                    )
+                ) {
+                    $this->loadTypeWithCallback(
+                        $element->getSchema(),
+                        $childNode,
+                        function (Type $type) use ($element) {
+                            $element->setType($type);
+                        }
+                    );
+                    $skip = true;
+                }
             }
+        );
+        if ($skip) {
+            return;
         }
-
-        if ($localType) {
-            $addCallback = function ($type) use ($element) {
-                $element->setType($type);
-            };
-            switch ($localType->localName) {
-                case 'complexType':
-                    call_user_func($this->loadComplexType($element->getSchema(), $localType, $addCallback));
-                    break;
-                case 'simpleType':
-                    call_user_func($this->loadSimpleType($element->getSchema(), $localType, $addCallback));
-                    break;
-            }
-        } else {
-
-            if ($node->getAttribute("type")) {
-                $type = $this->findSomething('findType', $element->getSchema(), $node, $node->getAttribute("type"));
-            } else {
-                $type = $this->findSomething('findType', $element->getSchema(), $node, ($node->lookupPrefix(self::XSD_NS) . ":anyType"));
-            }
-
-            $element->setType($type);
-        }
+        $this->fillItemNonLocalType($element, $node);
     }
 
-    private function loadImport(Schema $schema, DOMElement $node)
+    private function fillItemNonLocalType(Item $element, DOMElement $node): void
     {
-        $base = urldecode($node->ownerDocument->documentURI);
-        $file = UrlUtils::resolveRelativeUrl($base, $node->getAttribute("schemaLocation"));
-        if ($node->hasAttribute("namespace")
-            && isset(self::$globalSchemaInfo[$node->getAttribute("namespace")])
-            && isset($this->loadedFiles[self::$globalSchemaInfo[$node->getAttribute("namespace")]])
-        ) {
-
-            $schema->addSchema($this->loadedFiles[self::$globalSchemaInfo[$node->getAttribute("namespace")]]);
-
-            return function () {
-            };
-        } elseif ($node->hasAttribute("namespace")
-            && isset($this->loadedFiles[$this->getNamespaceSpecificFileIndex($file, $node->getAttribute("namespace"))])) {
-            $schema->addSchema($this->loadedFiles[$this->getNamespaceSpecificFileIndex($file, $node->getAttribute("namespace"))]);
-            return function () {
-            };
-        } elseif (isset($this->loadedFiles[$file])) {
-            $schema->addSchema($this->loadedFiles[$file]);
-            return function () {
-            };
-        }
-
-        if (!$node->getAttribute("namespace")) {
-            $this->loadedFiles[$file] = $newSchema = $schema;
+        if ($node->getAttribute('type')) {
+            /**
+             * @var Type
+             */
+            $type = $this->findSomeType($element, $node, 'type');
         } else {
-            $this->loadedFiles[$file] = $newSchema = new Schema();
-            $newSchema->addSchema($this->getGlobalSchema());
+            /**
+             * @var Type
+             */
+            $type = $this->findSomeTypeFromAttribute(
+                $element,
+                $node,
+                ($node->lookupPrefix(self::XSD_NS).':anyType')
+            );
         }
 
-        $xml = $this->getDOM(isset($this->knownLocationSchemas[$file]) ? $this->knownLocationSchemas[$file] : $file);
+        $element->setType($type);
+    }
 
-        $callbacks = $this->schemaNode($newSchema, $xml->documentElement, $schema);
+    private function loadImport(
+        Schema $schema,
+        DOMElement $node
+    ): Closure {
+        $base = urldecode($node->ownerDocument->documentURI);
+        $file = UrlUtils::resolveRelativeUrl($base, $node->getAttribute('schemaLocation'));
 
-        if ($node->getAttribute("namespace")) {
+        $namespace = $node->getAttribute('namespace');
+
+        $keys = $this->loadImportFreshKeys($namespace, $file);
+
+        foreach ($keys as $key) {
+            if (isset($this->loadedFiles[$key])) {
+                $schema->addSchema($this->loadedFiles[$key]);
+
+                return function () {
+                };
+            }
+        }
+
+        return $this->loadImportFresh($namespace, $schema, $file);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function loadImportFreshKeys(
+        string $namespace,
+        string $file
+    ): array {
+        $globalSchemaInfo = $this->getGlobalSchemaInfo();
+
+        $keys = [];
+
+        if (isset($globalSchemaInfo[$namespace])) {
+            $keys[] = $globalSchemaInfo[$namespace];
+        }
+
+        $keys[] = $this->getNamespaceSpecificFileIndex(
+            $file,
+            $namespace
+        );
+
+        $keys[] = $file;
+
+        return $keys;
+    }
+
+    private function loadImportFreshCallbacksNewSchema(
+        string $namespace,
+        Schema $schema,
+        string $file
+    ): Schema {
+        /**
+         * @var Schema $newSchema
+         */
+        $newSchema = $this->setLoadedFile(
+            $file,
+            (('' !== trim($namespace)) ? new Schema() : $schema)
+        );
+
+        if ('' !== trim($namespace)) {
+            $newSchema->addSchema($this->getGlobalSchema());
             $schema->addSchema($newSchema);
         }
 
+        return $newSchema;
+    }
 
-        return function () use ($callbacks) {
-            foreach ($callbacks as $callback) {
-                call_user_func($callback);
+    /**
+     * @return Closure[]
+     */
+    private function loadImportFreshCallbacks(
+        string $namespace,
+        Schema $schema,
+        string $file
+    ): array {
+        /**
+         * @var string
+         */
+        $file = $file;
+
+        return $this->schemaNode(
+            $this->loadImportFreshCallbacksNewSchema(
+                $namespace,
+                $schema,
+                $file
+            ),
+            $this->getDOM(
+                isset($this->knownLocationSchemas[$file])
+                    ? $this->knownLocationSchemas[$file]
+                    : $file
+            )->documentElement,
+            $schema
+        );
+    }
+
+    private function loadImportFresh(
+        string $namespace,
+        Schema $schema,
+        string $file
+    ): Closure {
+        return function () use ($namespace, $schema, $file) {
+            foreach (
+                $this->loadImportFreshCallbacks(
+                    $namespace,
+                    $schema,
+                    $file
+                ) as $callback
+            ) {
+                $callback();
             }
         };
     }
 
-    private $globalSchema;
+    /**
+     * @var Schema|null
+     */
+    protected $globalSchema;
 
     /**
-     *
+     * @return string[]
+     */
+    public function getGlobalSchemaInfo(): array
+    {
+        return self::$globalSchemaInfo;
+    }
+
+    /**
      * @return Schema
      */
-    public function getGlobalSchema()
+    public function getGlobalSchema(): Schema
     {
-        if (!$this->globalSchema) {
+        if (!($this->globalSchema instanceof Schema)) {
             $callbacks = array();
             $globalSchemas = array();
+            /**
+             * @var string $namespace
+             */
             foreach (self::$globalSchemaInfo as $namespace => $uri) {
-                $this->loadedFiles[$uri] = $globalSchemas [$namespace] = $schema = new Schema();
+                $this->setLoadedFile(
+                    $uri,
+                    $globalSchemas[$namespace] = $schema = new Schema()
+                );
                 if ($namespace === self::XSD_NS) {
                     $this->globalSchema = $schema;
                 }
@@ -711,29 +1208,42 @@ class SchemaReader
                 $callbacks = array_merge($callbacks, $this->schemaNode($schema, $xml->documentElement));
             }
 
-            $globalSchemas[self::XSD_NS]->addType(new SimpleType($globalSchemas[self::XSD_NS], "anySimpleType"));
-            $globalSchemas[self::XSD_NS]->addType(new SimpleType($globalSchemas[self::XSD_NS], "anyType"));
+            $globalSchemas[(string) static::XSD_NS]->addType(new SimpleType($globalSchemas[(string) static::XSD_NS], 'anySimpleType'));
+            $globalSchemas[(string) static::XSD_NS]->addType(new SimpleType($globalSchemas[(string) static::XSD_NS], 'anyType'));
 
-            $globalSchemas[self::XML_NS]->addSchema($globalSchemas[self::XSD_NS], self::XSD_NS);
-            $globalSchemas[self::XSD_NS]->addSchema($globalSchemas[self::XML_NS], self::XML_NS);
+            $globalSchemas[(string) static::XML_NS]->addSchema(
+                $globalSchemas[(string) static::XSD_NS],
+                (string) static::XSD_NS
+            );
+            $globalSchemas[(string) static::XSD_NS]->addSchema(
+                $globalSchemas[(string) static::XML_NS],
+                (string) static::XML_NS
+            );
 
+            /**
+             * @var Closure
+             */
             foreach ($callbacks as $callback) {
                 $callback();
             }
         }
-        return $this->globalSchema;
+
+        /**
+         * @var Schema
+         */
+        $out = $this->globalSchema;
+
+        if (!($out instanceof Schema)) {
+            throw new TypeException('Globa schema not discoverd');
+        }
+
+        return $out;
     }
 
-    /**
-     * @param DOMNode $node
-     * @param string  $file
-     * 
-     * @return Schema
-     */
-    public function readNode(DOMNode $node, $file = 'schema.xsd')
+    private function readNode(DOMElement $node, string $file = 'schema.xsd'): Schema
     {
-        $fileKey = $node instanceof DOMElement && $node->hasAttribute('targetNamespace') ? $this->getNamespaceSpecificFileIndex($file, $node->getAttribute('targetNamespace')) : $file;
-        $this->loadedFiles[$fileKey] = $rootSchema = new Schema();
+        $fileKey = $node->hasAttribute('targetNamespace') ? $this->getNamespaceSpecificFileIndex($file, $node->getAttribute('targetNamespace')) : $file;
+        $this->setLoadedFile($fileKey, $rootSchema = new Schema());
 
         $rootSchema->addSchema($this->getGlobalSchema());
         $callbacks = $this->schemaNode($rootSchema, $node);
@@ -750,26 +1260,16 @@ class SchemaReader
      *
      * Each of these  <xsd:schema/> nodes typically target a specific namespace. Append the target namespace to the
      * file to distinguish between multiple schemas in a single file.
-     *
-     * @param string $file
-     * @param string $targetNamespace
-     *
-     * @return string
      */
-    private function getNamespaceSpecificFileIndex($file, $targetNamespace)
+    private function getNamespaceSpecificFileIndex(string $file, string $targetNamespace): string
     {
-        return $file . '#' . $targetNamespace;
+        return $file.'#'.$targetNamespace;
     }
 
     /**
-     * @param string $content
-     * @param string $file
-     *
-     * @return Schema
-     *
      * @throws IOException
      */
-    public function readString($content, $file = 'schema.xsd')
+    public function readString(string $content, string $file = 'schema.xsd'): Schema
     {
         $xml = new DOMDocument('1.0', 'UTF-8');
         if (!$xml->loadXML($content)) {
@@ -780,30 +1280,145 @@ class SchemaReader
         return $this->readNode($xml->documentElement, $file);
     }
 
-    /**
-     * @param string $file
-     *
-     * @return Schema
-     */
-    public function readFile($file)
+    public function readFile(string $file): Schema
     {
         $xml = $this->getDOM($file);
+
         return $this->readNode($xml->documentElement, $file);
     }
 
     /**
-     * @param string $file
-     *
-     * @return DOMDocument
-     *
      * @throws IOException
      */
-    private function getDOM($file)
+    private function getDOM(string $file): DOMDocument
     {
         $xml = new DOMDocument('1.0', 'UTF-8');
         if (!$xml->load($file)) {
             throw new IOException("Can't load the file $file");
         }
+
         return $xml;
+    }
+
+    private static function againstDOMNodeList(
+        DOMElement $node,
+        Closure $againstNodeList
+    ) {
+        $limit = $node->childNodes->length;
+        for ($i = 0; $i < $limit; $i += 1) {
+            /**
+             * @var DOMNode
+             */
+            $childNode = $node->childNodes->item($i);
+
+            if ($childNode instanceof DOMElement) {
+                $againstNodeList(
+                    $node,
+                    $childNode
+                );
+            }
+        }
+    }
+
+    private function loadTypeWithCallback(
+        Schema $schema,
+        DOMElement $childNode,
+        Closure $callback
+    ) {
+        /**
+         * @var Closure|null $func
+         */
+        $func = null;
+
+        switch ($childNode->localName) {
+            case 'complexType':
+                $func = $this->loadComplexType($schema, $childNode, $callback);
+                break;
+            case 'simpleType':
+                $func = $this->loadSimpleType($schema, $childNode, $callback);
+                break;
+        }
+
+        if ($func instanceof Closure) {
+            call_user_func($func);
+        }
+    }
+
+    private function loadElement(
+        Schema $schema,
+        DOMElement $node
+    ): Element {
+        $element = new Element($schema, $node->getAttribute('name'));
+        $element->setDoc($this->getDocumentation($node));
+
+        $this->fillItem($element, $node);
+
+        self::maybeSetMax($element, $node);
+        self::maybeSetMin($element, $node);
+
+        $xp = new \DOMXPath($node->ownerDocument);
+        $xp->registerNamespace('xs', 'http://www.w3.org/2001/XMLSchema');
+
+        if ($xp->query('ancestor::xs:choice', $node)->length) {
+            $element->setMin(0);
+        }
+
+        if ($node->hasAttribute('nillable')) {
+            $element->setNil($node->getAttribute('nillable') == 'true');
+        }
+        if ($node->hasAttribute('form')) {
+            $element->setQualified($node->getAttribute('form') == 'qualified');
+        }
+
+        return $element;
+    }
+
+    private function addAttributeFromAttributeOrRef(
+        BaseComplexType $type,
+        DOMElement $childNode,
+        Schema $schema,
+        DOMElement $node
+    ): void {
+        $attribute = $this->getAttributeFromAttributeOrRef(
+            $childNode,
+            $schema,
+            $node
+        );
+
+        $type->addAttribute($attribute);
+    }
+
+    private function findSomethingLikeAttributeGroup(
+        Schema $schema,
+        DOMElement $node,
+        DOMElement $childNode,
+        AttributeContainer $addToThis
+    ): void {
+        $attribute = $this->findAttributeGroup($schema, $node, $childNode->getAttribute('ref'));
+        $addToThis->addAttribute($attribute);
+    }
+
+    private function setLoadedFile(string $key, Schema $schema): Schema
+    {
+        $this->loadedFiles[$key] = $schema;
+
+        return $schema;
+    }
+
+    private function setSchemaThingsFromNode(
+        Schema $schema,
+        DOMElement $node,
+        Schema $parent = null
+    ): void {
+        $schema->setDoc($this->getDocumentation($node));
+
+        if ($node->hasAttribute('targetNamespace')) {
+            $schema->setTargetNamespace($node->getAttribute('targetNamespace'));
+        } elseif ($parent instanceof Schema) {
+            $schema->setTargetNamespace($parent->getTargetNamespace());
+        }
+        $schema->setElementsQualification($node->getAttribute('elementFormDefault') == 'qualified');
+        $schema->setAttributesQualification($node->getAttribute('attributeFormDefault') == 'qualified');
+        $schema->setDoc($this->getDocumentation($node));
     }
 }

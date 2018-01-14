@@ -1,73 +1,53 @@
 <?php
+
+declare(strict_types=1);
+
 namespace GoetasWebservices\XML\XSDReader\Schema\Attribute;
 
-use GoetasWebservices\XML\XSDReader\Schema\Item;
-
-class Attribute extends Item implements AttributeSingle
+class Attribute extends AbstractAttributeItem implements AttributeSingle
 {
-
-    protected $fixed;
-
-    protected $default;
-
+    /**
+     * @var bool
+     */
     protected $qualified = true;
 
+    /**
+     * @var bool
+     */
     protected $nil = false;
 
+    /**
+     * @var string
+     */
     protected $use = self::USE_OPTIONAL;
 
-    public function getFixed()
-    {
-        return $this->fixed;
-    }
-
-    public function setFixed($fixed)
-    {
-        $this->fixed = $fixed;
-        return $this;
-    }
-
-    public function getDefault()
-    {
-        return $this->default;
-    }
-
-    public function setDefault($default)
-    {
-        $this->default = $default;
-        return $this;
-    }
-
-    public function isQualified()
+    public function isQualified(): bool
     {
         return $this->qualified;
     }
 
-    public function setQualified($qualified)
+    public function setQualified(bool $qualified): void
     {
         $this->qualified = $qualified;
-        return $this;
     }
 
-    public function isNil()
+    public function isNil(): bool
     {
         return $this->nil;
     }
 
-    public function setNil($nil)
+    public function setNil(bool $nil): void
     {
         $this->nil = $nil;
-        return $this;
     }
 
-    public function getUse()
+    public function getUse(): ?string
     {
         return $this->use;
     }
 
-    public function setUse($use)
+    public function setUse(string $use): void
     {
         $this->use = $use;
-        return $this;
     }
 }

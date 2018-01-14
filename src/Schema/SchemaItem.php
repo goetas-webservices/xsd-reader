@@ -1,15 +1,12 @@
 <?php
+
+declare(strict_types=1);
+
 namespace GoetasWebservices\XML\XSDReader\Schema;
 
 interface SchemaItem
 {
-    /**
-     * @return Schema
-     */
-    public function getSchema();
+    public function getSchema(): Schema;
 
-    /**
-     * @return string
-     */
-    public function getDoc();
+    public function getDoc(): ?string;
 }

@@ -1,13 +1,26 @@
 <?php
+
+declare(strict_types=1);
+
 namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
-class GroupRef extends Group
-{
+use BadMethodCallException;
 
+class GroupRef extends Group implements InterfaceSetMinMax
+{
+    /**
+     * @var Group
+     */
     protected $wrapped;
 
+    /**
+     * @var int
+     */
     protected $min = 1;
 
+    /**
+     * @var int
+     */
     protected $max = 1;
 
     public function __construct(Group $group)
@@ -16,53 +29,56 @@ class GroupRef extends Group
         $this->wrapped = $group;
     }
 
-    public function getMin()
+    public function getMin(): int
     {
         return $this->min;
     }
 
-    public function setMin($min)
+    public function setMin(int $min): void
     {
         $this->min = $min;
-        return $this;
     }
 
-    public function getMax()
+    public function getMax(): int
     {
         return $this->max;
     }
 
-    public function setMax($max)
+    public function setMax(int $max): void
     {
         $this->max = $max;
-        return $this;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->wrapped->getName();
     }
 
-    public function setName($name)
-    {
-        throw new \Exception("Can't set the name for a ref group");
-    }
-
-    public function getElements()
+    /**
+     * @return ElementItem[]
+     */
+    public function getElements(): array
     {
         $elements = $this->wrapped->getElements();
-        if($this->getMax()>0 || $this->getMax()===-1){
+        if ($this->getMax() > 0 || $this->getMax() === -1) {
+            /**
+             * @var string $k
+             */
             foreach ($elements as $k => $element) {
+                /**
+                 * @var Element|ElementRef|ElementSingle|GroupRef $e
+                 */
                 $e = clone $element;
                 $e->setMax($this->getMax());
                 $elements[$k] = $e;
             }
         }
+
         return $elements;
     }
 
-    public function addElement(ElementItem $element)
+    public function addElement(ElementItem $element): void
     {
-        throw new \Exception("Can't set the name for a ref group");
+        throw new BadMethodCallException("Can't add an element for a ref group");
     }
 }

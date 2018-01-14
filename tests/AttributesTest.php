@@ -1,13 +1,13 @@
 <?php
+
+declare(strict_types=1);
+
 namespace GoetasWebservices\XML\XSDReader\Tests;
 
 class AttributesTest extends BaseTest
 {
-
-
     public function testBase()
     {
-
         $schema = $this->reader->readString(
             '
             <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
@@ -29,8 +29,7 @@ class AttributesTest extends BaseTest
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef', $myAttribute);
         //$this->assertEquals('http://www.example.com', $myAttribute->getSchema()->getTargetNamespace());
         $this->assertEquals('myAttribute', $myAttribute->getName());
-        $this->assertEquals("string", $myAttribute->getType()->getName());
-
+        $this->assertEquals('string', $myAttribute->getType()->getName());
 
         $base1 = $myAttribute->getType();
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType', $base1);
@@ -48,13 +47,11 @@ class AttributesTest extends BaseTest
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef', $attributesInGroup[1]);
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Attribute\Group', $attributesInGroup[2]);
 
-
         $myAttribute = $schema->findAttribute('myAttributeOptions', 'http://www.example.com');
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef', $myAttribute);
         //$this->assertEquals('http://www.example.com', $myAttribute->getSchema()->getTargetNamespace());
         $this->assertEquals('myAttributeOptions', $myAttribute->getName());
-        $this->assertEquals("string", $myAttribute->getType()->getName());
-
+        $this->assertEquals('string', $myAttribute->getType()->getName());
     }
 
     public function testAnonym()
@@ -71,7 +68,6 @@ class AttributesTest extends BaseTest
 
             </xs:schema>');
 
-
         $myAttributeAnon = $schema->findAttribute('myAttributeAnonType', 'http://www.example.com');
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef', $myAttributeAnon);
         //$this->assertEquals('http://www.example.com', $myAttribute->getSchema()->getTargetNamespace());
@@ -82,7 +78,6 @@ class AttributesTest extends BaseTest
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType', $base2);
         $this->assertEquals('http://www.example.com', $base2->getSchema()->getTargetNamespace());
         $this->assertTrue(!$base2->getName());
-
 
         $restriction1 = $base2->getRestriction();
         $base3 = $restriction1->getBase();
