@@ -1,18 +1,6 @@
 tools:
     external_code_coverage: true
-build:
-    nodes:
-        php70:
-            environment:
-                php: 7.0
-        php71:
-            environment:
-                php: 7.1
-        analysis:
-            project_setup:
-                override: true
-            tests:
-                override: [php-scrutinizer-run]
+
 checks:
     php:
         code_rating: true
