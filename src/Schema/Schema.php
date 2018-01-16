@@ -255,7 +255,7 @@ class Schema
 
     public function addType(Type $type): void
     {
-        $this->types[$type->getName()] = $type;
+        $this->types[(string) $type->getName()] = $type;
     }
 
     public function addElement(ElementDef $element): void
