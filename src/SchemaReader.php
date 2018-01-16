@@ -215,7 +215,7 @@ class SchemaReader
         $this->setSchemaThingsFromNode($schema, $node, $parent);
         $functions = array();
 
-        static::againstDOMNodeList(
+        self::againstDOMNodeList(
             $node,
             function (
                 DOMElement $node,
@@ -302,7 +302,7 @@ class SchemaReader
             ? 2
             : null;
 
-        static::againstDOMNodeList(
+        self::againstDOMNodeList(
             $node,
             function (
                 DOMElement $node,
@@ -439,7 +439,7 @@ class SchemaReader
         $schema->addGroup($group);
 
         return function () use ($group, $node): void {
-            static::againstDOMNodeList(
+            self::againstDOMNodeList(
                 $node,
                 function (DOMelement $node, DOMElement $childNode) use ($group): void {
                     switch ($childNode->localName) {
@@ -461,7 +461,7 @@ class SchemaReader
          */
         $isSimple = false;
 
-        static::againstDOMNodeList(
+        self::againstDOMNodeList(
             $node,
             function (
                 DOMElement $node,
@@ -488,7 +488,7 @@ class SchemaReader
         return function () use ($type, $node, $schema, $callback): void {
             $this->fillTypeNode($type, $node, true);
 
-            static::againstDOMNodeList(
+            self::againstDOMNodeList(
                 $node,
                 function (
                     DOMElement $node,
@@ -571,7 +571,7 @@ class SchemaReader
         return function () use ($type, $node, $callback): void {
             $this->fillTypeNode($type, $node, true);
 
-            static::againstDOMNodeList(
+            self::againstDOMNodeList(
                 $node,
                 function (DOMElement $node, DOMElement $childNode) use ($type): void {
                     switch ($childNode->localName) {
@@ -687,7 +687,7 @@ class SchemaReader
             $type->setAbstract($node->getAttribute('abstract') === 'true' || $node->getAttribute('abstract') === '1');
         }
 
-        static::againstDOMNodeList(
+        self::againstDOMNodeList(
             $node,
             function (DOMElement $node, DOMElement $childNode) use ($type): void {
                 switch ($childNode->localName) {
@@ -739,7 +739,7 @@ class SchemaReader
         BaseComplexType $type,
         DOMElement $node
     ): void {
-        static::againstDOMNodeList(
+        self::againstDOMNodeList(
             $node,
             function (
                 DOMElement $node,
@@ -1034,7 +1034,7 @@ class SchemaReader
          * @var bool
          */
         $skip = false;
-        static::againstDOMNodeList(
+        self::againstDOMNodeList(
             $node,
             function (
                 DOMElement $node,
