@@ -41,9 +41,6 @@ abstract class Type implements SchemaItem
         $this->schema = $schema;
     }
 
-    /**
-     * @return string|null
-     */
     public function getName(): ?string
     {
         return $this->name;
@@ -82,9 +79,6 @@ abstract class Type implements SchemaItem
         $this->restriction = $restriction;
     }
 
-    /**
-     * @return Extension|null
-     */
     public function getExtension(): ?Extension
     {
         return $this->extension;

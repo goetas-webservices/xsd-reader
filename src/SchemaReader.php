@@ -321,14 +321,11 @@ class SchemaReader
         );
     }
 
-    /**
-     * @param int|null $max
-     */
     private function loadSequenceChildNode(
         ElementContainer $elementContainer,
         DOMElement $node,
         DOMElement $childNode,
-        $max
+        ? int $max
     ): void {
         switch ($childNode->localName) {
             case 'sequence':
@@ -359,14 +356,11 @@ class SchemaReader
         }
     }
 
-    /**
-     * @param int|null $max
-     */
     private function loadSequenceChildNodeLoadElement(
         ElementContainer $elementContainer,
         DOMElement $node,
         DOMElement $childNode,
-        $max
+        ? int $max
     ): void {
         if ($childNode->hasAttribute('ref')) {
             $element = new ElementRef(
