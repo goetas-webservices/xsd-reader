@@ -1066,7 +1066,6 @@ class SchemaReader
         Schema $schema,
         DOMElement $node
     ): Closure {
-
         $namespace = $node->getAttribute('namespace');
         $schemaLocation = $node->getAttribute('schemaLocation');
 
@@ -1088,6 +1087,7 @@ class SchemaReader
 
         if (isset($this->loadedFiles[$file])) {
             $schema->addSchema($this->loadedFiles[$file]);
+
             return function () {
             };
         }
@@ -1099,7 +1099,6 @@ class SchemaReader
         Schema $schema,
         string $namespace
     ): Schema {
-
         if (('' !== trim($namespace))) {
             $newSchema = new Schema();
             $newSchema->addSchema($this->getGlobalSchema());
@@ -1117,7 +1116,6 @@ class SchemaReader
         string $file
     ): Closure {
         return function () use ($namespace, $schema, $file) {
-
             $dom = $this->getDOM(
             isset($this->knownLocationSchemas[$file])
                 ? $this->knownLocationSchemas[$file]
@@ -1208,7 +1206,6 @@ class SchemaReader
         $all = array();
         foreach ($nodes as $k => $node) {
             if (($node instanceof \DOMElement) && $node->namespaceURI === self::XSD_NS && $node->localName == 'schema') {
-
                 $holderSchema = new Schema();
                 $holderSchema->addSchema($this->getGlobalSchema());
 
@@ -1224,6 +1221,7 @@ class SchemaReader
         foreach ($all as $callback) {
             call_user_func($callback);
         }
+
         return $rootSchema;
     }
 
@@ -1237,7 +1235,6 @@ class SchemaReader
         }
 
         $this->setLoadedSchema($node, $rootSchema);
-
 
         $callbacks = $this->schemaNode($rootSchema, $node);
 

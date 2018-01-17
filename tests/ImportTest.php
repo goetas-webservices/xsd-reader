@@ -73,7 +73,6 @@ class ImportTest extends BaseTest
         ');
         $schema = $this->reader->readNodes(iterator_to_array($dom->documentElement->childNodes));
 
-        $this->assertInstanceOf(ElementDef::class, $schema->findElement("outerEl", "http://tempuri.org/1"));
-
+        $this->assertInstanceOf(ElementDef::class, $schema->findElement('outerEl', 'http://tempuri.org/1'));
     }
 }
