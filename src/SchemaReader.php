@@ -1142,7 +1142,7 @@ class SchemaReader
     /**
      * @return Schema
      */
-    private function getGlobalSchema(): Schema
+    public function getGlobalSchema(): Schema
     {
         if (!($this->globalSchema instanceof Schema)) {
             $callbacks = array();
