@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace GoetasWebservices\XML\XSDReader\Tests;
 
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItem;
+use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
+
 class ImportTest extends BaseTest
 {
     public function testBase()
@@ -36,5 +39,40 @@ class ImportTest extends BaseTest
         $localAttrs = $localAttrGroup->getAttributes();
 
         $this->assertSame($remoteAttr, $localAttrs[0]);
+    }
+
+    public function testBaseNode()
+    {
+        $dom = new \DOMDocument();
+        $dom->loadXML('
+        <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:attribute name="myAttribute" type="xs:string"></xs:attribute>
+        </xs:schema>
+        ');
+        $schema = $this->reader->readNode($dom->documentElement);
+        $attr = $schema->findAttribute('myAttribute', 'http://www.example.com');
+
+        $this->assertInstanceOf(AttributeItem::class, $attr);
+    }
+
+    public function testDependentImport()
+    {
+        $dom = new \DOMDocument();
+        $dom->loadXML('
+        <types xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://tempuri.org/1" xmlns:t2="http://tempuri.org/2">
+                <xs:import namespace="http://tempuri.org/2"/>
+                <xs:element name="outerEl" type="t2:inner"/>
+            </xs:schema>
+            <xs:schema targetNamespace="http://tempuri.org/2">
+                <xs:complexType name="inner">
+                    <xs:attribute name="inner_attr"/>
+                </xs:complexType>
+            </xs:schema>
+        </types>
+        ');
+        $schema = $this->reader->readNodes(iterator_to_array($dom->documentElement->childNodes));
+
+        $this->assertInstanceOf(ElementDef::class, $schema->findElement('outerEl', 'http://tempuri.org/1'));
     }
 }
