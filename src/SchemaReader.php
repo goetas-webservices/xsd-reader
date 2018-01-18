@@ -1100,7 +1100,7 @@ class SchemaReader
 
         // postpone schema loading
         if ($namespace && !$schemaLocation && !isset(self::$globalSchemaInfo[$namespace])) {
-            return function () use ($schema, $namespace) {
+            return function () use ($schema, $namespace) : void {
                 if (!empty($this->loadedSchemas[$namespace])) {
                     foreach ($this->loadedSchemas[$namespace] as $s) {
                         $schema->addSchema($s, $namespace);
@@ -1117,7 +1117,7 @@ class SchemaReader
         if (isset($this->loadedFiles[$file])) {
             $schema->addSchema($this->loadedFiles[$file]);
 
-            return function () {
+            return function () : void {
             };
         }
 
@@ -1223,7 +1223,10 @@ class SchemaReader
         return $out;
     }
 
-    public function readNodes(array $nodes, string $file = null)
+    /**
+    * @param DOMElement[] $nodes
+    */
+    public function readNodes(array $nodes, string $file = null) : Schema
     {
         $rootSchema = new Schema();
         $rootSchema->addSchema($this->getGlobalSchema());
