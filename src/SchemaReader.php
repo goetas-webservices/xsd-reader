@@ -55,6 +55,11 @@ class SchemaReader
     private $loadedFiles = array();
 
     /**
+     * @var Schema[][]
+     */
+    private $loadedSchemas = array();
+
+    /**
      * @var string[]
      */
     protected $knownLocationSchemas = [
@@ -1090,97 +1095,48 @@ class SchemaReader
         Schema $schema,
         DOMElement $node
     ): Closure {
+        $namespace = $node->getAttribute('namespace');
+        $schemaLocation = $node->getAttribute('schemaLocation');
+
+        // postpone schema loading
+        if ($namespace && !$schemaLocation && !isset(self::$globalSchemaInfo[$namespace])) {
+            return function () use ($schema, $namespace) {
+                if (!empty($this->loadedSchemas[$namespace])) {
+                    foreach ($this->loadedSchemas[$namespace] as $s) {
+                        $schema->addSchema($s, $namespace);
+                    }
+                }
+            };
+        } elseif ($namespace && !$schemaLocation && isset($this->globalSchema[$namespace])) {
+            $schema->addSchema($this->globalSchema[$namespace]);
+        }
+
         $base = urldecode($node->ownerDocument->documentURI);
         $file = UrlUtils::resolveRelativeUrl($base, $node->getAttribute('schemaLocation'));
 
-        $namespace = $node->getAttribute('namespace');
+        if (isset($this->loadedFiles[$file])) {
+            $schema->addSchema($this->loadedFiles[$file]);
 
-        $keys = $this->loadImportFreshKeys($namespace, $file);
-
-        foreach ($keys as $key) {
-            if (isset($this->loadedFiles[$key])) {
-                $schema->addSchema($this->loadedFiles[$key]);
-
-                return function (): void {
-                };
-            }
+            return function () {
+            };
         }
 
         return $this->loadImportFresh($namespace, $schema, $file);
     }
 
-    /**
-     * @return string[]
-     */
-    private function loadImportFreshKeys(
-        string $namespace,
-        string $file
-    ): array {
-        $globalSchemaInfo = $this->getGlobalSchemaInfo();
-
-        $keys = [];
-
-        if (isset($globalSchemaInfo[$namespace])) {
-            $keys[] = $globalSchemaInfo[$namespace];
-        }
-
-        $keys[] = $this->getNamespaceSpecificFileIndex(
-            $file,
-            $namespace
-        );
-
-        $keys[] = $file;
-
-        return $keys;
-    }
-
-    private function loadImportFreshCallbacksNewSchema(
-        string $namespace,
+    private function createOrUseSchemaForNs(
         Schema $schema,
-        string $file
+        string $namespace
     ): Schema {
-        /**
-         * @var Schema $newSchema
-         */
-        $newSchema = $this->setLoadedFile(
-            $file,
-            (('' !== trim($namespace)) ? new Schema() : $schema)
-        );
-
-        if ('' !== trim($namespace)) {
+        if (('' !== trim($namespace))) {
+            $newSchema = new Schema();
             $newSchema->addSchema($this->getGlobalSchema());
             $schema->addSchema($newSchema);
+        } else {
+            $newSchema = $schema;
         }
 
         return $newSchema;
-    }
-
-    /**
-     * @return Closure[]
-     */
-    private function loadImportFreshCallbacks(
-        string $namespace,
-        Schema $schema,
-        string $file
-    ): array {
-        /**
-         * @var string
-         */
-        $file = $file;
-
-        return $this->schemaNode(
-            $this->loadImportFreshCallbacksNewSchema(
-                $namespace,
-                $schema,
-                $file
-            ),
-            $this->getDOM(
-                isset($this->knownLocationSchemas[$file])
-                    ? $this->knownLocationSchemas[$file]
-                    : $file
-            )->documentElement,
-            $schema
-        );
     }
 
     private function loadImportFresh(
@@ -1189,13 +1145,19 @@ class SchemaReader
         string $file
     ): Closure {
         return function () use ($namespace, $schema, $file): void {
-            foreach (
-                $this->loadImportFreshCallbacks(
-                    $namespace,
-                    $schema,
-                    $file
-                ) as $callback
-            ) {
+            $dom = $this->getDOM(
+            isset($this->knownLocationSchemas[$file])
+                ? $this->knownLocationSchemas[$file]
+                : $file
+            );
+
+            $schemaNew = $this->createOrUseSchemaForNs($schema, $namespace);
+
+            $this->setLoadedFile($file, $schemaNew);
+
+            $callbacks = $this->schemaNode($schemaNew, $dom->documentElement, $schema);
+
+            foreach ($callbacks as $callback) {
                 $callback();
             }
         };
@@ -1205,14 +1167,6 @@ class SchemaReader
      * @var Schema|null
      */
     protected $globalSchema;
-
-    /**
-     * @return string[]
-     */
-    public function getGlobalSchemaInfo(): array
-    {
-        return self::$globalSchemaInfo;
-    }
 
     /**
      * @return Schema
@@ -1269,12 +1223,48 @@ class SchemaReader
         return $out;
     }
 
-    private function readNode(DOMElement $node, string $file = 'schema.xsd'): Schema
+    public function readNodes(array $nodes, string $file = null)
     {
-        $fileKey = $node->hasAttribute('targetNamespace') ? $this->getNamespaceSpecificFileIndex($file, $node->getAttribute('targetNamespace')) : $file;
-        $this->setLoadedFile($fileKey, $rootSchema = new Schema());
-
+        $rootSchema = new Schema();
         $rootSchema->addSchema($this->getGlobalSchema());
+
+        if ($file !== null) {
+            $this->setLoadedFile($file, $rootSchema);
+        }
+
+        $all = array();
+        foreach ($nodes as $k => $node) {
+            if (($node instanceof \DOMElement) && $node->namespaceURI === self::XSD_NS && $node->localName == 'schema') {
+                $holderSchema = new Schema();
+                $holderSchema->addSchema($this->getGlobalSchema());
+
+                $this->setLoadedSchema($node, $holderSchema);
+
+                $rootSchema->addSchema($holderSchema);
+
+                $callbacks = $this->schemaNode($holderSchema, $node);
+                $all = array_merge($callbacks, $all);
+            }
+        }
+
+        foreach ($all as $callback) {
+            call_user_func($callback);
+        }
+
+        return $rootSchema;
+    }
+
+    public function readNode(DOMElement $node, string $file = null): Schema
+    {
+        $rootSchema = new Schema();
+        $rootSchema->addSchema($this->getGlobalSchema());
+
+        if ($file !== null) {
+            $this->setLoadedFile($file, $rootSchema);
+        }
+
+        $this->setLoadedSchema($node, $rootSchema);
+
         $callbacks = $this->schemaNode($rootSchema, $node);
 
         foreach ($callbacks as $callback) {
@@ -1282,17 +1272,6 @@ class SchemaReader
         }
 
         return $rootSchema;
-    }
-
-    /**
-     * It is possible that a single file contains multiple <xsd:schema/> nodes, for instance in a WSDL file.
-     *
-     * Each of these  <xsd:schema/> nodes typically target a specific namespace. Append the target namespace to the
-     * file to distinguish between multiple schemas in a single file.
-     */
-    private function getNamespaceSpecificFileIndex(string $file, string $targetNamespace): string
-    {
-        return $file.'#'.$targetNamespace;
     }
 
     /**
@@ -1427,11 +1406,16 @@ class SchemaReader
         $addToThis->addAttribute($attribute);
     }
 
-    private function setLoadedFile(string $key, Schema $schema): Schema
+    private function setLoadedFile(string $key, Schema $schema): void
     {
         $this->loadedFiles[$key] = $schema;
+    }
 
-        return $schema;
+    private function setLoadedSchema(DOMElement $node, Schema $schema): void
+    {
+        if ($node->hasAttribute('targetNamespace')) {
+            $this->loadedSchemas[$node->getAttribute('targetNamespace')][] = $schema;
+        }
     }
 
     private function setSchemaThingsFromNode(
