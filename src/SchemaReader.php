@@ -869,14 +869,14 @@ class SchemaReader
         list($name, $namespace) = static::splitParts($node, $typeName);
 
         /**
-        * @var string|null $namespace
-        */
+         * @var string|null $namespace
+         */
         $namespace = $namespace ?: $schema->getTargetNamespace();
 
         try {
             /**
-            * @var AttributeItem $out
-            */
+             * @var AttributeItem $out
+             */
             $out = $schema->findAttribute((string) $name, $namespace);
 
             return $out;
@@ -901,14 +901,14 @@ class SchemaReader
         list($name, $namespace) = static::splitParts($node, $typeName);
 
         /**
-        * @var string|null $namespace
-        */
+         * @var string|null $namespace
+         */
         $namespace = $namespace ?: $schema->getTargetNamespace();
 
         try {
             /**
-            * @var AttributeGroup $out
-            */
+             * @var AttributeGroup $out
+             */
             $out = $schema->findAttributeGroup((string) $name, $namespace);
 
             return $out;
@@ -933,8 +933,8 @@ class SchemaReader
         list($name, $namespace) = static::splitParts($node, $typeName);
 
         /**
-        * @var string|null $namespace
-        */
+         * @var string|null $namespace
+         */
         $namespace = $namespace ?: $schema->getTargetNamespace();
 
         try {
@@ -960,14 +960,14 @@ class SchemaReader
         list($name, $namespace) = static::splitParts($node, $typeName);
 
         /**
-        * @var string|null $namespace
-        */
+         * @var string|null $namespace
+         */
         $namespace = $namespace ?: $schema->getTargetNamespace();
 
         try {
             /**
-            * @var Group $out
-            */
+             * @var Group $out
+             */
             $out = $schema->findGroup((string) $name, $namespace);
 
             return $out;
@@ -992,14 +992,14 @@ class SchemaReader
         list($name, $namespace) = static::splitParts($node, $typeName);
 
         /**
-        * @var string|null $namespace
-        */
+         * @var string|null $namespace
+         */
         $namespace = $namespace ?: $schema->getTargetNamespace();
 
         try {
             /**
-            * @var SchemaItem $out
-            */
+             * @var SchemaItem $out
+             */
             $out = $schema->findType((string) $name, $namespace);
 
             return $out;
@@ -1100,7 +1100,7 @@ class SchemaReader
 
         // postpone schema loading
         if ($namespace && !$schemaLocation && !isset(self::$globalSchemaInfo[$namespace])) {
-            return function () use ($schema, $namespace) : void {
+            return function () use ($schema, $namespace): void {
                 if (!empty($this->loadedSchemas[$namespace])) {
                     foreach ($this->loadedSchemas[$namespace] as $s) {
                         $schema->addSchema($s, $namespace);
@@ -1117,7 +1117,7 @@ class SchemaReader
         if (isset($this->loadedFiles[$file])) {
             $schema->addSchema($this->loadedFiles[$file]);
 
-            return function () : void {
+            return function (): void {
             };
         }
 
@@ -1224,9 +1224,9 @@ class SchemaReader
     }
 
     /**
-    * @param DOMElement[] $nodes
-    */
-    public function readNodes(array $nodes, string $file = null) : Schema
+     * @param DOMElement[] $nodes
+     */
+    public function readNodes(array $nodes, string $file = null): Schema
     {
         $rootSchema = new Schema();
         $rootSchema->addSchema($this->getGlobalSchema());
@@ -1314,7 +1314,7 @@ class SchemaReader
     private static function againstDOMNodeList(
         DOMElement $node,
         Closure $againstNodeList
-    ) : void {
+    ): void {
         $limit = $node->childNodes->length;
         for ($i = 0; $i < $limit; $i += 1) {
             /**
@@ -1335,7 +1335,7 @@ class SchemaReader
         Schema $schema,
         DOMElement $childNode,
         Closure $callback
-    ) : void {
+    ): void {
         /**
          * @var Closure|null $func
          */
