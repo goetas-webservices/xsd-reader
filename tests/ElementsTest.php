@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace GoetasWebservices\XML\XSDReader\Tests;
 
 use GoetasWebservices\XML\XSDReader\Schema\Element\Element;
+use GoetasWebservices\XML\XSDReader\Schema\Element\Group;
+use GoetasWebservices\XML\XSDReader\Schema\Element\GroupRef;
+use GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType;
 
 class ElementsTest extends BaseTest
 {
@@ -50,6 +53,77 @@ class ElementsTest extends BaseTest
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\Element', $elementsInGroup[0]);
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\ElementItem', $elementsInGroup[1]);
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\Group', $elementsInGroup[2]);
+    }
+
+    /**
+     * @dataProvider getGroupCounts
+     */
+    public function testGroupOccurrences($item, $min, $max)
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xs:complexType name="myType">
+                    <xs:sequence>     
+                        <xs:group ref="myGroup" minOccurs="1" />
+                        <xs:group ref="myGroup" minOccurs="2" />
+                        
+                        <xs:group ref="myGroup" maxOccurs="1" />
+                        <xs:group ref="myGroup" maxOccurs="unbounded" />
+                        
+                        <xs:group ref="myGroup" minOccurs="1" maxOccurs="1"/>
+                        <xs:group ref="myGroup" minOccurs="2" maxOccurs="2"/>
+                        
+                    </xs:sequence>
+                </xs:complexType>
+
+                <xs:group name="myGroup">
+                    <xs:sequence>
+                        <xs:element name="groupEl1" type="xs:string" />
+                    </xs:sequence>
+                </xs:group>
+            </xs:schema>');
+
+        $myType = $schema->findType('myType', 'http://www.example.com');
+        $this->assertInstanceOf(ComplexType::class, $myType);
+
+        $myGroup = $schema->findGroup('myGroup', 'http://www.example.com');
+        $this->assertInstanceOf(Group::class, $myGroup);
+
+        $myGroupRef = $myType->getElements()[$item];
+        $this->assertInstanceOf(GroupRef::class, $myGroupRef);
+
+        $wrappedEls = $myGroupRef->getElements();
+        if ($max === -1 || $max > 0) {
+            $this->assertEquals($max,  $wrappedEls[0]->getMax());
+        } else {
+            $this->assertEquals(1,  $wrappedEls[0]->getMax());
+        }
+
+        if ($min > 1) {
+            $this->assertEquals($max,  $wrappedEls[0]->getMin());
+        } else {
+            $this->assertEquals(1,  $wrappedEls[0]->getMin());
+        }
+
+        $this->assertEquals('myGroup', $myGroupRef->getName());
+
+        $this->assertEquals($min, $myGroupRef->getMin());
+        $this->assertEquals($max, $myGroupRef->getMax());
+    }
+
+    public function getGroupCounts()
+    {
+        return [
+            // item, min, max
+            [0, 1, 1],
+            [1, 2, 2], // if the min = 2, max must be at least 2
+            [2, 1, 1],
+            [3, 1, -1],
+            [4, 1, 1],
+            [5, 2, 2],
+
+        ];
     }
 
     public function testAnonym()

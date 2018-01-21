@@ -303,6 +303,9 @@ class SchemaReader
     {
         if ($node->hasAttribute('minOccurs')) {
             $ref->setMin((int)$node->getAttribute('minOccurs'));
+            if ($ref->getMin() > $ref->getMax()) {
+                $ref->setMax($ref->getMin());
+            }
         }
 
         return $ref;
@@ -1180,13 +1183,13 @@ class SchemaReader
             $globalSchemas[(string) static::XSD_NS]->addType(new SimpleType($globalSchemas[(string) static::XSD_NS], 'anySimpleType'));
             $globalSchemas[(string) static::XSD_NS]->addType(new SimpleType($globalSchemas[(string) static::XSD_NS], 'anyType'));
 
-            $globalSchemas[(string) static::XML_NS]->addSchema(
-                $globalSchemas[(string) static::XSD_NS],
-                (string) static::XSD_NS
+            $globalSchemas[(string)static::XML_NS]->addSchema(
+                $globalSchemas[(string)static::XSD_NS],
+                (string)static::XSD_NS
             );
-            $globalSchemas[(string) static::XSD_NS]->addSchema(
-                $globalSchemas[(string) static::XML_NS],
-                (string) static::XML_NS
+            $globalSchemas[(string)static::XSD_NS]->addSchema(
+                $globalSchemas[(string)static::XML_NS],
+                (string)static::XML_NS
             );
 
             /**
