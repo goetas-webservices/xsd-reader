@@ -6,6 +6,7 @@ namespace GoetasWebservices\XML\XSDReader\Tests;
 
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItem;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
+use GoetasWebservices\XML\XSDReader\Schema\Schema;
 
 class ImportTest extends BaseTest
 {
@@ -41,6 +42,36 @@ class ImportTest extends BaseTest
         $this->assertSame($remoteAttr, $localAttrs[0]);
     }
 
+    public function testKnownImport()
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.user.com" xmlns:xs="http://www.w3.org/2001/XMLSchema"  xmlns:ex="http://www.example.com">
+                <xs:import namespace="http://www.w3.org/2001/XMLSchema"/>
+                 <xs:complexType name="t">
+                    <xs:attribute name="att"/>
+                </xs:complexType>
+            </xs:schema>');
+        $this->assertInstanceOf(Schema::class, $schema);
+    }
+
+    public function testKnownLocationImport()
+    {
+        $this->reader->addKnownSchemaLocation("http://www.example.com/test.xsd", __DIR__."/schema/test.xsd");
+
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.user.com" xmlns:xs="http://www.w3.org/2001/XMLSchema"  xmlns:ex="http://www.example.com">
+                <xs:import namespace="http://www.w3.org/2001/XMLSchema" schemaLocation="http://www.example.com/test.xsd"/>
+                 <xs:complexType name="out">
+                    <xs:sequence>
+                        <xs:element type="ex:in" name="foo"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:schema>');
+        $this->assertInstanceOf(Schema::class, $schema);
+    }
+
     public function testBaseNode()
     {
         $dom = new \DOMDocument();
@@ -71,7 +102,7 @@ class ImportTest extends BaseTest
             </xs:schema>
         </types>
         ');
-        $schema = $this->reader->readNodes(iterator_to_array($dom->documentElement->childNodes));
+        $schema = $this->reader->readNodes(iterator_to_array($dom->documentElement->childNodes), 'file.xsd');
 
         $this->assertInstanceOf(ElementDef::class, $schema->findElement('outerEl', 'http://tempuri.org/1'));
     }
