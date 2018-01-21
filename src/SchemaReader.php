@@ -288,18 +288,14 @@ class SchemaReader
         return $ref;
     }
 
-    private static function maybeSetMax(InterfaceSetMinMax $ref, DOMElement $node): InterfaceSetMinMax
+    private static function maybeSetMax(InterfaceSetMinMax $ref, DOMElement $node): void
     {
-        if (
-        $node->hasAttribute('maxOccurs')
-        ) {
+        if ($node->hasAttribute('maxOccurs')) {
             $ref->setMax($node->getAttribute('maxOccurs') == 'unbounded' ? -1 : (int)$node->getAttribute('maxOccurs'));
         }
-
-        return $ref;
     }
 
-    private static function maybeSetMin(InterfaceSetMinMax $ref, DOMElement $node): InterfaceSetMinMax
+    private static function maybeSetMin(InterfaceSetMinMax $ref, DOMElement $node): void
     {
         if ($node->hasAttribute('minOccurs')) {
             $ref->setMin((int)$node->getAttribute('minOccurs'));
@@ -307,8 +303,6 @@ class SchemaReader
                 $ref->setMax($ref->getMin());
             }
         }
-
-        return $ref;
     }
 
     private function loadSequence(ElementContainer $elementContainer, DOMElement $node, int $max = null): void
@@ -439,34 +433,30 @@ class SchemaReader
     {
         $group = new Group($schema, $node->getAttribute('name'));
         $group->setDoc($this->getDocumentation($node));
+        $groupOriginal = $group;
 
-        if ($node->hasAttribute('maxOccurs')) {
-            /**
-             * @var GroupRef
-             */
-            $group = self::maybeSetMax(new GroupRef($group), $node);
-        }
-        if ($node->hasAttribute('minOccurs')) {
-            /**
-             * @var GroupRef
-             */
-            $group = self::maybeSetMin(
-                $group instanceof GroupRef ? $group : new GroupRef($group),
-                $node
-            );
+        if ($node->hasAttribute('maxOccurs') || $node->hasAttribute('maxOccurs')) {
+            $group = new GroupRef($group);
+
+            if ($node->hasAttribute('maxOccurs')) {
+                self::maybeSetMax($group, $node);
+            }
+            if ($node->hasAttribute('minOccurs')) {
+                self::maybeSetMin($group, $node);
+            }
         }
 
         $schema->addGroup($group);
 
-        return function () use ($group, $node) {
+        return function () use ($groupOriginal, $node) {
             static::againstDOMNodeList(
                 $node,
-                function (DOMelement $node, DOMElement $childNode) use ($group) {
+                function (DOMelement $node, DOMElement $childNode) use ($groupOriginal) {
                     switch ($childNode->localName) {
                         case 'sequence':
                         case 'choice':
                         case 'all':
-                            $this->loadSequence($group, $childNode);
+                            $this->loadSequence($groupOriginal, $childNode);
                             break;
                     }
                 }

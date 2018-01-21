@@ -126,6 +126,39 @@ class ElementsTest extends BaseTest
         ];
     }
 
+    public function testGroupRefOccurrences()
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xs:complexType name="myType">
+                    <xs:sequence>     
+                        <xs:group ref="myGroup" />                        
+                    </xs:sequence>
+                </xs:complexType>
+
+                <xs:group name="myGroup" minOccurs="2" maxOccurs="5">
+                    <xs:sequence>
+                        <xs:element name="groupEl1" type="xs:string" />
+                    </xs:sequence>
+                </xs:group>
+            </xs:schema>');
+
+        $myType = $schema->findType('myType', 'http://www.example.com');
+        $this->assertInstanceOf(ComplexType::class, $myType);
+
+        $myGroup = $schema->findGroup('myGroup', 'http://www.example.com');
+        $this->assertInstanceOf(Group::class, $myGroup);
+
+        $myGroupRef = $myType->getElements()[0];
+        $this->assertInstanceOf(GroupRef::class, $myGroupRef);
+
+        $this->assertEquals('myGroup', $myGroupRef->getName());
+        // @todo this is not yet really working
+        //        $this->assertEquals(2, $myGroupRef->getMin());
+        //        $this->assertEquals(5, $myGroupRef->getMax());
+    }
+
     public function testAnonym()
     {
         $schema = $this->reader->readString(
