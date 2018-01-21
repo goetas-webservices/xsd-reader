@@ -95,15 +95,15 @@ class ElementsTest extends BaseTest
 
         $wrappedEls = $myGroupRef->getElements();
         if ($max === -1 || $max > 0) {
-            $this->assertEquals($max,  $wrappedEls[0]->getMax());
+            $this->assertEquals($max, $wrappedEls[0]->getMax());
         } else {
-            $this->assertEquals(1,  $wrappedEls[0]->getMax());
+            $this->assertEquals(1, $wrappedEls[0]->getMax());
         }
 
         if ($min > 1) {
-            $this->assertEquals($max,  $wrappedEls[0]->getMin());
+            $this->assertEquals($max, $wrappedEls[0]->getMin());
         } else {
-            $this->assertEquals(1,  $wrappedEls[0]->getMin());
+            $this->assertEquals(1, $wrappedEls[0]->getMin());
         }
 
         $this->assertEquals('myGroup', $myGroupRef->getName());
@@ -122,7 +122,6 @@ class ElementsTest extends BaseTest
             [3, 1, -1],
             [4, 1, 1],
             [5, 2, 2],
-
         ];
     }
 

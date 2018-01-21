@@ -12,6 +12,7 @@ class SchemaTest extends BaseTest
     /**
      * @expectedException \GoetasWebservices\XML\XSDReader\Exception\IOException
      * @expectedExceptionMessage Can't load the schema
+     *
      * @throws \GoetasWebservices\XML\XSDReader\Exception\IOException
      */
     public function testErrorString()
@@ -22,6 +23,7 @@ class SchemaTest extends BaseTest
     /**
      * @expectedException \GoetasWebservices\XML\XSDReader\Exception\IOException
      * @expectedExceptionMessage Can't load the file 'abcd'
+     *
      * @throws \GoetasWebservices\XML\XSDReader\Exception\IOException
      */
     public function testErrorFile()

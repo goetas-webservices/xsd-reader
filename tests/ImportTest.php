@@ -57,7 +57,7 @@ class ImportTest extends BaseTest
 
     public function testKnownLocationImport()
     {
-        $this->reader->addKnownSchemaLocation("http://www.example.com/test.xsd", __DIR__."/schema/test.xsd");
+        $this->reader->addKnownSchemaLocation('http://www.example.com/test.xsd', __DIR__.'/schema/test.xsd');
 
         $schema = $this->reader->readString(
             '

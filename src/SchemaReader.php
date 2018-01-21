@@ -64,22 +64,22 @@ class SchemaReader
      */
     protected $knownLocationSchemas = [
         'http://www.w3.org/2001/xml.xsd' => (
-            __DIR__ . '/Resources/xml.xsd'
+            __DIR__.'/Resources/xml.xsd'
         ),
         'http://www.w3.org/2001/XMLSchema.xsd' => (
-            __DIR__ . '/Resources/XMLSchema.xsd'
+            __DIR__.'/Resources/XMLSchema.xsd'
         ),
         'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd' => (
-            __DIR__ . '/Resources/oasis-200401-wss-wssecurity-secext-1.0.xsd'
+            __DIR__.'/Resources/oasis-200401-wss-wssecurity-secext-1.0.xsd'
         ),
         'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd' => (
-            __DIR__ . '/Resources/oasis-200401-wss-wssecurity-utility-1.0.xsd'
+            __DIR__.'/Resources/oasis-200401-wss-wssecurity-utility-1.0.xsd'
         ),
         'https://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd' => (
-            __DIR__ . '/Resources/xmldsig-core-schema.xsd'
+            __DIR__.'/Resources/xmldsig-core-schema.xsd'
         ),
         'http://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd' => (
-            __DIR__ . '/Resources/xmldsig-core-schema.xsd'
+            __DIR__.'/Resources/xmldsig-core-schema.xsd'
         ),
     ];
 
@@ -98,8 +98,9 @@ class SchemaReader
         foreach (libxml_get_errors() as $error) {
             $errors[] = sprintf("Error[%s] code %s: %s in '%s' at position %s:%s", $error->level, $error->code, trim($error->message), $error->file, $error->line, $error->column);
         }
-        $e = new \Exception(implode("; ", $errors));
+        $e = new \Exception(implode('; ', $errors));
         libxml_use_internal_errors(false);
+
         return $e;
     }
 
@@ -291,14 +292,14 @@ class SchemaReader
     private static function maybeSetMax(InterfaceSetMinMax $ref, DOMElement $node): void
     {
         if ($node->hasAttribute('maxOccurs')) {
-            $ref->setMax($node->getAttribute('maxOccurs') == 'unbounded' ? -1 : (int)$node->getAttribute('maxOccurs'));
+            $ref->setMax($node->getAttribute('maxOccurs') == 'unbounded' ? -1 : (int) $node->getAttribute('maxOccurs'));
         }
     }
 
     private static function maybeSetMin(InterfaceSetMinMax $ref, DOMElement $node): void
     {
         if ($node->hasAttribute('minOccurs')) {
-            $ref->setMin((int)$node->getAttribute('minOccurs'));
+            $ref->setMin((int) $node->getAttribute('minOccurs'));
             if ($ref->getMin() > $ref->getMax()) {
                 $ref->setMax($ref->getMin());
             }
@@ -309,7 +310,7 @@ class SchemaReader
     {
         $max =
             (
-                (is_int($max) && (bool)$max) ||
+                (is_int($max) && (bool) $max) ||
                 $node->getAttribute('maxOccurs') == 'unbounded' ||
                 $node->getAttribute('maxOccurs') > 1
             )
@@ -408,7 +409,7 @@ class SchemaReader
             * phpstan@a4f89fa still thinks it's possibly null.
             * see https://github.com/phpstan/phpstan/issues/577 for related issue
             */
-            $element->setMax((int)$max);
+            $element->setMax((int) $max);
         }
         $elementContainer->addElement($element);
     }
@@ -1060,7 +1061,7 @@ class SchemaReader
             $type = $this->findSomeTypeFromAttribute(
                 $element,
                 $node,
-                ($node->lookupPrefix(self::XSD_NS) . ':anyType')
+                ($node->lookupPrefix(self::XSD_NS).':anyType')
             );
         }
 
@@ -1173,13 +1174,13 @@ class SchemaReader
             $globalSchemas[(string) static::XSD_NS]->addType(new SimpleType($globalSchemas[(string) static::XSD_NS], 'anySimpleType'));
             $globalSchemas[(string) static::XSD_NS]->addType(new SimpleType($globalSchemas[(string) static::XSD_NS], 'anyType'));
 
-            $globalSchemas[(string)static::XML_NS]->addSchema(
-                $globalSchemas[(string)static::XSD_NS],
-                (string)static::XSD_NS
+            $globalSchemas[(string) static::XML_NS]->addSchema(
+                $globalSchemas[(string) static::XSD_NS],
+                (string) static::XSD_NS
             );
-            $globalSchemas[(string)static::XSD_NS]->addSchema(
-                $globalSchemas[(string)static::XML_NS],
-                (string)static::XML_NS
+            $globalSchemas[(string) static::XSD_NS]->addSchema(
+                $globalSchemas[(string) static::XML_NS],
+                (string) static::XML_NS
             );
 
             /**
