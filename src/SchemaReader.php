@@ -22,8 +22,8 @@ use GoetasWebservices\XML\XSDReader\Schema\Element\ElementContainer;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementRef;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Group;
-use GoetasWebservices\XML\XSDReader\Schema\Element\InterfaceSetMinMax;
 use GoetasWebservices\XML\XSDReader\Schema\Element\GroupRef;
+use GoetasWebservices\XML\XSDReader\Schema\Element\InterfaceSetMinMax;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\TypeNotFoundException;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Base;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Extension;
@@ -90,6 +90,19 @@ class SchemaReader
         self::XML_NS => 'http://www.w3.org/2001/xml.xsd',
         self::XSD_NS => 'http://www.w3.org/2001/XMLSchema.xsd',
     );
+
+    private function extractErrorMessage(): \Exception
+    {
+        $errors = array();
+
+        foreach (libxml_get_errors() as $error) {
+            $errors[] = sprintf("Error[%s] code %s: %s in '%s' at position %s:%s", $error->level, $error->code, trim($error->message), $error->file, $error->line, $error->column);
+        }
+        $e = new \Exception(implode('; ', $errors));
+        libxml_use_internal_errors(false);
+
+        return $e;
+    }
 
     public function __construct(DocumentationReader $documentationReader = null)
     {
@@ -276,36 +289,33 @@ class SchemaReader
         return $ref;
     }
 
-    private static function maybeSetMax(InterfaceSetMinMax $ref, DOMElement $node): InterfaceSetMinMax
+    private static function maybeSetMax(InterfaceSetMinMax $ref, DOMElement $node): void
     {
-        if (
-            $node->hasAttribute('maxOccurs')
-        ) {
+        if ($node->hasAttribute('maxOccurs')) {
             $ref->setMax($node->getAttribute('maxOccurs') == 'unbounded' ? -1 : (int) $node->getAttribute('maxOccurs'));
         }
-
-        return $ref;
     }
 
-    private static function maybeSetMin(InterfaceSetMinMax $ref, DOMElement $node): InterfaceSetMinMax
+    private static function maybeSetMin(InterfaceSetMinMax $ref, DOMElement $node): void
     {
         if ($node->hasAttribute('minOccurs')) {
             $ref->setMin((int) $node->getAttribute('minOccurs'));
+            if ($ref->getMin() > $ref->getMax()) {
+                $ref->setMax($ref->getMin());
+            }
         }
-
-        return $ref;
     }
 
     private function loadSequence(ElementContainer $elementContainer, DOMElement $node, int $max = null): void
     {
         $max =
-        (
-            (is_int($max) && (bool) $max) ||
-            $node->getAttribute('maxOccurs') == 'unbounded' ||
-            $node->getAttribute('maxOccurs') > 1
-        )
-            ? 2
-            : null;
+            (
+                (is_int($max) && (bool) $max) ||
+                $node->getAttribute('maxOccurs') == 'unbounded' ||
+                $node->getAttribute('maxOccurs') > 1
+            )
+                ? 2
+                : null;
 
         static::againstDOMNodeList(
             $node,
@@ -424,34 +434,30 @@ class SchemaReader
     {
         $group = new Group($schema, $node->getAttribute('name'));
         $group->setDoc($this->getDocumentation($node));
+        $groupOriginal = $group;
 
-        if ($node->hasAttribute('maxOccurs')) {
-            /**
-             * @var GroupRef
-             */
-            $group = self::maybeSetMax(new GroupRef($group), $node);
-        }
-        if ($node->hasAttribute('minOccurs')) {
-            /**
-             * @var GroupRef
-             */
-            $group = self::maybeSetMin(
-                $group instanceof GroupRef ? $group : new GroupRef($group),
-                $node
-            );
+        if ($node->hasAttribute('maxOccurs') || $node->hasAttribute('maxOccurs')) {
+            $group = new GroupRef($group);
+
+            if ($node->hasAttribute('maxOccurs')) {
+                self::maybeSetMax($group, $node);
+            }
+            if ($node->hasAttribute('minOccurs')) {
+                self::maybeSetMin($group, $node);
+            }
         }
 
         $schema->addGroup($group);
 
-        return function () use ($group, $node) {
+        return function () use ($groupOriginal, $node) {
             static::againstDOMNodeList(
                 $node,
-                function (DOMelement $node, DOMElement $childNode) use ($group) {
+                function (DOMelement $node, DOMElement $childNode) use ($groupOriginal) {
                     switch ($childNode->localName) {
                         case 'sequence':
                         case 'choice':
                         case 'all':
-                            $this->loadSequence($group, $childNode);
+                            $this->loadSequence($groupOriginal, $childNode);
                             break;
                     }
                 }
@@ -819,24 +825,24 @@ class SchemaReader
                 $restriction
             ) {
                 if (
-                    in_array(
-                        $childNode->localName,
-                        [
-                            'enumeration',
-                            'pattern',
-                            'length',
-                            'minLength',
-                            'maxLength',
-                            'minInclusive',
-                            'maxInclusive',
-                            'minExclusive',
-                            'maxExclusive',
-                            'fractionDigits',
-                            'totalDigits',
-                            'whiteSpace',
-                        ],
-                        true
-                    )
+                in_array(
+                    $childNode->localName,
+                    [
+                        'enumeration',
+                        'pattern',
+                        'length',
+                        'minLength',
+                        'maxLength',
+                        'minInclusive',
+                        'maxInclusive',
+                        'minExclusive',
+                        'maxExclusive',
+                        'fractionDigits',
+                        'totalDigits',
+                        'whiteSpace',
+                    ],
+                    true
+                )
                 ) {
                     $restriction->addCheck(
                         $childNode->localName,
@@ -1078,8 +1084,10 @@ class SchemaReader
                     }
                 }
             };
-        } elseif ($namespace && !$schemaLocation && isset($this->globalSchema[$namespace])) {
-            $schema->addSchema($this->globalSchema[$namespace]);
+        } elseif ($namespace && !$schemaLocation && !empty($this->loadedSchemas[$namespace])) {
+            foreach ($this->loadedSchemas[$namespace] as $s) {
+                $schema->addSchema($s, $namespace);
+            }
         }
 
         $base = urldecode($node->ownerDocument->documentURI);
@@ -1117,9 +1125,9 @@ class SchemaReader
     ): Closure {
         return function () use ($namespace, $schema, $file) {
             $dom = $this->getDOM(
-            isset($this->knownLocationSchemas[$file])
-                ? $this->knownLocationSchemas[$file]
-                : $file
+                isset($this->knownLocationSchemas[$file])
+                    ? $this->knownLocationSchemas[$file]
+                    : $file
             );
 
             $schemaNew = $this->createOrUseSchemaForNs($schema, $namespace);
@@ -1155,6 +1163,7 @@ class SchemaReader
                     $uri,
                     $globalSchemas[$namespace] = $schema = new Schema()
                 );
+                $this->setLoadedSchema($namespace, $schema);
                 if ($namespace === self::XSD_NS) {
                     $this->globalSchema = $schema;
                 }
@@ -1209,7 +1218,7 @@ class SchemaReader
                 $holderSchema = new Schema();
                 $holderSchema->addSchema($this->getGlobalSchema());
 
-                $this->setLoadedSchema($node, $holderSchema);
+                $this->setLoadedSchemaFromElement($node, $holderSchema);
 
                 $rootSchema->addSchema($holderSchema);
 
@@ -1234,7 +1243,7 @@ class SchemaReader
             $this->setLoadedFile($file, $rootSchema);
         }
 
-        $this->setLoadedSchema($node, $rootSchema);
+        $this->setLoadedSchemaFromElement($node, $rootSchema);
 
         $callbacks = $this->schemaNode($rootSchema, $node);
 
@@ -1251,14 +1260,19 @@ class SchemaReader
     public function readString(string $content, string $file = 'schema.xsd'): Schema
     {
         $xml = new DOMDocument('1.0', 'UTF-8');
-        if (!$xml->loadXML($content)) {
-            throw new IOException("Can't load the schema");
+        libxml_use_internal_errors(true);
+        if (!@$xml->loadXML($content)) {
+            throw new IOException("Can't load the schema", 0, $this->extractErrorMessage());
         }
+        libxml_use_internal_errors(false);
         $xml->documentURI = $file;
 
         return $this->readNode($xml->documentElement, $file);
     }
 
+    /**
+     * @throws IOException
+     */
     public function readFile(string $file): Schema
     {
         $xml = $this->getDOM($file);
@@ -1272,9 +1286,12 @@ class SchemaReader
     private function getDOM(string $file): DOMDocument
     {
         $xml = new DOMDocument('1.0', 'UTF-8');
-        if (!$xml->load($file)) {
-            throw new IOException("Can't load the file $file");
+        libxml_use_internal_errors(true);
+        if (!@$xml->load($file)) {
+            libxml_use_internal_errors(false);
+            throw new IOException("Can't load the file '$file'", 0, $this->extractErrorMessage());
         }
+        libxml_use_internal_errors(false);
 
         return $xml;
     }
@@ -1382,10 +1399,20 @@ class SchemaReader
         $this->loadedFiles[$key] = $schema;
     }
 
-    private function setLoadedSchema(DOMElement $node, Schema $schema): void
+    private function setLoadedSchemaFromElement(DOMElement $node, Schema $schema): void
     {
         if ($node->hasAttribute('targetNamespace')) {
-            $this->loadedSchemas[$node->getAttribute('targetNamespace')][] = $schema;
+            $this->setLoadedSchema($node->getAttribute('targetNamespace'), $schema);
+        }
+    }
+
+    private function setLoadedSchema(string $namespace, Schema $schema): void
+    {
+        if (!isset($this->loadedSchemas[$namespace])) {
+            $this->loadedSchemas[$namespace] = array();
+        }
+        if (!in_array($schema, $this->loadedSchemas[$namespace], true)) {
+            $this->loadedSchemas[$namespace][] = $schema;
         }
     }
 
