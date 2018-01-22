@@ -23,6 +23,8 @@ before_script:
 script:
   - vendor/bin/phpunit $PHPUNIT_FLAGS
   - vendor/phpstan/phpstan/bin/phpstan analyse -c ./phpstan.neon src
+  - php ./vendor/vimeo/psalm/psalm
+  - php ./vendor/sebastian/phpcpd/phpcpd ./src/
   - php ./vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix --verbose --allow-risky=yes --dry-run
 
 after_script:
