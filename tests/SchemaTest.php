@@ -9,6 +9,28 @@ use GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType;
 
 class SchemaTest extends BaseTest
 {
+    /**
+     * @expectedException \GoetasWebservices\XML\XSDReader\Exception\IOException
+     * @expectedExceptionMessage Can't load the schema
+     *
+     * @throws \GoetasWebservices\XML\XSDReader\Exception\IOException
+     */
+    public function testErrorString()
+    {
+        $this->reader->readString('abcd');
+    }
+
+    /**
+     * @expectedException \GoetasWebservices\XML\XSDReader\Exception\IOException
+     * @expectedExceptionMessage Can't load the file 'abcd'
+     *
+     * @throws \GoetasWebservices\XML\XSDReader\Exception\IOException
+     */
+    public function testErrorFile()
+    {
+        $this->reader->readFile('abcd');
+    }
+
     public function testBaseEmpty()
     {
         $schema = $this->reader->readString('<xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema"/>');
