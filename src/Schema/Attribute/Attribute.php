@@ -41,7 +41,7 @@ class Attribute extends AbstractAttributeItem implements AttributeSingle
         $this->nil = $nil;
     }
 
-    public function getUse(): ?string
+    public function getUse(): string
     {
         return $this->use;
     }

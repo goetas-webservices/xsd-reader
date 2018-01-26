@@ -125,7 +125,7 @@ class SchemaReader
         $attGroup->setDoc($this->getDocumentation($node));
         $schema->addAttributeGroup($attGroup);
 
-        return function () use ($schema, $node, $attGroup) {
+        return function () use ($schema, $node, $attGroup): void {
             SchemaReader::againstDOMNodeList(
                 $node,
                 function (
@@ -134,7 +134,7 @@ class SchemaReader
                 ) use (
                     $schema,
                     $attGroup
-                ) {
+                ): void {
                     switch ($childNode->localName) {
                         case 'attribute':
                             $attribute = $this->getAttributeFromAttributeOrRef(
@@ -210,7 +210,7 @@ class SchemaReader
             $schema->addElement($attribute);
         }
 
-        return function () use ($attribute, $node) {
+        return function () use ($attribute, $node): void {
             $this->fillItem($attribute, $node);
         };
     }
@@ -233,7 +233,7 @@ class SchemaReader
         $this->setSchemaThingsFromNode($schema, $node, $parent);
         $functions = array();
 
-        static::againstDOMNodeList(
+        self::againstDOMNodeList(
             $node,
             function (
                 DOMElement $node,
@@ -241,7 +241,7 @@ class SchemaReader
             ) use (
                 $schema,
                 &$functions
-            ) {
+            ): void {
                 $callback = null;
 
                 switch ($childNode->localName) {
@@ -317,7 +317,7 @@ class SchemaReader
                 ? 2
                 : null;
 
-        static::againstDOMNodeList(
+        self::againstDOMNodeList(
             $node,
             function (
                 DOMElement $node,
@@ -325,7 +325,7 @@ class SchemaReader
             ) use (
                 $elementContainer,
                 $max
-            ) {
+            ): void {
                 $this->loadSequenceChildNode(
                     $elementContainer,
                     $node,
@@ -336,14 +336,11 @@ class SchemaReader
         );
     }
 
-    /**
-     * @param int|null $max
-     */
     private function loadSequenceChildNode(
         ElementContainer $elementContainer,
         DOMElement $node,
         DOMElement $childNode,
-        $max
+        ? int $max
     ): void {
         switch ($childNode->localName) {
             case 'sequence':
@@ -374,14 +371,11 @@ class SchemaReader
         }
     }
 
-    /**
-     * @param int|null $max
-     */
     private function loadSequenceChildNodeLoadElement(
         ElementContainer $elementContainer,
         DOMElement $node,
         DOMElement $childNode,
-        $max
+        ? int $max
     ): void {
         if ($childNode->hasAttribute('ref')) {
             $element = new ElementRef(
@@ -449,10 +443,10 @@ class SchemaReader
 
         $schema->addGroup($group);
 
-        return function () use ($groupOriginal, $node) {
+        return function () use ($groupOriginal, $node): void {
             static::againstDOMNodeList(
                 $node,
-                function (DOMelement $node, DOMElement $childNode) use ($groupOriginal) {
+                function (DOMelement $node, DOMElement $childNode) use ($groupOriginal): void {
                     switch ($childNode->localName) {
                         case 'sequence':
                         case 'choice':
@@ -472,14 +466,14 @@ class SchemaReader
          */
         $isSimple = false;
 
-        static::againstDOMNodeList(
+        self::againstDOMNodeList(
             $node,
             function (
                 DOMElement $node,
                 DOMElement $childNode
             ) use (
                 &$isSimple
-            ) {
+            ): void {
                 if ($isSimple) {
                     return;
                 }
@@ -496,10 +490,10 @@ class SchemaReader
             $schema->addType($type);
         }
 
-        return function () use ($type, $node, $schema, $callback) {
+        return function () use ($type, $node, $schema, $callback): void {
             $this->fillTypeNode($type, $node, true);
 
-            static::againstDOMNodeList(
+            self::againstDOMNodeList(
                 $node,
                 function (
                     DOMElement $node,
@@ -507,7 +501,7 @@ class SchemaReader
                 ) use (
                     $schema,
                     $type
-                ) {
+                ): void {
                     $this->loadComplexTypeFromChildNode(
                         $type,
                         $node,
@@ -579,12 +573,12 @@ class SchemaReader
             $schema->addType($type);
         }
 
-        return function () use ($type, $node, $callback) {
+        return function () use ($type, $node, $callback): void {
             $this->fillTypeNode($type, $node, true);
 
-            static::againstDOMNodeList(
+            self::againstDOMNodeList(
                 $node,
-                function (DOMElement $node, DOMElement $childNode) use ($type) {
+                function (DOMElement $node, DOMElement $childNode) use ($type): void {
                     switch ($childNode->localName) {
                         case 'union':
                             $this->loadUnion($type, $childNode);
@@ -618,11 +612,11 @@ class SchemaReader
                     DOMElement $childNode
                 ) use (
                     $type
-                ) {
+                ): void {
                     $this->loadTypeWithCallback(
                         $type->getSchema(),
                         $childNode,
-                        function (SimpleType $list) use ($type) {
+                        function (SimpleType $list) use ($type): void {
                             $type->setList($list);
                         }
                     );
@@ -680,11 +674,11 @@ class SchemaReader
                 DOMElement $childNode
             ) use (
                 $type
-            ) {
+            ): void {
                 $this->loadTypeWithCallback(
                     $type->getSchema(),
                     $childNode,
-                    function (SimpleType $unType) use ($type) {
+                    function (SimpleType $unType) use ($type): void {
                         $type->addUnion($unType);
                     }
                 );
@@ -698,9 +692,9 @@ class SchemaReader
             $type->setAbstract($node->getAttribute('abstract') === 'true' || $node->getAttribute('abstract') === '1');
         }
 
-        static::againstDOMNodeList(
+        self::againstDOMNodeList(
             $node,
-            function (DOMElement $node, DOMElement $childNode) use ($type) {
+            function (DOMElement $node, DOMElement $childNode) use ($type): void {
                 switch ($childNode->localName) {
                     case 'restriction':
                         $this->loadRestriction($type, $childNode);
@@ -749,15 +743,15 @@ class SchemaReader
     private function loadExtensionChildNodes(
         BaseComplexType $type,
         DOMElement $node
-    ) {
-        static::againstDOMNodeList(
+    ): void {
+        self::againstDOMNodeList(
             $node,
             function (
                 DOMElement $node,
                 DOMElement $childNode
             ) use (
                 $type
-            ) {
+            ): void {
                 switch ($childNode->localName) {
                     case 'sequence':
                     case 'choice':
@@ -805,11 +799,11 @@ class SchemaReader
                 ) use (
                     $type,
                     $restriction
-                ) {
+                ): void {
                     $this->loadTypeWithCallback(
                         $type->getSchema(),
                         $childNode,
-                        function (Type $restType) use ($restriction) {
+                        function (Type $restType) use ($restriction): void {
                             $restriction->setBase($restType);
                         }
                     );
@@ -823,7 +817,7 @@ class SchemaReader
                 DOMElement $childNode
             ) use (
                 $restriction
-            ) {
+            ): void {
                 if (
                 in_array(
                     $childNode->localName,
@@ -880,10 +874,18 @@ class SchemaReader
     {
         list($name, $namespace) = static::splitParts($node, $typeName);
 
+        /**
+         * @var string|null $namespace
+         */
         $namespace = $namespace ?: $schema->getTargetNamespace();
 
         try {
-            return $schema->findAttribute($name, $namespace);
+            /**
+             * @var AttributeItem $out
+             */
+            $out = $schema->findAttribute((string) $name, $namespace);
+
+            return $out;
         } catch (TypeNotFoundException $e) {
             throw new TypeException(
                 sprintf(
@@ -904,10 +906,18 @@ class SchemaReader
     {
         list($name, $namespace) = static::splitParts($node, $typeName);
 
+        /**
+         * @var string|null $namespace
+         */
         $namespace = $namespace ?: $schema->getTargetNamespace();
 
         try {
-            return $schema->findAttributeGroup($name, $namespace);
+            /**
+             * @var AttributeGroup $out
+             */
+            $out = $schema->findAttributeGroup((string) $name, $namespace);
+
+            return $out;
         } catch (TypeNotFoundException $e) {
             throw new TypeException(
                 sprintf(
@@ -928,10 +938,13 @@ class SchemaReader
     {
         list($name, $namespace) = static::splitParts($node, $typeName);
 
+        /**
+         * @var string|null $namespace
+         */
         $namespace = $namespace ?: $schema->getTargetNamespace();
 
         try {
-            return $schema->findElement($name, $namespace);
+            return $schema->findElement((string) $name, $namespace);
         } catch (TypeNotFoundException $e) {
             throw new TypeException(
                 sprintf(
@@ -952,10 +965,18 @@ class SchemaReader
     {
         list($name, $namespace) = static::splitParts($node, $typeName);
 
+        /**
+         * @var string|null $namespace
+         */
         $namespace = $namespace ?: $schema->getTargetNamespace();
 
         try {
-            return $schema->findGroup($name, $namespace);
+            /**
+             * @var Group $out
+             */
+            $out = $schema->findGroup((string) $name, $namespace);
+
+            return $out;
         } catch (TypeNotFoundException $e) {
             throw new TypeException(
                 sprintf(
@@ -976,10 +997,18 @@ class SchemaReader
     {
         list($name, $namespace) = static::splitParts($node, $typeName);
 
+        /**
+         * @var string|null $namespace
+         */
         $namespace = $namespace ?: $schema->getTargetNamespace();
 
         try {
-            return $schema->findType($name, $namespace);
+            /**
+             * @var SchemaItem $out
+             */
+            $out = $schema->findType((string) $name, $namespace);
+
+            return $out;
         } catch (TypeNotFoundException $e) {
             throw new TypeException(
                 sprintf(
@@ -1004,13 +1033,13 @@ class SchemaReader
         return $this->loadAttributeOrElementDef($schema, $node, false);
     }
 
-    private function fillItem(Item $element, DOMElement $node)
+    private function fillItem(Item $element, DOMElement $node): void
     {
         /**
          * @var bool
          */
         $skip = false;
-        static::againstDOMNodeList(
+        self::againstDOMNodeList(
             $node,
             function (
                 DOMElement $node,
@@ -1018,7 +1047,7 @@ class SchemaReader
             ) use (
                 $element,
                 &$skip
-            ) {
+            ): void {
                 if (
                     !$skip &&
                     in_array(
@@ -1033,7 +1062,7 @@ class SchemaReader
                     $this->loadTypeWithCallback(
                         $element->getSchema(),
                         $childNode,
-                        function (Type $type) use ($element) {
+                        function (Type $type) use ($element): void {
                             $element->setType($type);
                         }
                     );
@@ -1077,7 +1106,7 @@ class SchemaReader
 
         // postpone schema loading
         if ($namespace && !$schemaLocation && !isset(self::$globalSchemaInfo[$namespace])) {
-            return function () use ($schema, $namespace) {
+            return function () use ($schema, $namespace): void {
                 if (!empty($this->loadedSchemas[$namespace])) {
                     foreach ($this->loadedSchemas[$namespace] as $s) {
                         $schema->addSchema($s, $namespace);
@@ -1096,7 +1125,7 @@ class SchemaReader
         if (isset($this->loadedFiles[$file])) {
             $schema->addSchema($this->loadedFiles[$file]);
 
-            return function () {
+            return function (): void {
             };
         }
 
@@ -1123,7 +1152,7 @@ class SchemaReader
         Schema $schema,
         string $file
     ): Closure {
-        return function () use ($namespace, $schema, $file) {
+        return function () use ($namespace, $schema, $file): void {
             $dom = $this->getDOM(
                 isset($this->knownLocationSchemas[$file])
                     ? $this->knownLocationSchemas[$file]
@@ -1203,7 +1232,10 @@ class SchemaReader
         return $out;
     }
 
-    public function readNodes(array $nodes, string $file = null)
+    /**
+     * @param DOMElement[] $nodes
+     */
+    public function readNodes(array $nodes, string $file = null): Schema
     {
         $rootSchema = new Schema();
         $rootSchema->addSchema($this->getGlobalSchema());
@@ -1299,7 +1331,7 @@ class SchemaReader
     private static function againstDOMNodeList(
         DOMElement $node,
         Closure $againstNodeList
-    ) {
+    ): void {
         $limit = $node->childNodes->length;
         for ($i = 0; $i < $limit; $i += 1) {
             /**
@@ -1320,7 +1352,7 @@ class SchemaReader
         Schema $schema,
         DOMElement $childNode,
         Closure $callback
-    ) {
+    ): void {
         /**
          * @var Closure|null $func
          */

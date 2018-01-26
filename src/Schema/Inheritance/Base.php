@@ -13,10 +13,7 @@ abstract class Base
      */
     protected $base;
 
-    /**
-     * @return Type|null
-     */
-    public function getBase()
+    public function getBase(): ? Type
     {
         return $this->base;
     }

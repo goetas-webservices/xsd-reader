@@ -35,7 +35,7 @@ class AbstractElementSingle extends Item implements ElementSingle
 
     public function setQualified(bool $qualified): void
     {
-        $this->qualified = is_bool($qualified) ? $qualified : (bool) $qualified;
+        $this->qualified = $qualified;
     }
 
     public function isNil(): bool
@@ -45,7 +45,7 @@ class AbstractElementSingle extends Item implements ElementSingle
 
     public function setNil(bool $nil): void
     {
-        $this->nil = is_bool($nil) ? $nil : (bool) $nil;
+        $this->nil = $nil;
     }
 
     public function getMin(): int

@@ -22,11 +22,12 @@
         "php": "^7.1"
     },
     "require-dev" : {
-        "friendsofphp/php-cs-fixer": "^2.9",
+        "friendsofphp/php-cs-fixer": "^2.10",
         "phpstan/phpstan": "^0.9.1",
         "phpstan/phpstan-strict-rules": "^0.9.0",
         "phpunit/phpunit": "^6.5",
-        "sebastian/phpcpd": "^3.0"
+        "sebastian/phpcpd": "^3.0",
+        "vimeo/psalm": "^0.3.85"
     },
     "autoload" : {
         "psr-4" : {
@@ -49,6 +50,7 @@
         "tests": [
             "php ./vendor/phpunit/phpunit/phpunit -v",
             "php ./vendor/phpstan/phpstan/bin/phpstan analyse -c ./phpstan.neon src",
+            "php ./vendor/vimeo/psalm/psalm",
             "php ./vendor/sebastian/phpcpd/phpcpd ./src/"
         ]
     }

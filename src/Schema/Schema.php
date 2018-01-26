@@ -18,15 +18,13 @@ class Schema
 {
     /**
      * @param bool[] $calling
-     *
-     * @return SchemaItem|null
      */
     protected function findSomethingNoThrow(
         string $getter,
         string $name,
         string $namespace = null,
         array &$calling = array()
-    ) {
+    ): ? SchemaItem {
         $calling[spl_object_hash($this)] = true;
         $cid = "$getter, $name, $namespace";
 
@@ -58,8 +56,6 @@ class Schema
     /**
      * @param Schema[] $schemas
      * @param bool[]   $calling
-     *
-     * @return SchemaItem|null
      */
     protected function findSomethingNoThrowSchemas(
         array $schemas,
@@ -68,7 +64,7 @@ class Schema
         string $name,
         string $namespace = null,
         array &$calling = array()
-    ) {
+    ): ? SchemaItem {
         foreach ($schemas as $childSchema) {
             if (!isset($calling[spl_object_hash($childSchema)])) {
                 /**
@@ -81,6 +77,8 @@ class Schema
                 }
             }
         }
+
+        return null;
     }
 
     /**
@@ -184,18 +182,12 @@ class Schema
         $this->attributesQualification = $attributesQualification;
     }
 
-    /**
-     * @return string|null
-     */
     public function getTargetNamespace(): ?string
     {
         return $this->targetNamespace;
     }
 
-    /**
-     * @param string|null $targetNamespace
-     */
-    public function setTargetNamespace($targetNamespace): void
+    public function setTargetNamespace(? string $targetNamespace): void
     {
         $this->targetNamespace = $targetNamespace;
     }
@@ -240,9 +232,6 @@ class Schema
         return $this->groups;
     }
 
-    /**
-     * @return string|null
-     */
     public function getDoc(): ?string
     {
         return $this->doc;
@@ -255,7 +244,7 @@ class Schema
 
     public function addType(Type $type): void
     {
-        $this->types[$type->getName()] = $type;
+        $this->types[(string) $type->getName()] = $type;
     }
 
     public function addElement(ElementDef $element): void

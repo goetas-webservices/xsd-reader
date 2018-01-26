@@ -21,7 +21,7 @@ trait SchemaItemTrait
         return $this->schema;
     }
 
-    public function getDoc(): ?string
+    public function getDoc(): string
     {
         return $this->doc;
     }

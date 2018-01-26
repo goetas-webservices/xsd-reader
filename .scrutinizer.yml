@@ -1,3 +1,13 @@
+build:
+    nodes:
+        analysis:
+            environment:
+                php: 7.1
+            project_setup:
+                override: true
+            tests:
+                override: [php-scrutinizer-run]
+
 tools:
     external_code_coverage: true
 
