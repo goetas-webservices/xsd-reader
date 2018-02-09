@@ -300,7 +300,7 @@ class SchemaReader
     {
         if ($node->hasAttribute('minOccurs')) {
             $ref->setMin((int) $node->getAttribute('minOccurs'));
-            if ($ref->getMin() > $ref->getMax()) {
+            if ($ref->getMin() > $ref->getMax() && $ref->getMax() !== -1) {
                 $ref->setMax($ref->getMin());
             }
         }

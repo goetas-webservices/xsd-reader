@@ -74,6 +74,8 @@ class ElementsTest extends BaseTest
                         <xs:group ref="myGroup" minOccurs="1" maxOccurs="1"/>
                         <xs:group ref="myGroup" minOccurs="2" maxOccurs="2"/>
                         
+                        <xs:group ref="myGroup" minOccurs="1" maxOccurs="unbounded"/>
+                        
                     </xs:sequence>
                 </xs:complexType>
 
@@ -122,6 +124,7 @@ class ElementsTest extends BaseTest
             [3, 1, -1],
             [4, 1, 1],
             [5, 2, 2],
+            [6, 1, -1],
         ];
     }
 
