@@ -21,7 +21,7 @@ class AbstractElementSingle extends Item implements ElementSingle
     /**
      * @var bool
      */
-    protected $qualified = true;
+    protected $qualified = false;
 
     /**
      * @var bool

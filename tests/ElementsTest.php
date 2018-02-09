@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace GoetasWebservices\XML\XSDReader\Tests;
 
 use GoetasWebservices\XML\XSDReader\Schema\Element\Element;
+use GoetasWebservices\XML\XSDReader\Schema\Element\ElementSingle;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Group;
 use GoetasWebservices\XML\XSDReader\Schema\Element\GroupRef;
 use GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType;
@@ -126,6 +127,35 @@ class ElementsTest extends BaseTest
             [5, 2, 2],
             [6, 1, -1],
         ];
+    }
+
+    public function testNotQualifiedTargetQualifiedElement()
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema version="1.0" targetNamespace="http://www.example.com" 
+                xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified">
+                <xs:complexType name="root">
+                    <xs:sequence>
+                        <xs:element name="child" type="xs:string"/>
+                        <xs:element name="childRoot" type="xs:string" form="qualified"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:schema>
+            ');
+
+        $myType = $schema->findType('root', 'http://www.example.com');
+        $this->assertInstanceOf(ComplexType::class, $myType);
+        $this->assertFalse($schema->getElementsQualification());
+
+        /**
+         * @var $element ElementSingle
+         */
+        $element = $myType->getElements()[0];
+        $this->assertFalse($element->isQualified());
+
+        $element = $myType->getElements()[1];
+        $this->assertTrue($element->isQualified());
     }
 
     public function testGroupRefOccurrences()
