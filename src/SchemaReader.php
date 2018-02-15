@@ -300,7 +300,7 @@ class SchemaReader
     {
         if ($node->hasAttribute('minOccurs')) {
             $ref->setMin((int) $node->getAttribute('minOccurs'));
-            if ($ref->getMin() > $ref->getMax()) {
+            if ($ref->getMin() > $ref->getMax() && $ref->getMax() !== -1) {
                 $ref->setMax($ref->getMin());
             }
         }
@@ -1176,9 +1176,6 @@ class SchemaReader
      */
     protected $globalSchema;
 
-    /**
-     * @return Schema
-     */
     public function getGlobalSchema(): Schema
     {
         if (!($this->globalSchema instanceof Schema)) {
@@ -1220,20 +1217,15 @@ class SchemaReader
             }
         }
 
-        /**
-         * @var Schema
-         */
-        $out = $this->globalSchema;
-
-        if (!($out instanceof Schema)) {
+        if (!($this->globalSchema instanceof Schema)) {
             throw new TypeException('Globa schema not discoverd');
         }
 
-        return $out;
+        return $this->globalSchema;
     }
 
     /**
-     * @param DOMElement[] $nodes
+     * @param DOMNode[] $nodes
      */
     public function readNodes(array $nodes, string $file = null): Schema
     {
