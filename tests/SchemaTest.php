@@ -6,9 +6,34 @@ namespace GoetasWebservices\XML\XSDReader\Tests;
 
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
 use GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType;
+use GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType;
 
 class SchemaTest extends BaseTest
 {
+    public function testWithXSDAsDefaultNamespace()
+    {
+        $xml = '
+        <schema xmlns="http://www.w3.org/2001/XMLSchema"
+            xmlns:ds="http://www.example.com"
+            targetNamespace="http://www.example.com"
+            elementFormDefault="qualified"> 
+
+            <simpleType name="CryptoBinary">
+              <restriction base="base64Binary"/>
+            </simpleType>
+            <simpleType name="LocalCryptoBinary">
+              <restriction base="ds:CryptoBinary"/>
+            </simpleType>
+        </schema>';
+        $schema = $this->reader->readString($xml);
+
+        $crypto = $schema->findType('CryptoBinary', 'http://www.example.com');
+        $this->assertInstanceOf(SimpleType::class, $crypto);
+
+        $localCrypto = $schema->findType('LocalCryptoBinary', 'http://www.example.com');
+        $this->assertInstanceOf(SimpleType::class, $localCrypto);
+    }
+
     /**
      * @expectedException \GoetasWebservices\XML\XSDReader\Exception\IOException
      * @expectedExceptionMessage Can't load the schema

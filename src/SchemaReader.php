@@ -861,7 +861,10 @@ class SchemaReader
             list($prefix, $name) = explode(':', $typeName);
         }
 
-        $namespace = $node->lookupNamespaceUri($prefix ?: '');
+        /**
+         * @psalm-suppress PossiblyNullArgument
+         */
+        $namespace = $node->lookupNamespaceUri($prefix);
 
         return array(
             $name,
