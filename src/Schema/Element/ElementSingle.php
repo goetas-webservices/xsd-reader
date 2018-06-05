@@ -6,7 +6,7 @@ namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
 use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
 
-interface ElementSingle extends ElementItem, InterfaceSetMinMax
+interface ElementSingle extends ElementItem, InterfaceSetMinMax, InterfaceSetDefault
 {
     public function getType(): ? Type;
 
