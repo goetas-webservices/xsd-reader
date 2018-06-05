@@ -185,12 +185,6 @@ class TypesTest extends BaseTest
         $this->assertEquals('testDefault', $elements[0]->getDefault());
     }
 
-
-
-
-
-
-
     public function testComplex()
     {
         $schema = $this->reader->readString(
