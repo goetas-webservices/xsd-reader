@@ -28,6 +28,11 @@ class AbstractElementSingle extends Item implements ElementSingle
      */
     protected $nil = false;
 
+    /**
+     * @var null|string
+     */
+    protected $default = null;
+
     public function isQualified(): bool
     {
         return $this->qualified;
@@ -66,5 +71,15 @@ class AbstractElementSingle extends Item implements ElementSingle
     public function setMax(int $max): void
     {
         $this->max = $max;
+    }
+
+    public function getDefault(): ?string
+    {
+        return $this->default;
+    }
+
+    public function setDefault(string $default): void
+    {
+        $this->default = $default;
     }
 }

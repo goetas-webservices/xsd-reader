@@ -24,6 +24,7 @@ use GoetasWebservices\XML\XSDReader\Schema\Element\ElementRef;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Group;
 use GoetasWebservices\XML\XSDReader\Schema\Element\GroupRef;
 use GoetasWebservices\XML\XSDReader\Schema\Element\InterfaceSetMinMax;
+use GoetasWebservices\XML\XSDReader\Schema\Element\InterfaceSetDefault;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\TypeNotFoundException;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Base;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Extension;
@@ -303,6 +304,13 @@ class SchemaReader
             if ($ref->getMin() > $ref->getMax() && $ref->getMax() !== -1) {
                 $ref->setMax($ref->getMin());
             }
+        }
+    }
+
+    private static function maybeSetDefault(InterfaceSetDefault $ref, DOMElement $node): void
+    {
+        if ($node->hasAttribute('default')) {
+            $ref->setDefault($node->getAttribute('default'));
         }
     }
 
@@ -1328,7 +1336,7 @@ class SchemaReader
         Closure $againstNodeList
     ): void {
         $limit = $node->childNodes->length;
-        for ($i = 0; $i < $limit; $i += 1) {
+        for ($i = 0; $i < $limit; ++$i) {
             /**
              * @var DOMNode
              */
@@ -1378,6 +1386,7 @@ class SchemaReader
 
         self::maybeSetMax($element, $node);
         self::maybeSetMin($element, $node);
+        self::maybeSetDefault($element, $node);
 
         $xp = new \DOMXPath($node->ownerDocument);
         $xp->registerNamespace('xs', 'http://www.w3.org/2001/XMLSchema');
