@@ -6,7 +6,7 @@ namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
 interface InterfaceSetDefault
 {
-    public function getDefault();
+    public function getDefault(): ?string;
 
-    public function setDefault($default): void;
+    public function setDefault(string $default): void;
 }

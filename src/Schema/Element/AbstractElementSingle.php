@@ -29,7 +29,7 @@ class AbstractElementSingle extends Item implements ElementSingle
     protected $nil = false;
 
     /**
-     * @var null|mixed
+     * @var null|string
      */
     protected $default = null;
 
@@ -73,12 +73,12 @@ class AbstractElementSingle extends Item implements ElementSingle
         $this->max = $max;
     }
 
-    public function getDefault()
+    public function getDefault(): ?string
     {
         return $this->default;
     }
 
-    public function setDefault($default): void
+    public function setDefault(string $default): void
     {
         $this->default = $default;
     }
