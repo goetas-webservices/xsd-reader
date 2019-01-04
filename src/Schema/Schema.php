@@ -254,7 +254,13 @@ class Schema
 
     public function addSchema(self $schema, string $namespace = null): void
     {
-        if ($namespace !== null && $schema->getTargetNamespace() !== $namespace) {
+        if ($namespace === null) {
+            $this->schemas[] = $schema;
+
+            return;
+        }
+
+        if ($schema->getTargetNamespace() !== $namespace) {
             throw new SchemaException(
                 sprintf(
                     "The target namespace ('%s') for schema, does not match the declared namespace '%s'",
@@ -264,7 +270,13 @@ class Schema
             );
         }
 
-        $this->schemas[] = $schema;
+        if (isset($this->schemas[$namespace])) {
+            $this->schemas[$namespace]->addSchema($schema);
+
+            return;
+        }
+
+        $this->schemas[$namespace] = $schema;
     }
 
     public function addAttribute(AttributeDef $attribute): void
