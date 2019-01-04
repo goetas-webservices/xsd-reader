@@ -159,6 +159,43 @@ class SchemaTest extends BaseTest
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef', $schema2->findElement('myElement2', 'http://www.example2.com'));
     }
 
+    public function testMultipleSchemasInSameFileWithSameTargetNamespace()
+    {
+        $file = 'schema.xsd';
+        $schema1 = $this->reader->readString('
+            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xs:complexType name="myType"></xs:complexType>
+                <xs:element name="myElement" type="myType"></xs:element>
+            </xs:schema>',
+            $file
+        );
+
+        $this->assertCount(1, $schema1->getTypes());
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType', $schema1->findType('myType', 'http://www.example.com'));
+
+        $this->assertCount(1, $schema1->getElements());
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef', $schema1->findElement('myElement', 'http://www.example.com'));
+
+        //Now use a second schema which uses the same targetNamespace
+        $schema2 = $this->reader->readString('
+            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xs:import namespace="http://www.example.com"/>
+                <xs:element name="myElement2" type="ns1:myType"></xs:element>
+            </xs:schema>',
+            $file
+        );
+
+        $schema1->addSchema($schema2);
+
+        $this->assertCount(0, $schema2->getTypes());
+        $this->assertCount(1, $schema2->getElements());
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef', $schema2->findElement('myElement2', 'http://www.example.com'));
+
+        $this->assertCount(1, $schema1->getTypes());
+        $this->assertCount(1, $schema2->getElements());
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef', $schema1->findElement('myElement2', 'http://www.example.com'));
+    }
+
     public function testGroupRefInType()
     {
         $schema1 = $this->reader->readString('
