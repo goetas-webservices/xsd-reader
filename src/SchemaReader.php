@@ -1229,7 +1229,7 @@ class SchemaReader
         }
 
         if (!($this->globalSchema instanceof Schema)) {
-            throw new TypeException('Globa schema not discoverd');
+            throw new TypeException('Global schema not discovered');
         }
 
         return $this->globalSchema;
