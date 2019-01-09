@@ -29,7 +29,7 @@ class AbstractElementSingle extends Item implements ElementSingle
     protected $nil = false;
 
     /**
-     * @var null|string
+     * @var string|null
      */
     protected $default = null;
 
