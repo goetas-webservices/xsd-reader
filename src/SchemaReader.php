@@ -208,6 +208,7 @@ class SchemaReader
             $schema->addAttribute($attribute);
         } else {
             $attribute = new ElementDef($schema, $name);
+            $attribute->setDoc($this->getDocumentation($node));
             $schema->addElement($attribute);
         }
 
