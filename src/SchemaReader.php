@@ -87,6 +87,11 @@ class SchemaReader
     /**
      * @var string[]
      */
+    protected $knownNamespaceSchemaLocations = [];
+
+    /**
+     * @var string[]
+     */
     protected static $globalSchemaInfo = array(
         self::XML_NS => 'http://www.w3.org/2001/xml.xsd',
         self::XSD_NS => 'http://www.w3.org/2001/XMLSchema.xsd',
@@ -113,9 +118,25 @@ class SchemaReader
         $this->documentationReader = $documentationReader;
     }
 
+    /**
+     * Override remote location with a local file.
+     * @param string $remote remote schema URL.
+     * @param string $local local file path.
+     */
     public function addKnownSchemaLocation(string $remote, string $local): void
     {
         $this->knownLocationSchemas[$remote] = $local;
+    }
+
+    /**
+     * Specify schema location by namespace.
+     * This can be used for schemas which import namespaces but do not specify schemaLocation attributes.
+     * @param string $remote remote schema URL.
+     * @param string $local local file path.
+     */
+    public function addKnownNamespaceSchemaLocation(string $remote, string $local): void
+    {
+        $this->knownNamespaceSchemaLocations[$remote] = $local;
     }
 
     private function loadAttributeGroup(
@@ -1115,6 +1136,9 @@ class SchemaReader
     ): Closure {
         $namespace = $node->getAttribute('namespace');
         $schemaLocation = $node->getAttribute('schemaLocation');
+        if (!$schemaLocation && isset($this->knownNamespaceSchemaLocations[$namespace])) {
+            $schemaLocation = $this->knownNamespaceSchemaLocations[$namespace];
+        }
 
         // postpone schema loading
         if ($namespace && !$schemaLocation && !isset(self::$globalSchemaInfo[$namespace])) {
@@ -1132,7 +1156,7 @@ class SchemaReader
         }
 
         $base = urldecode($node->ownerDocument->documentURI);
-        $file = UrlUtils::resolveRelativeUrl($base, $node->getAttribute('schemaLocation'));
+        $file = UrlUtils::resolveRelativeUrl($base, $schemaLocation);
 
         if (isset($this->loadedFiles[$file])) {
             $schema->addSchema($this->loadedFiles[$file]);
