@@ -133,12 +133,12 @@ class SchemaReader
      * Specify schema location by namespace.
      * This can be used for schemas which import namespaces but do not specify schemaLocation attributes.
      *
-     * @param string $remote remote schema URL
-     * @param string $local  local file path
+     * @param string $namespace namespace
+     * @param string $location  schema URL
      */
-    public function addKnownNamespaceSchemaLocation(string $remote, string $local): void
+    public function addKnownNamespaceSchemaLocation(string $namespace, string $location): void
     {
-        $this->knownNamespaceSchemaLocations[$remote] = $local;
+        $this->knownNamespaceSchemaLocations[$namespace] = $location;
     }
 
     private function loadAttributeGroup(
