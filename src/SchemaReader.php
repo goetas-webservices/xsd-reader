@@ -40,6 +40,8 @@ class SchemaReader
 
     private $knownLocationSchemas = array();
 
+    private $knownNamespaceSchemaLocations = array();
+
     private static $globalSchemaInfo = array(
         self::XML_NS => 'http://www.w3.org/2001/xml.xsd',
         self::XSD_NS => 'http://www.w3.org/2001/XMLSchema.xsd'
@@ -55,9 +57,27 @@ class SchemaReader
         $this->addKnownSchemaLocation('http://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd', __DIR__ . '/Resources/xmldsig-core-schema.xsd');
     }
 
+    /**
+     * Override remote location with a local file.
+     *
+     * @param string $remote remote schema URL
+     * @param string $local  local file path
+     */
     public function addKnownSchemaLocation($remote, $local)
     {
         $this->knownLocationSchemas[$remote] = $local;
+    }
+
+    /**
+     * Specify schema location by namespace.
+     * This can be used for schemas which import namespaces but do not specify schemaLocation attributes.
+     *
+     * @param string $namespace namespace
+     * @param string $location  schema URL
+     */
+    public function addKnownNamespaceSchemaLocation($namespace, $location)
+    {
+        $this->knownNamespaceSchemaLocations[$namespace] = $location;
     }
 
     private function loadAttributeGroup(Schema $schema, DOMElement $node)
@@ -647,7 +667,11 @@ class SchemaReader
     private function loadImport(Schema $schema, DOMElement $node)
     {
         $base = urldecode($node->ownerDocument->documentURI);
-        $file = UrlUtils::resolveRelativeUrl($base, $node->getAttribute("schemaLocation"));
+        $schemaLocation = $node->getAttribute("schemaLocation");
+        if (!$schemaLocation && $node->hasAttribute("namespace") && isset($this->knownNamespaceSchemaLocations[$node->getAttribute("namespace")])) {
+            $schemaLocation = $this->knownNamespaceSchemaLocations[$node->getAttribute("namespace")];
+        }
+        $file = UrlUtils::resolveRelativeUrl($base, $schemaLocation);
         if ($node->hasAttribute("namespace")
             && isset(self::$globalSchemaInfo[$node->getAttribute("namespace")])
             && isset($this->loadedFiles[self::$globalSchemaInfo[$node->getAttribute("namespace")]])

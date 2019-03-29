@@ -37,4 +37,12 @@ class ImportTest extends BaseTest
 
         $this->assertSame($remoteAttr, $localAttrs[0]);
     }
+
+    public function testKnownNamespaceLocationImport()
+    {
+        $this->reader->addKnownNamespaceSchemaLocation('urn:example:profile-1.1', __DIR__.'/schema/profile-1.1.xsd');
+
+        $schema = $this->reader->readFile(__DIR__.'/schema/transaction-1.0.xsd');
+        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Schema', $schema);
+    }
 }

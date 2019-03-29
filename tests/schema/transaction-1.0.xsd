@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns="urn:example:transaction-1.0"
+  xmlns:vcp="urn:example:profile-1.1"
+  targetNamespace="urn:example:transaction-1.0">
+
+  <xsd:import namespace="urn:example:profile-1.1"/><!-- this line does no specify schemaLocation -->
+
+  <xsd:complexType name="TransactionStatusType">
+    <xsd:sequence>
+      <xsd:element name="TransactionId" type="xsd:normalizedString" />
+      <xsd:element name="Transaction" type="vcp:TransactionType" minOccurs="0" maxOccurs="1"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+
+  <xsd:complexType name="RequestType">
+    <xsd:sequence>
+      <xsd:element name="TransactionID" type="xsd:normalizedString" minOccurs="0" maxOccurs="1" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+</xsd:schema>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns="urn:example:profile-1.1"
+    xmlns:vct="urn:example:transaction-1.0"
+    targetNamespace="urn:example:profile-1.1">
+    
+  <xsd:import namespace="urn:example:transaction-1.0"
+    schemaLocation="transaction-1.0.xsd" />
+
+  <xsd:element name="GetProfileRequest" type="vct:RequestType">
+    <xsd:annotation>
+      <xsd:documentation>Example</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:simpleType name="TransactionType">
+    <xsd:annotation>
+      <xsd:documentation>Liste der Transaktionen.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:normalizedString">
+      <xsd:enumeration value="Order">
+    <xsd:annotation>
+      <xsd:documentation>Order</xsd:documentation>
+    </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="OrderInOnlineShop">
+    <xsd:annotation>
+      <xsd:documentation>OrderInOnlineShop</xsd:documentation>
+    </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="TextSearch">
+    <xsd:annotation>
+      <xsd:documentation>Volltextsuche</xsd:documentation>
+    </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+</xsd:schema>
