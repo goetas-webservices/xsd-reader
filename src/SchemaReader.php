@@ -120,8 +120,9 @@ class SchemaReader
 
     /**
      * Override remote location with a local file.
-     * @param string $remote remote schema URL.
-     * @param string $local local file path.
+     *
+     * @param string $remote remote schema URL
+     * @param string $local  local file path
      */
     public function addKnownSchemaLocation(string $remote, string $local): void
     {
@@ -131,8 +132,9 @@ class SchemaReader
     /**
      * Specify schema location by namespace.
      * This can be used for schemas which import namespaces but do not specify schemaLocation attributes.
-     * @param string $remote remote schema URL.
-     * @param string $local local file path.
+     *
+     * @param string $remote remote schema URL
+     * @param string $local  local file path
      */
     public function addKnownNamespaceSchemaLocation(string $remote, string $local): void
     {

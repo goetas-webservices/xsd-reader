@@ -72,6 +72,14 @@ class ImportTest extends BaseTest
         $this->assertInstanceOf(Schema::class, $schema);
     }
 
+    public function testKnownNamespaceLocationImport()
+    {
+        $this->reader->addKnownNamespaceSchemaLocation('urn:example:profile-1.1', __DIR__.'/schema/profile-1.1.xsd');
+
+        $schema = $this->reader->readFile(__DIR__.'/schema/transaction-1.0.xsd');
+        $this->assertInstanceOf(Schema::class, $schema);
+    }
+
     public function testBaseNode()
     {
         $dom = new \DOMDocument();
