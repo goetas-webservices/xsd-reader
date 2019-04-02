@@ -1,6 +1,8 @@
 <?php
 namespace GoetasWebservices\XML\XSDReader\Tests;
 
+use GoetasWebservices\XML\XSDReader\Schema\Schema;
+
 class RedefineTest extends BaseTest
 {
     public function testBase()
@@ -54,7 +56,7 @@ class RedefineTest extends BaseTest
         /* @var $type \GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType */
         $type = $localAttr->getType();
 
-        $this->assertInstanceOf('\GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType', $type);
+        $this->assertInstanceOf(\GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType::class, $type);
 
         $children = array();
         foreach($type->getElements() as $element){
@@ -62,5 +64,33 @@ class RedefineTest extends BaseTest
         }
 
         $this->assertContains('generation', $children);
+    }
+
+    public function testReadSchemaLocation()
+    {
+        $schema = $this->reader->readFile(__DIR__ . '/schema/extend-components.xsd');
+        $this->assertInstanceOf(Schema::class, $schema);
+
+        $this->assertEquals('spec:example:xsd:CommonBasicComponents-1.0', $schema->getTargetNamespace());
+
+        // defined in /schema/base-components.xsd
+        $dateElement = $schema->findElement("Date", 'spec:example:xsd:CommonBasicComponents-1.0');
+        $this->assertNotNull($dateElement);
+        $this->assertInstanceOf(\GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef::class, $dateElement);
+        $type = $dateElement->getType();
+        $this->assertEquals('DateType', $type->getName());
+        $this->assertInstanceOf(\GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType::class, $type);
+
+        $dateType = $schema->findType("DateType", 'spec:example:xsd:CommonBasicComponents-1.0');
+        $this->assertNotNull($dateType);
+        $this->assertInstanceOf(\GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType::class, $dateType);
+
+        // defined in /schema/extend-components.xsd
+        $deliveryDateElement = $schema->findElement("DeliveryDate", 'spec:example:xsd:CommonBasicComponents-1.0');
+        $this->assertNotNull($deliveryDateElement);
+        $this->assertInstanceOf(\GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef::class, $deliveryDateElement);
+        $type = $deliveryDateElement->getType();
+        $this->assertEquals('DateType', $type->getName());
+        $this->assertInstanceOf(\GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType::class, $type);
     }
 }
