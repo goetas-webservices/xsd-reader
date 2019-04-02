@@ -1188,7 +1188,12 @@ class SchemaReader
 
             $schema->addSchema($redefined);
 
-            return function (): void {
+            return function () use ($redefined, $node, $schema): void {
+
+                $callbacks = $this->schemaNode($redefined, $node, $schema);
+                foreach ($callbacks as $callback) {
+                    $callback();
+                }
             };
         }
 
