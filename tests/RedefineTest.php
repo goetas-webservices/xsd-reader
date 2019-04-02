@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace GoetasWebservices\XML\XSDReader\Tests;
 
 use GoetasWebservices\XML\XSDReader\Schema\Schema;
@@ -19,7 +22,6 @@ class RedefineTest extends BaseTest
 
                 <xs:element name="addressee" type="personName"/>
             </xs:schema>', 'http://www.example.com/xsd.xsd');
-
 
         $schema = $this->reader->readString(
             '
@@ -46,11 +48,11 @@ class RedefineTest extends BaseTest
         /* @var $localAttr \GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef */
 
         // it should inherit namespace of main schema
-        $localAttr = $schema->findElement("addressee", "http://www.user.com");
+        $localAttr = $schema->findElement('addressee', 'http://www.user.com');
         $this->assertNotNull($localAttr);
 
         // find author element
-        $localAttr = $schema->findElement("author", "http://www.user.com");
+        $localAttr = $schema->findElement('author', 'http://www.user.com');
         $this->assertNotNull($localAttr);
 
         /* @var $type \GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType */
@@ -59,7 +61,7 @@ class RedefineTest extends BaseTest
         $this->assertInstanceOf(\GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType::class, $type);
 
         $children = array();
-        foreach($type->getElements() as $element){
+        foreach ($type->getElements() as $element) {
             $children[] = $element->getName();
         }
 
@@ -68,25 +70,25 @@ class RedefineTest extends BaseTest
 
     public function testReadSchemaLocation()
     {
-        $schema = $this->reader->readFile(__DIR__ . '/schema/extend-components.xsd');
+        $schema = $this->reader->readFile(__DIR__.'/schema/extend-components.xsd');
         $this->assertInstanceOf(Schema::class, $schema);
 
         $this->assertEquals('spec:example:xsd:CommonBasicComponents-1.0', $schema->getTargetNamespace());
 
         // defined in /schema/base-components.xsd
-        $dateElement = $schema->findElement("Date", 'spec:example:xsd:CommonBasicComponents-1.0');
+        $dateElement = $schema->findElement('Date', 'spec:example:xsd:CommonBasicComponents-1.0');
         $this->assertNotNull($dateElement);
         $this->assertInstanceOf(\GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef::class, $dateElement);
         $type = $dateElement->getType();
         $this->assertEquals('DateType', $type->getName());
         $this->assertInstanceOf(\GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType::class, $type);
 
-        $dateType = $schema->findType("DateType", 'spec:example:xsd:CommonBasicComponents-1.0');
+        $dateType = $schema->findType('DateType', 'spec:example:xsd:CommonBasicComponents-1.0');
         $this->assertNotNull($dateType);
         $this->assertInstanceOf(\GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType::class, $dateType);
 
         // defined in /schema/extend-components.xsd
-        $deliveryDateElement = $schema->findElement("DeliveryDate", 'spec:example:xsd:CommonBasicComponents-1.0');
+        $deliveryDateElement = $schema->findElement('DeliveryDate', 'spec:example:xsd:CommonBasicComponents-1.0');
         $this->assertNotNull($deliveryDateElement);
         $this->assertInstanceOf(\GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef::class, $deliveryDateElement);
         $type = $deliveryDateElement->getType();

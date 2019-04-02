@@ -1173,7 +1173,7 @@ class SchemaReader
         return $this->loadImportFresh($namespace, $schema, $file);
     }
 
-    private function loadRedefine(Schema $schema, DOMElement $node)
+    private function loadRedefine(Schema $schema, DOMElement $node): Closure
     {
         $base = urldecode($node->ownerDocument->documentURI);
         $file = UrlUtils::resolveRelativeUrl($base, $node->getAttribute('schemaLocation'));
@@ -1182,14 +1182,13 @@ class SchemaReader
             /* @var $redefined Schema */
             $redefined = clone $this->loadedFiles[$file];
 
-            if($schema->getTargetNamespace() !== $redefined->getTargetNamespace()){
+            if ($schema->getTargetNamespace() !== $redefined->getTargetNamespace()) {
                 $redefined->setTargetNamespace($schema->getTargetNamespace());
             }
 
             $schema->addSchema($redefined);
 
             return function () use ($redefined, $node, $schema): void {
-
                 $callbacks = $this->schemaNode($redefined, $node, $schema);
                 foreach ($callbacks as $callback) {
                     $callback();
@@ -1197,7 +1196,7 @@ class SchemaReader
             };
         }
 
-        return $this->loadImportFresh($schema->getTargetNamespace(), $schema, $file);
+        return $this->loadImportFresh((string) $schema->getTargetNamespace(), $schema, $file);
     }
 
     private function createOrUseSchemaForNs(
