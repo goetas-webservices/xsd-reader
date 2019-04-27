@@ -393,6 +393,14 @@ class SchemaReader
 
             self::maybeSetMax($element, $childNode);
             self::maybeSetMin($element, $childNode);
+
+            $xp = new \DOMXPath($node->ownerDocument);
+            $xp->registerNamespace('xs', 'http://www.w3.org/2001/XMLSchema');
+
+            if ($xp->query('ancestor::xs:choice', $childNode)->length) {
+                $element->setMin(0);
+            }
+
             if ($childNode->hasAttribute('nillable')) {
                 $element->setNil($childNode->getAttribute('nillable') == 'true');
             }
