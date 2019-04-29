@@ -264,6 +264,14 @@ class SchemaReader
         if ($node->hasAttribute("minOccurs")) {
             $ref->setMin((int)$node->getAttribute("minOccurs"));
         }
+        
+        $xp = new \DOMXPath($node->ownerDocument);
+        $xp->registerNamespace('xs', 'http://www.w3.org/2001/XMLSchema');
+        
+        if ($xp->query('ancestor::xs:choice', $node)->length) {
+            $ref->setMin(0);
+        }
+        
         if ($node->hasAttribute("nillable")) {
             $ref->setNil($node->getAttribute("nillable") == "true");
         }
