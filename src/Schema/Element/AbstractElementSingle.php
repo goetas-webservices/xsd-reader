@@ -26,6 +26,11 @@ class AbstractElementSingle extends Item implements ElementSingle
     /**
      * @var bool
      */
+    protected $local = false;
+
+    /**
+     * @var bool
+     */
     protected $nil = false;
 
     /**
@@ -41,6 +46,16 @@ class AbstractElementSingle extends Item implements ElementSingle
     public function setQualified(bool $qualified): void
     {
         $this->qualified = $qualified;
+    }
+
+    public function isLocal(): bool
+    {
+        return $this->local;
+    }
+
+    public function setLocal(bool $local): void
+    {
+        $this->local = $local;
     }
 
     public function isNil(): bool

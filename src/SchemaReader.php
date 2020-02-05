@@ -410,9 +410,8 @@ class SchemaReader
         ? int $max
     ): void {
         if ($childNode->hasAttribute('ref')) {
-            $element = new ElementRef(
-                $this->findElement($elementContainer->getSchema(), $node, $childNode->getAttribute('ref'))
-            );
+            $elementDef = $this->findElement($elementContainer->getSchema(), $node, $childNode->getAttribute('ref'));
+            $element = new ElementRef($elementDef);
             $element->setDoc($this->getDocumentation($childNode));
 
             self::maybeSetMax($element, $childNode);
@@ -1439,6 +1438,12 @@ class SchemaReader
         }
         if ($node->hasAttribute('form')) {
             $element->setQualified($node->getAttribute('form') == 'qualified');
+        }
+
+        $parentNode = $node->parentNode;
+
+        if ($parentNode->localName != 'schema' || $parentNode->namespaceURI != 'http://www.w3.org/2001/XMLSchema') {
+            $element->setLocal(true);
         }
 
         return $element;

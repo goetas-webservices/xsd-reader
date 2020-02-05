@@ -17,6 +17,10 @@ interface ElementSingle extends ElementItem, InterfaceSetMinMax, InterfaceSetDef
      */
     public function setQualified(bool $qualified): void;
 
+    public function isLocal(): bool;
+
+    public function setLocal(bool $local): void;
+
     public function isNil(): bool;
 
     public function setNil(bool $nil): void;
