@@ -1045,27 +1045,31 @@ class SchemaReader
          */
         $namespace = $namespace ?: $schema->getTargetNamespace();
 
-        try {
-            /**
-             * @var SchemaItem $out
-             */
-            $out = $schema->findType((string) $name, $namespace);
+        $tryFindType = static function (Schema $schema, string $name, ?string $namespace): ?SchemaItem {
+            try {
+                return $schema->findType((string) $name, $namespace);
+            } catch (TypeNotFoundException $e) {
+                return null;
+            }
+        };
 
-            return $out;
-        } catch (TypeNotFoundException $e) {
-            throw new TypeException(
-                sprintf(
-                    "Can't find %s named {%s}#%s, at line %d in %s ",
-                    'type',
-                    $namespace,
-                    $name,
-                    $node->getLineNo(),
-                    $node->ownerDocument->documentURI
-                ),
-                0,
-                $e
-            );
+        $interestingSchemas = array_merge([$schema], $this->loadedSchemas[$namespace] ?? []);
+        foreach ($interestingSchemas as $interestingSchema) {
+            if ($result = $tryFindType($interestingSchema, $name, $namespace)) {
+                return $result;
+            }
         }
+
+        throw new TypeException(
+            sprintf(
+                "Can't find %s named {%s}#%s, at line %d in %s ",
+                'type',
+                $namespace,
+                $name,
+                $node->getLineNo(),
+                $node->ownerDocument->documentURI
+            )
+        );
     }
 
     /**

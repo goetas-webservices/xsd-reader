@@ -16,7 +16,7 @@ class SchemaTest extends BaseTest
         <schema xmlns="http://www.w3.org/2001/XMLSchema"
             xmlns:ds="http://www.example.com"
             targetNamespace="http://www.example.com"
-            elementFormDefault="qualified"> 
+            elementFormDefault="qualified">
 
             <simpleType name="CryptoBinary">
               <restriction base="base64Binary"/>
@@ -230,5 +230,34 @@ class SchemaTest extends BaseTest
 
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\GroupRef', $type->getElements()[0]);
         $this->assertEquals($group->getElements(), $type->getElements()[0]->getElements());
+    }
+
+    public function testDependentReferencingSchemes()
+    {
+        $dom = new \DOMDocument();
+        $dom->loadXML('
+        <types xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://tempuri.org/1">
+                <xs:complexType name="Categories" mixed="true">
+                    <xs:sequence>
+                        <xs:element minOccurs="0" maxOccurs="unbounded" name="Category" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:schema>
+            <xs:schema targetNamespace="http://tempuri.org/2">
+                <xs:element name="CategoryList">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="1" name="result" type="q1:Categories" xmlns:q1="http://tempuri.org/1" />
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:schema>
+        </types>
+        ');
+        $schema = $this->reader->readNodes(iterator_to_array($dom->documentElement->childNodes), 'file.xsd');
+
+        $this->assertInstanceOf(ElementDef::class, $schema->findElement('CategoryList', 'http://tempuri.org/2'));
+        $this->assertInstanceOf(ComplexType::class, $schema->findType('Categories', 'http://tempuri.org/1'));
     }
 }
