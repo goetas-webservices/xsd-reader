@@ -1046,7 +1046,7 @@ class SchemaReader
 
         $tryFindType = static function (Schema $schema, string $name, ?string $namespace): ?SchemaItem {
             try {
-                return $schema->findType((string) $name, $namespace);
+                return $schema->findType($name, $namespace);
             } catch (TypeNotFoundException $e) {
                 return null;
             }
