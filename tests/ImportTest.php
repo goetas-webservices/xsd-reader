@@ -29,7 +29,7 @@ class ImportTest extends BaseTest
 
             </xs:schema>');
 
-        $this->assertContains($remoteSchema, $schema->getSchemas(), false, true);
+        $this->assertContains($remoteSchema, $schema->getSchemas());
 
         $remoteAttr = $remoteSchema->findAttribute('myAttribute', 'http://www.example.com');
         $localAttr = $schema->findAttribute('myAttribute', 'http://www.example.com');

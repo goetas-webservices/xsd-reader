@@ -12,7 +12,6 @@
         <log
             type="coverage-html"
             target="phpunit"
-            logIncompleteSkipped="true"
         />
         <log
             type="coverage-text"
