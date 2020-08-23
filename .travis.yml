@@ -24,10 +24,10 @@ before_script:
 
 script:
   - vendor/bin/phpunit $PHPUNIT_FLAGS
-  - vendor/phpstan/phpstan/bin/phpstan analyse -c ./phpstan.neon src
-  - php ./vendor/vimeo/psalm/psalm
-  - php ./vendor/sebastian/phpcpd/phpcpd ./src/
-  - php ./vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix --verbose --allow-risky=yes --dry-run
+  - vendor/bin/phpstan analyse -c ./phpstan.neon --level 6 src
+  - vendor/bin/psalm
+  - vendor/sebastian/phpcpd/phpcpd ./src/
+  - vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix --verbose --allow-risky=yes --dry-run
 
 after_script:
   - wget https://scrutinizer-ci.com/ocular.phar

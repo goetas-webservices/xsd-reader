@@ -24,9 +24,6 @@ class ElementRef extends AbstractElementSingle
         return $this->wrapped->getName();
     }
 
-    /**
-     * @return ElementDef
-     */
     public function getReferencedElement(): ElementDef
     {
         return $this->wrapped;

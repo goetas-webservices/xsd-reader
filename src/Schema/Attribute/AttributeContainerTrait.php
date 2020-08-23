@@ -9,7 +9,7 @@ trait AttributeContainerTrait
     /**
      * @var AttributeItem[]
      */
-    protected $attributes = array();
+    protected $attributes = [];
 
     public function addAttribute(AttributeItem $attribute): void
     {

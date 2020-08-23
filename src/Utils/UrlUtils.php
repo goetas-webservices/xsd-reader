@@ -33,12 +33,6 @@ class UrlUtils
         return static::resolveRelativeUrlAfterEarlyChecks($base, $rel);
     }
 
-    /**
-     * @param string $base
-     * @param string $rel
-     *
-     * @return string
-     */
     protected static function resolveRelativeUrlAfterEarlyChecks(string $base, string $rel): string
     {
         /* fix url file for Windows */
@@ -71,6 +65,9 @@ class UrlUtils
         );
     }
 
+    /**
+     * @param array<string, string> $parts
+     */
     protected static function resolveRelativeUrlToAbsoluteUrl(
         string $rel,
         string $path,
@@ -99,7 +96,7 @@ class UrlUtils
 
     /**
      * replace superfluous slashes with a single slash.
-     * covers:
+     * covers:.
      * //
      * /./
      * /foo/../.
