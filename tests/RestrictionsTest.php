@@ -34,18 +34,18 @@ class RestrictionsTest extends BaseTest
         $restriction = $simpleType->getRestriction();
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction', $restriction);
 
-        $expectedChecks = array(
-            'enumeration' => array(
-                array(
+        $expectedChecks = [
+            'enumeration' => [
+                [
                     'value' => 'foo',
                     'doc' => '',
-                ),
-                array(
+                ],
+                [
                     'value' => 'bar',
                     'doc' => '',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
         $this->assertEquals($expectedChecks, $restriction->getChecks());
     }
 
@@ -73,14 +73,14 @@ class RestrictionsTest extends BaseTest
         $restriction = $simpleType->getRestriction();
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction', $restriction);
 
-        $expectedChecks = array(
-            'pattern' => array(
-                array(
+        $expectedChecks = [
+            'pattern' => [
+                [
                     'value' => '[a-zA-Z0-9]',
                     'doc' => '',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
         $this->assertEquals($expectedChecks, $restriction->getChecks());
     }
 
@@ -108,14 +108,14 @@ class RestrictionsTest extends BaseTest
         $restriction = $simpleType->getRestriction();
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction', $restriction);
 
-        $expectedChecks = array(
-            'length' => array(
-                array(
+        $expectedChecks = [
+            'length' => [
+                [
                     'value' => '10',
                     'doc' => '',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
         $this->assertEquals($expectedChecks, $restriction->getChecks());
     }
 
@@ -144,20 +144,20 @@ class RestrictionsTest extends BaseTest
         $restriction = $simpleType->getRestriction();
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction', $restriction);
 
-        $expectedChecks = array(
-            'minLength' => array(
-                array(
+        $expectedChecks = [
+            'minLength' => [
+                [
                     'value' => '5',
                     'doc' => '',
-                ),
-            ),
-            'maxLength' => array(
-                array(
+                ],
+            ],
+            'maxLength' => [
+                [
                     'value' => '8',
                     'doc' => '',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
         $this->assertEquals($expectedChecks, $restriction->getChecks());
     }
 
@@ -186,20 +186,20 @@ class RestrictionsTest extends BaseTest
         $restriction = $simpleType->getRestriction();
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction', $restriction);
 
-        $expectedChecks = array(
-            'minInclusive' => array(
-                array(
+        $expectedChecks = [
+            'minInclusive' => [
+                [
                     'value' => '1',
                     'doc' => '',
-                ),
-            ),
-            'maxInclusive' => array(
-                array(
+                ],
+            ],
+            'maxInclusive' => [
+                [
                     'value' => '10',
                     'doc' => '',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
         $this->assertEquals($expectedChecks, $restriction->getChecks());
     }
 
@@ -228,20 +228,20 @@ class RestrictionsTest extends BaseTest
         $restriction = $simpleType->getRestriction();
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction', $restriction);
 
-        $expectedChecks = array(
-            'minExclusive' => array(
-                array(
+        $expectedChecks = [
+            'minExclusive' => [
+                [
                     'value' => '1',
                     'doc' => '',
-                ),
-            ),
-            'maxExclusive' => array(
-                array(
+                ],
+            ],
+            'maxExclusive' => [
+                [
                     'value' => '10',
                     'doc' => '',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
         $this->assertEquals($expectedChecks, $restriction->getChecks());
     }
 
@@ -269,14 +269,14 @@ class RestrictionsTest extends BaseTest
         $restriction = $simpleType->getRestriction();
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction', $restriction);
 
-        $expectedChecks = array(
-            'fractionDigits' => array(
-                array(
+        $expectedChecks = [
+            'fractionDigits' => [
+                [
                     'value' => '2',
                     'doc' => '',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
         $this->assertEquals($expectedChecks, $restriction->getChecks());
     }
 
@@ -304,14 +304,14 @@ class RestrictionsTest extends BaseTest
         $restriction = $simpleType->getRestriction();
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction', $restriction);
 
-        $expectedChecks = array(
-            'totalDigits' => array(
-                array(
+        $expectedChecks = [
+            'totalDigits' => [
+                [
                     'value' => '4',
                     'doc' => '',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
         $this->assertEquals($expectedChecks, $restriction->getChecks());
     }
 
@@ -340,20 +340,20 @@ class RestrictionsTest extends BaseTest
         $restriction = $simpleType->getRestriction();
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction', $restriction);
 
-        $expectedChecks = array(
-            'totalDigits' => array(
-                array(
+        $expectedChecks = [
+            'totalDigits' => [
+                [
                     'value' => '4',
                     'doc' => '',
-                ),
-            ),
-            'fractionDigits' => array(
-                array(
+                ],
+            ],
+            'fractionDigits' => [
+                [
                     'value' => '2',
                     'doc' => '',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
         $this->assertEquals($expectedChecks, $restriction->getChecks());
     }
 
@@ -381,14 +381,14 @@ class RestrictionsTest extends BaseTest
         $restriction = $simpleType->getRestriction();
         $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction', $restriction);
 
-        $expectedChecks = array(
-            'whiteSpace' => array(
-                array(
+        $expectedChecks = [
+            'whiteSpace' => [
+                [
                     'value' => 'replace',
                     'doc' => '',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
         $this->assertEquals($expectedChecks, $restriction->getChecks());
     }
 }

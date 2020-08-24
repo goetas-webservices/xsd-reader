@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace GoetasWebservices\XML\XSDReader\Tests;
 
+use GoetasWebservices\XML\XSDReader\Exception\IOException;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
 use GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType;
 use GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType;
@@ -35,24 +36,22 @@ class SchemaTest extends BaseTest
     }
 
     /**
-     * @expectedException \GoetasWebservices\XML\XSDReader\Exception\IOException
-     * @expectedExceptionMessage Can't load the schema
-     *
      * @throws \GoetasWebservices\XML\XSDReader\Exception\IOException
      */
     public function testErrorString()
     {
+        $this->expectException(IOException::class);
+        $this->expectExceptionMessage("Can't load the schema");
         $this->reader->readString('abcd');
     }
 
     /**
-     * @expectedException \GoetasWebservices\XML\XSDReader\Exception\IOException
-     * @expectedExceptionMessage Can't load the file 'abcd'
-     *
      * @throws \GoetasWebservices\XML\XSDReader\Exception\IOException
      */
     public function testErrorFile()
     {
+        $this->expectException(IOException::class);
+        $this->expectExceptionMessage("Can't load the file 'abcd'");
         $this->reader->readFile('abcd');
     }
 

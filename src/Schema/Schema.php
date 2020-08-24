@@ -23,7 +23,7 @@ class Schema
         string $getter,
         string $name,
         string $namespace = null,
-        array &$calling = array()
+        array &$calling = []
     ): ? SchemaItem {
         $calling[spl_object_hash($this)] = true;
         $cid = "$getter, $name, $namespace";
@@ -63,7 +63,7 @@ class Schema
         string $getter,
         string $name,
         string $namespace = null,
-        array &$calling = array()
+        array &$calling = []
     ): ? SchemaItem {
         foreach ($schemas as $childSchema) {
             if (!isset($calling[spl_object_hash($childSchema)])) {
@@ -82,9 +82,11 @@ class Schema
     }
 
     /**
+     * @param array<mixed> $calling
+     *
      * @throws TypeNotFoundException
      */
-    protected function findSomething(string $getter, string $name, string $namespace = null, array &$calling = array()): SchemaItem
+    protected function findSomething(string $getter, string $name, string $namespace = null, array &$calling = []): SchemaItem
     {
         $in = $this->findSomethingNoThrow(
             $getter,
@@ -97,14 +99,7 @@ class Schema
             return $in;
         }
 
-        throw new TypeNotFoundException(
-            sprintf(
-                "Can't find the %s named {%s}#%s.",
-                (string) substr($getter, 3),
-                $namespace,
-                $name
-            )
-        );
+        throw new TypeNotFoundException(sprintf("Can't find the %s named {%s}#%s.", substr($getter, 3), $namespace, $name));
     }
 
     /**
@@ -125,32 +120,32 @@ class Schema
     /**
      * @var Schema[]
      */
-    protected $schemas = array();
+    protected $schemas = [];
 
     /**
      * @var Type[]
      */
-    protected $types = array();
+    protected $types = [];
 
     /**
      * @var ElementDef[]
      */
-    protected $elements = array();
+    protected $elements = [];
 
     /**
      * @var Group[]
      */
-    protected $groups = array();
+    protected $groups = [];
 
     /**
      * @var AttributeGroup[]
      */
-    protected $attributeGroups = array();
+    protected $attributeGroups = [];
 
     /**
      * @var AttributeDef[]
      */
-    protected $attributes = array();
+    protected $attributes = [];
 
     /**
      * @var string|null
@@ -160,7 +155,7 @@ class Schema
     /**
      * @var \GoetasWebservices\XML\XSDReader\Schema\SchemaItem[]
      */
-    protected $typeCache = array();
+    protected $typeCache = [];
 
     public function getElementsQualification(): bool
     {
@@ -261,13 +256,7 @@ class Schema
         }
 
         if ($schema->getTargetNamespace() !== $namespace) {
-            throw new SchemaException(
-                sprintf(
-                    "The target namespace ('%s') for schema, does not match the declared namespace '%s'",
-                    $schema->getTargetNamespace(),
-                    $namespace
-                )
-            );
+            throw new SchemaException(sprintf("The target namespace ('%s') for schema, does not match the declared namespace '%s'", $schema->getTargetNamespace(), $namespace));
         }
 
         if (isset($this->schemas[$namespace])) {

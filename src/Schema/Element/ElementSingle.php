@@ -12,9 +12,6 @@ interface ElementSingle extends ElementItem, InterfaceSetMinMax, InterfaceSetDef
 
     public function isQualified(): bool;
 
-    /**
-     * @param bool $qualified
-     */
     public function setQualified(bool $qualified): void;
 
     public function isLocal(): bool;

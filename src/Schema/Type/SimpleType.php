@@ -16,7 +16,7 @@ class SimpleType extends Type
     /**
      * @var SimpleType[]
      */
-    protected $unions = array();
+    protected $unions = [];
 
     /**
      * @var SimpleType|null

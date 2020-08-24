@@ -14,7 +14,7 @@ class StandardDocumentationReaderTest extends TestCase
      */
     private $reader;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->reader = new StandardDocumentationReader();
     }
@@ -25,7 +25,11 @@ class StandardDocumentationReaderTest extends TestCase
 
         $result = $this->reader->get($element);
 
-        $this->assertInternalType('string', $result);
+        if (method_exists($this, 'assertIsString')) {
+            $this->assertIsString($result);
+        } else {
+            $this->assertInternalType('string', $result);
+        }
     }
 
     public function testItReturnsTheTrimmedAnnotationDocumentationText()

@@ -23,8 +23,8 @@ use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementRef;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Group;
 use GoetasWebservices\XML\XSDReader\Schema\Element\GroupRef;
-use GoetasWebservices\XML\XSDReader\Schema\Element\InterfaceSetMinMax;
 use GoetasWebservices\XML\XSDReader\Schema\Element\InterfaceSetDefault;
+use GoetasWebservices\XML\XSDReader\Schema\Element\InterfaceSetMinMax;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\TypeNotFoundException;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Base;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Extension;
@@ -53,12 +53,12 @@ class SchemaReader
     /**
      * @var Schema[]
      */
-    private $loadedFiles = array();
+    private $loadedFiles = [];
 
     /**
      * @var Schema[][]
      */
-    private $loadedSchemas = array();
+    private $loadedSchemas = [];
 
     /**
      * @var string[]
@@ -92,14 +92,14 @@ class SchemaReader
     /**
      * @var string[]
      */
-    protected static $globalSchemaInfo = array(
+    protected static $globalSchemaInfo = [
         self::XML_NS => 'http://www.w3.org/2001/xml.xsd',
         self::XSD_NS => 'http://www.w3.org/2001/XMLSchema.xsd',
-    );
+    ];
 
     private function extractErrorMessage(): \Exception
     {
-        $errors = array();
+        $errors = [];
 
         foreach (libxml_get_errors() as $error) {
             $errors[] = sprintf("Error[%s] code %s: %s in '%s' at position %s:%s", $error->level, $error->code, trim($error->message), $error->file, $error->line, $error->column);
@@ -256,7 +256,7 @@ class SchemaReader
     private function schemaNode(Schema $schema, DOMElement $node, Schema $parent = null): array
     {
         $this->setSchemaThingsFromNode($schema, $node, $parent);
-        $functions = array();
+        $functions = [];
 
         self::againstDOMNodeList(
             $node,
@@ -905,11 +905,11 @@ class SchemaReader
          */
         $namespace = $node->lookupNamespaceUri($prefix);
 
-        return array(
+        return [
             $name,
             $namespace,
             $prefix,
-        );
+        ];
     }
 
     private function findAttributeItem(Schema $schema, DOMElement $node, string $typeName): AttributeItem
@@ -929,18 +929,7 @@ class SchemaReader
 
             return $out;
         } catch (TypeNotFoundException $e) {
-            throw new TypeException(
-                sprintf(
-                    "Can't find %s named {%s}#%s, at line %d in %s ",
-                    'attribute',
-                    $namespace,
-                    $name,
-                    $node->getLineNo(),
-                    $node->ownerDocument->documentURI
-                ),
-                0,
-                $e
-            );
+            throw new TypeException(sprintf("Can't find %s named {%s}#%s, at line %d in %s ", 'attribute', $namespace, $name, $node->getLineNo(), $node->ownerDocument->documentURI), 0, $e);
         }
     }
 
@@ -961,18 +950,7 @@ class SchemaReader
 
             return $out;
         } catch (TypeNotFoundException $e) {
-            throw new TypeException(
-                sprintf(
-                    "Can't find %s named {%s}#%s, at line %d in %s ",
-                    'attributegroup',
-                    $namespace,
-                    $name,
-                    $node->getLineNo(),
-                    $node->ownerDocument->documentURI
-                ),
-                0,
-                $e
-            );
+            throw new TypeException(sprintf("Can't find %s named {%s}#%s, at line %d in %s ", 'attributegroup', $namespace, $name, $node->getLineNo(), $node->ownerDocument->documentURI), 0, $e);
         }
     }
 
@@ -988,18 +966,7 @@ class SchemaReader
         try {
             return $schema->findElement((string) $name, $namespace);
         } catch (TypeNotFoundException $e) {
-            throw new TypeException(
-                sprintf(
-                    "Can't find %s named {%s}#%s, at line %d in %s ",
-                    'element',
-                    $namespace,
-                    $name,
-                    $node->getLineNo(),
-                    $node->ownerDocument->documentURI
-                ),
-                0,
-                $e
-            );
+            throw new TypeException(sprintf("Can't find %s named {%s}#%s, at line %d in %s ", 'element', $namespace, $name, $node->getLineNo(), $node->ownerDocument->documentURI), 0, $e);
         }
     }
 
@@ -1020,18 +987,7 @@ class SchemaReader
 
             return $out;
         } catch (TypeNotFoundException $e) {
-            throw new TypeException(
-                sprintf(
-                    "Can't find %s named {%s}#%s, at line %d in %s ",
-                    'group',
-                    $namespace,
-                    $name,
-                    $node->getLineNo(),
-                    $node->ownerDocument->documentURI
-                ),
-                0,
-                $e
-            );
+            throw new TypeException(sprintf("Can't find %s named {%s}#%s, at line %d in %s ", 'group', $namespace, $name, $node->getLineNo(), $node->ownerDocument->documentURI), 0, $e);
         }
     }
 
@@ -1046,7 +1002,7 @@ class SchemaReader
 
         $tryFindType = static function (Schema $schema, string $name, ?string $namespace): ?SchemaItem {
             try {
-                return $schema->findType((string) $name, $namespace);
+                return $schema->findType($name, $namespace);
             } catch (TypeNotFoundException $e) {
                 return null;
             }
@@ -1059,21 +1015,9 @@ class SchemaReader
             }
         }
 
-        throw new TypeException(
-            sprintf(
-                "Can't find %s named {%s}#%s, at line %d in %s ",
-                'type',
-                $namespace,
-                $name,
-                $node->getLineNo(),
-                $node->ownerDocument->documentURI
-            )
-        );
+        throw new TypeException(sprintf("Can't find %s named {%s}#%s, at line %d in %s ", 'type', $namespace, $name, $node->getLineNo(), $node->ownerDocument->documentURI));
     }
 
-    /**
-     * @return Closure
-     */
     private function loadElementDef(Schema $schema, DOMElement $node): Closure
     {
         return $this->loadAttributeOrElementDef($schema, $node, false);
@@ -1228,8 +1172,8 @@ class SchemaReader
     public function getGlobalSchema(): Schema
     {
         if (!($this->globalSchema instanceof Schema)) {
-            $callbacks = array();
-            $globalSchemas = array();
+            $callbacks = [];
+            $globalSchemas = [];
             /**
              * @var string $namespace
              */
@@ -1259,7 +1203,7 @@ class SchemaReader
             );
 
             /**
-             * @var Closure
+             * @var Closure $callback
              */
             foreach ($callbacks as $callback) {
                 $callback();
@@ -1285,7 +1229,7 @@ class SchemaReader
             $this->setLoadedFile($file, $rootSchema);
         }
 
-        $all = array();
+        $all = [];
         foreach ($nodes as $k => $node) {
             if (($node instanceof \DOMElement) && $node->namespaceURI === self::XSD_NS && $node->localName == 'schema') {
                 $holderSchema = new Schema();
@@ -1489,7 +1433,7 @@ class SchemaReader
     private function setLoadedSchema(string $namespace, Schema $schema): void
     {
         if (!isset($this->loadedSchemas[$namespace])) {
-            $this->loadedSchemas[$namespace] = array();
+            $this->loadedSchemas[$namespace] = [];
         }
         if (!in_array($schema, $this->loadedSchemas[$namespace], true)) {
             $this->loadedSchemas[$namespace][] = $schema;
