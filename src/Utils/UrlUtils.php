@@ -103,6 +103,12 @@ class UrlUtils
      */
     protected static function replaceSuperfluousSlashes(string $abs): string
     {
+        /* Use realpath to deal with multiple levels if the path exists */
+        $rp = realpath($abs);
+        if ($rp) {
+            return $rp;
+        }
+
         $n = 1;
         do {
             $abs = preg_replace(
