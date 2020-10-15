@@ -145,8 +145,6 @@ class SchemaReader
         Schema $schema,
         DOMElement $node
     ): Closure {
-        $this->reportProgress("loadAttributeGroup", [ $schema, $node ]);
-
         $attGroup = new AttributeGroup($schema, $node->getAttribute('name'));
         $attGroup->setDoc($this->getDocumentation($node));
         $schema->addAttributeGroup($attGroup);
@@ -205,8 +203,6 @@ class SchemaReader
         Schema $schema,
         DOMElement $node
     ): Attribute {
-        $this->reportProgress("loadAttribute", [ $schema, $node ]);
-
         $attribute = new Attribute($schema, $node->getAttribute('name'));
         $attribute->setDoc($this->getDocumentation($node));
         $this->fillItem($attribute, $node);
@@ -259,8 +255,6 @@ class SchemaReader
      */
     private function schemaNode(Schema $schema, DOMElement $node, Schema $parent = null): array
     {
-        $this->reportProgress("schemaNode", [ $schema, $node, $parent ]);
-
         $this->setSchemaThingsFromNode($schema, $node, $parent);
         $functions = [];
 
@@ -471,8 +465,6 @@ class SchemaReader
 
     private function loadGroup(Schema $schema, DOMElement $node): Closure
     {
-        $this->reportProgress("loadGroup", [ $schema, $node ]);
-
         $group = new Group($schema, $node->getAttribute('name'));
         $group->setDoc($this->getDocumentation($node));
         $groupOriginal = $group;
@@ -1099,8 +1091,6 @@ class SchemaReader
         Schema $schema,
         DOMElement $node
     ): Closure {
-        $this->reportProgress("loadImport", [ $schema, $node ]);
-
         $namespace = $node->getAttribute('namespace');
         $schemaLocation = $node->getAttribute('schemaLocation');
         if (!$schemaLocation && isset($this->knownNamespaceSchemaLocations[$namespace])) {
@@ -1155,8 +1145,6 @@ class SchemaReader
         Schema $schema,
         string $file
     ): Closure {
-        $this->reportProgress("loadImportFresh", [ $namespace, $schema, $file ]);
-
         return function () use ($namespace, $schema, $file): void {
             $dom = $this->getDOM(
                 isset($this->knownLocationSchemas[$file])
@@ -1322,8 +1310,6 @@ class SchemaReader
         }
         libxml_use_internal_errors(false);
 
-        $this->reportProgress("getDomLoaded", [ $file, $xml ]);
-
         return $xml;
     }
 
@@ -1352,8 +1338,6 @@ class SchemaReader
         DOMElement $childNode,
         Closure $callback
     ): void {
-        $this->reportProgress("loadTypeWithCallback", [ $schema, $childNode ]);
-
         /**
          * @var Closure|null $func
          */
@@ -1377,8 +1361,6 @@ class SchemaReader
         Schema $schema,
         DOMElement $node
     ): Element {
-        $this->reportProgress("loadElement", [ $schema, $node ]);
-
         $element = new Element($schema, $node->getAttribute('name'));
         $element->setDoc($this->getDocumentation($node));
 
@@ -1473,18 +1455,5 @@ class SchemaReader
         $schema->setElementsQualification($node->getAttribute('elementFormDefault') == 'qualified');
         $schema->setAttributesQualification($node->getAttribute('attributeFormDefault') == 'qualified');
         $schema->setDoc($this->getDocumentation($node));
-    }
-
-    /** @var callable $reportCallback */
-    private $reportCallback;
-    public function setReportCallback(callable $rc)
-    {
-        $this->reportCallback = $rc;
-    }
-    private function reportProgress(string $report, array $data)
-    {
-        if (!empty($this->reportCallback)) {
-            call_user_func($this->reportCallback, $report, $data);
-        }
     }
 }
