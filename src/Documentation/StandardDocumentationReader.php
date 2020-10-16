@@ -22,7 +22,11 @@ class StandardDocumentationReader implements DocumentationReader
                  */
                 foreach ($childNode->childNodes as $subChildNode) {
                     if ($subChildNode instanceof DOMElement && $subChildNode->localName == 'documentation') {
-                        $doc .= ($subChildNode->nodeValue);
+                        if (!empty($doc)) {
+                            $doc .=  "\n" . ($subChildNode->nodeValue);
+                        } else {
+                            $doc .= ($subChildNode->nodeValue);
+                        }
                     }
                 }
             }
