@@ -6,6 +6,7 @@ php:
   - 7.2
   - 7.3
   - 7.4
+  - 8.0
 
 matrix:
   include:
@@ -32,3 +33,4 @@ script:
 after_script:
   - wget https://scrutinizer-ci.com/ocular.phar
   - if [[ $TRAVIS_PHP_VERSION = '7.1' ]] ; then php ocular.phar code-coverage:upload --format=php-clover coverage.clover; fi
+  - if [[ $TRAVIS_PHP_VERSION = '8.0' ]] ; then php ocular.phar code-coverage:upload --format=php-clover coverage.clover; fi
