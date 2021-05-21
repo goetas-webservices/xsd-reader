@@ -19,14 +19,14 @@
         "sort-packages": true
     },
     "require" : {
-        "php": "^7.1|^8.0",
-        "vimeo/psalm": "^3.14"
+        "php": "^7.1|^8.0"
     },
     "require-dev" : {
         "friendsofphp/php-cs-fixer": "^2.10",
         "phpstan/phpstan": "^0.12",
         "phpunit/phpunit": "^7.0|^8.0|^9.0",
-        "sebastian/phpcpd": "^4.0|^5.0|^6.0"
+        "sebastian/phpcpd": "^4.0|^5.0|^6.0",
+        "vimeo/psalm": "^3.14"
     },
     "autoload" : {
         "psr-4" : {
