@@ -199,7 +199,6 @@ class TypesTest extends BaseTest
         ];
     }
 
-
     public function getMinOccurences()
     {
         return [

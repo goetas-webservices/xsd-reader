@@ -381,8 +381,8 @@ class SchemaReader
         ElementContainer $elementContainer,
         DOMElement $node,
         DOMElement $childNode,
-        ? int $max,
-        ? int $min = null
+        ?int $max,
+        ?int $min = null
     ): void {
         switch ($childNode->localName) {
             case 'sequence':
@@ -419,8 +419,8 @@ class SchemaReader
         ElementContainer $elementContainer,
         DOMElement $node,
         DOMElement $childNode,
-        ? int $max,
-        ? int $min
+        ?int $max,
+        ?int $min
     ): void {
         if ($childNode->hasAttribute('ref')) {
             $elementDef = $this->findElement($elementContainer->getSchema(), $node, $childNode->getAttribute('ref'));
@@ -915,7 +915,7 @@ class SchemaReader
         $prefix = null;
         $name = $typeName;
         if (strpos($typeName, ':') !== false) {
-            list($prefix, $name) = explode(':', $typeName);
+            [$prefix, $name] = explode(':', $typeName);
         }
 
         /**
@@ -932,7 +932,7 @@ class SchemaReader
 
     private function findAttributeItem(Schema $schema, DOMElement $node, string $typeName): AttributeItem
     {
-        list($name, $namespace) = static::splitParts($node, $typeName);
+        [$name, $namespace] = static::splitParts($node, $typeName);
 
         /**
          * @var string|null $namespace
@@ -953,7 +953,7 @@ class SchemaReader
 
     private function findAttributeGroup(Schema $schema, DOMElement $node, string $typeName): AttributeGroup
     {
-        list($name, $namespace) = static::splitParts($node, $typeName);
+        [$name, $namespace] = static::splitParts($node, $typeName);
 
         /**
          * @var string|null $namespace
@@ -974,7 +974,7 @@ class SchemaReader
 
     private function findElement(Schema $schema, DOMElement $node, string $typeName): ElementDef
     {
-        list($name, $namespace) = static::splitParts($node, $typeName);
+        [$name, $namespace] = static::splitParts($node, $typeName);
 
         /**
          * @var string|null $namespace
@@ -990,7 +990,7 @@ class SchemaReader
 
     private function findGroup(Schema $schema, DOMElement $node, string $typeName): Group
     {
-        list($name, $namespace) = static::splitParts($node, $typeName);
+        [$name, $namespace] = static::splitParts($node, $typeName);
 
         /**
          * @var string|null $namespace
@@ -1011,7 +1011,7 @@ class SchemaReader
 
     private function findType(Schema $schema, DOMElement $node, string $typeName): SchemaItem
     {
-        list($name, $namespace) = static::splitParts($node, $typeName);
+        [$name, $namespace] = static::splitParts($node, $typeName);
 
         /**
          * @var string|null $namespace
@@ -1165,9 +1165,8 @@ class SchemaReader
     ): Closure {
         return function () use ($namespace, $schema, $file): void {
             $dom = $this->getDOM(
-                isset($this->knownLocationSchemas[$file])
-                    ? $this->knownLocationSchemas[$file]
-                    : $file
+                $this->knownLocationSchemas[$file]
+                    ?? $file
             );
 
             $schemaNew = $this->createOrUseSchemaForNs($schema, $namespace);

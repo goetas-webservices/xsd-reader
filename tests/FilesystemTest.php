@@ -11,7 +11,7 @@ class FilesystemTest extends BaseTest
      *
      * Covers the issue described in {@link https://github.com/goetas/xsd-reader/pull/10 PR #10}.
      */
-    public function testReferencedOnFileSystem_1()
+    public function testReferencedOnFileSystem1()
     {
         /*
          * Using vfsStream seems ideal, but currently seems to have an issue with directorypaths with a space in
