@@ -12,7 +12,7 @@ class RestrictionsTest extends BaseTest
     /**
      * Test the correct detection an Enumeration-restriction.
      */
-    public function testRestriction_1()
+    public function testRestriction1()
     {
         $schema = $this->reader->readString(
             '
@@ -52,7 +52,7 @@ class RestrictionsTest extends BaseTest
     /**
      * Test the correct detection a pattern-restriction.
      */
-    public function testRestriction_2()
+    public function testRestriction2()
     {
         $schema = $this->reader->readString(
             '
@@ -87,7 +87,7 @@ class RestrictionsTest extends BaseTest
     /**
      * Test the correct detection a length-restriction.
      */
-    public function testRestriction_3()
+    public function testRestriction3()
     {
         $schema = $this->reader->readString(
             '
@@ -122,7 +122,7 @@ class RestrictionsTest extends BaseTest
     /**
      * Test the correct detection a minLength- and maxLength-restriction.
      */
-    public function testRestriction_4()
+    public function testRestriction4()
     {
         $schema = $this->reader->readString(
             '
@@ -164,7 +164,7 @@ class RestrictionsTest extends BaseTest
     /**
      * Test the correct detection a minInclusive- and maxInclusive-restriction.
      */
-    public function testRestriction_5()
+    public function testRestriction5()
     {
         $schema = $this->reader->readString(
             '
@@ -206,7 +206,7 @@ class RestrictionsTest extends BaseTest
     /**
      * Test the correct detection a minExclusive- and maxExclusive-restriction.
      */
-    public function testRestriction_6()
+    public function testRestriction6()
     {
         $schema = $this->reader->readString(
             '
@@ -248,7 +248,7 @@ class RestrictionsTest extends BaseTest
     /**
      * Test the correct detection a fractionDigits-restriction.
      */
-    public function testRestriction_7()
+    public function testRestriction7()
     {
         $schema = $this->reader->readString(
             '
@@ -283,7 +283,7 @@ class RestrictionsTest extends BaseTest
     /**
      * Test the correct detection a totalDigits-restriction.
      */
-    public function testRestriction_8()
+    public function testRestriction8()
     {
         $schema = $this->reader->readString(
             '
@@ -318,7 +318,7 @@ class RestrictionsTest extends BaseTest
     /**
      * Test the correct detection a totalDigits- and fractionDigits-restriction.
      */
-    public function testRestriction_9()
+    public function testRestriction9()
     {
         $schema = $this->reader->readString(
             '
@@ -360,7 +360,7 @@ class RestrictionsTest extends BaseTest
     /**
      * Test the correct detection a whiteSpace-restriction.
      */
-    public function testRestriction_10()
+    public function testRestriction10()
     {
         $schema = $this->reader->readString(
             '

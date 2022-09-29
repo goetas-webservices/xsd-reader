@@ -32,6 +32,6 @@ class Restriction extends Base
      */
     public function getChecksByType(string $type): array
     {
-        return isset($this->checks[$type]) ? $this->checks[$type] : [];
+        return $this->checks[$type] ?? [];
     }
 }

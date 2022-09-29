@@ -24,7 +24,7 @@ class Schema
         string $name,
         string $namespace = null,
         array &$calling = []
-    ): ? SchemaItem {
+    ): ?SchemaItem {
         $calling[spl_object_hash($this)] = true;
         $cid = "$getter, $name, $namespace";
 
@@ -64,7 +64,7 @@ class Schema
         string $name,
         string $namespace = null,
         array &$calling = []
-    ): ? SchemaItem {
+    ): ?SchemaItem {
         foreach ($schemas as $childSchema) {
             if (!isset($calling[spl_object_hash($childSchema)])) {
                 /**
@@ -182,7 +182,7 @@ class Schema
         return $this->targetNamespace;
     }
 
-    public function setTargetNamespace(? string $targetNamespace): void
+    public function setTargetNamespace(?string $targetNamespace): void
     {
         $this->targetNamespace = $targetNamespace;
     }
@@ -318,7 +318,7 @@ class Schema
         return null;
     }
 
-    public function getAttribute(string $name): ? AttributeItem
+    public function getAttribute(string $name): ?AttributeItem
     {
         if (isset($this->attributes[$name])) {
             return $this->attributes[$name];

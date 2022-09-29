@@ -140,6 +140,65 @@ class TypesTest extends BaseTest
         $this->assertEquals($expected, $elements[0]->getMax());
     }
 
+    /**
+     * @dataProvider getMinOccurencesOverride
+     */
+    public function testSequencMinOccursOverride($xml, $expected)
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xs:complexType name="complexType">
+                    <xs:sequence minOccurs="'.$xml.'" >
+                        <xs:element name="el1" minOccurs="1" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:schema>');
+
+        $complex = $schema->findType('complexType', 'http://www.example.com');
+        $elements = $complex->getElements();
+        $this->assertEquals($expected, $elements[0]->getMin());
+    }
+
+    public function getMinOccurencesOverride()
+    {
+        return [
+            ['2', 2],
+            ['1', 1],
+            ['0', 0],
+        ];
+    }
+
+    /**
+     * @dataProvider getMaxOccurencesOverride
+     */
+    public function testSequencMaxOccursOverride($xml, $expected)
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xs:complexType name="complexType">
+                    <xs:sequence maxOccurs="'.$xml.'" >
+                        <xs:element name="el1" maxOccurs="5" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:schema>');
+
+        $complex = $schema->findType('complexType', 'http://www.example.com');
+        $elements = $complex->getElements();
+        $this->assertEquals($expected, $elements[0]->getMax());
+    }
+
+    public function getMaxOccurencesOverride()
+    {
+        return [
+            ['0', 5], //maxOccurs=0 is ignored
+            ['1', 5],
+            ['2', 2], // 2 in this case just means "many"
+            ['unbounded', 2], // 2 in this case just means "many"
+        ];
+    }
+
     public function getMinOccurences()
     {
         return [

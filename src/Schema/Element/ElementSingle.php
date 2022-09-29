@@ -8,7 +8,7 @@ use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
 
 interface ElementSingle extends ElementItem, InterfaceSetMinMax, InterfaceSetDefault
 {
-    public function getType(): ? Type;
+    public function getType(): ?Type;
 
     public function isQualified(): bool;
 
