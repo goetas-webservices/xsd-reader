@@ -338,7 +338,7 @@ class SchemaReader
         }
     }
 
-    private function loadSequence(ElementContainer $elementContainer, DOMElement $node, int $max = null): void
+    private function loadSequence(ElementContainer $elementContainer, DOMElement $node, int $max = null, int $min = null): void
     {
         $max =
             (
@@ -348,6 +348,13 @@ class SchemaReader
             )
                 ? 2
                 : null;
+        $min =
+            (
+                $min === null &&
+                !$node->hasAttribute('minOccurs')
+            )
+                ? null
+                : (int) max((int) $min, $node->getAttribute('minOccurs'));
 
         self::againstDOMNodeList(
             $node,
@@ -356,13 +363,15 @@ class SchemaReader
                 DOMElement $childNode
             ) use (
                 $elementContainer,
-                $max
+                $max,
+                $min
             ): void {
                 $this->loadSequenceChildNode(
                     $elementContainer,
                     $node,
                     $childNode,
-                    $max
+                    $max,
+                    $min
                 );
             }
         );
@@ -372,7 +381,8 @@ class SchemaReader
         ElementContainer $elementContainer,
         DOMElement $node,
         DOMElement $childNode,
-        ? int $max
+        ? int $max,
+        ? int $min = null
     ): void {
         switch ($childNode->localName) {
             case 'sequence':
@@ -381,7 +391,8 @@ class SchemaReader
                 $this->loadSequence(
                     $elementContainer,
                     $childNode,
-                    $max
+                    $max,
+                    $min
                 );
                 break;
             case 'element':
@@ -389,7 +400,8 @@ class SchemaReader
                     $elementContainer,
                     $node,
                     $childNode,
-                    $max
+                    $max,
+                    $min
                 );
                 break;
             case 'group':
@@ -407,7 +419,8 @@ class SchemaReader
         ElementContainer $elementContainer,
         DOMElement $node,
         DOMElement $childNode,
-        ? int $max
+        ? int $max,
+        ? int $min
     ): void {
         if ($childNode->hasAttribute('ref')) {
             $elementDef = $this->findElement($elementContainer->getSchema(), $node, $childNode->getAttribute('ref'));
@@ -436,6 +449,11 @@ class SchemaReader
                 $childNode
             );
         }
+
+        if ($min !== null) {
+            $element->setMin($min);
+        }
+
         if ($max > 1) {
             /*
             * although one might think the typecast is not needed with $max being `? int $max` after passing > 1,
