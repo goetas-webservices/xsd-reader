@@ -36,7 +36,7 @@ class AbstractElementSingle extends Item implements ElementSingle
     /**
      * @var string|null
      */
-    protected $fixed;
+    protected $fixed = null;
 
     /**
      * @var string|null
