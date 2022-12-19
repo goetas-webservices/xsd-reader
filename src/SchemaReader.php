@@ -24,6 +24,7 @@ use GoetasWebservices\XML\XSDReader\Schema\Element\ElementRef;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Group;
 use GoetasWebservices\XML\XSDReader\Schema\Element\GroupRef;
 use GoetasWebservices\XML\XSDReader\Schema\Element\InterfaceSetDefault;
+use GoetasWebservices\XML\XSDReader\Schema\Element\InterfaceSetFixed;
 use GoetasWebservices\XML\XSDReader\Schema\Element\InterfaceSetMinMax;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\TypeNotFoundException;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Base;
@@ -328,6 +329,13 @@ class SchemaReader
             if ($ref->getMin() > $ref->getMax() && $ref->getMax() !== -1) {
                 $ref->setMax($ref->getMin());
             }
+        }
+    }
+
+    private static function maybeSetFixed(InterfaceSetFixed $ref, DOMElement $node): void
+    {
+        if ($node->hasAttribute('fixed')) {
+            $ref->setFixed($node->getAttribute('fixed'));
         }
     }
 
@@ -1385,6 +1393,7 @@ class SchemaReader
 
         self::maybeSetMax($element, $node);
         self::maybeSetMin($element, $node);
+        self::maybeSetFixed($element, $node);
         self::maybeSetDefault($element, $node);
 
         $xp = new \DOMXPath($node->ownerDocument);
