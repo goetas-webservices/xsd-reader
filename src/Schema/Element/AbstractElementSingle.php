@@ -36,6 +36,11 @@ class AbstractElementSingle extends Item implements ElementSingle
     /**
      * @var string|null
      */
+    protected $fixed;
+
+    /**
+     * @var string|null
+     */
     protected $default = null;
 
     public function isQualified(): bool
@@ -86,6 +91,16 @@ class AbstractElementSingle extends Item implements ElementSingle
     public function setMax(int $max): void
     {
         $this->max = $max;
+    }
+
+    public function getFixed(): ?string
+    {
+        return $this->fixed;
+    }
+
+    public function setFixed(string $fixed): void
+    {
+        $this->fixed = $fixed;
     }
 
     public function getDefault(): ?string
