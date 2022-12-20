@@ -232,6 +232,9 @@ class SchemaReader
         $name = $node->getAttribute('name');
         if ($attributeDef) {
             $attribute = new AttributeDef($schema, $name);
+            if ($node->hasAttribute('fixed')) {
+                $attribute->setFixed($node->getAttribute('fixed'));
+            }
             if ($node->hasAttribute('default')) {
                 $attribute->setDefault($node->getAttribute('default'));
             }
