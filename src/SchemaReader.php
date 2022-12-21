@@ -17,6 +17,7 @@ use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeContainer;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItem;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
+use GoetasWebservices\XML\XSDReader\Schema\Element\AbstractElementSingle;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Element;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementContainer;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
@@ -200,14 +201,18 @@ class SchemaReader
         return $attribute;
     }
 
-    private function loadAttribute(
-        Schema $schema,
-        DOMElement $node
-    ): Attribute {
+    private function loadAttribute(Schema $schema, DOMElement $node): Attribute
+    {
         $attribute = new Attribute($schema, $node->getAttribute('name'));
         $attribute->setDoc($this->getDocumentation($node));
         $this->fillItem($attribute, $node);
+        $this->fillAttribute($attribute, $node);
 
+        return $attribute;
+    }
+
+    private function fillAttribute(Attribute $attribute, DOMElement $node): void
+    {
         if ($node->hasAttribute('nillable')) {
             $attribute->setNil($node->getAttribute('nillable') == 'true');
         }
@@ -217,8 +222,6 @@ class SchemaReader
         if ($node->hasAttribute('use')) {
             $attribute->setUse($node->getAttribute('use'));
         }
-
-        return $attribute;
     }
 
     private function loadAttributeOrElementDef(
@@ -229,10 +232,17 @@ class SchemaReader
         $name = $node->getAttribute('name');
         if ($attributeDef) {
             $attribute = new AttributeDef($schema, $name);
+            if ($node->hasAttribute('fixed')) {
+                $attribute->setFixed($node->getAttribute('fixed'));
+            }
+            if ($node->hasAttribute('default')) {
+                $attribute->setDefault($node->getAttribute('default'));
+            }
             $schema->addAttribute($attribute);
         } else {
             $attribute = new ElementDef($schema, $name);
             $attribute->setDoc($this->getDocumentation($node));
+            $this->fillElement($attribute, $node);
             $schema->addElement($attribute);
         }
 
@@ -434,28 +444,9 @@ class SchemaReader
             $elementDef = $this->findElement($elementContainer->getSchema(), $node, $childNode->getAttribute('ref'));
             $element = new ElementRef($elementDef);
             $element->setDoc($this->getDocumentation($childNode));
-
-            self::maybeSetMax($element, $childNode);
-            self::maybeSetMin($element, $childNode);
-
-            $xp = new \DOMXPath($node->ownerDocument);
-            $xp->registerNamespace('xs', 'http://www.w3.org/2001/XMLSchema');
-
-            if ($xp->query('ancestor::xs:choice', $childNode)->length) {
-                $element->setMin(0);
-            }
-
-            if ($childNode->hasAttribute('nillable')) {
-                $element->setNil($childNode->getAttribute('nillable') == 'true');
-            }
-            if ($childNode->hasAttribute('form')) {
-                $element->setQualified($childNode->getAttribute('form') == 'qualified');
-            }
+            $this->fillElement($element, $childNode);
         } else {
-            $element = $this->loadElement(
-                $elementContainer->getSchema(),
-                $childNode
-            );
+            $element = $this->loadElement($elementContainer->getSchema(), $childNode);
         }
 
         if ($min !== null) {
@@ -1382,22 +1373,25 @@ class SchemaReader
         }
     }
 
-    private function loadElement(
-        Schema $schema,
-        DOMElement $node
-    ): Element {
+    private function loadElement(Schema $schema, DOMElement $node): Element
+    {
         $element = new Element($schema, $node->getAttribute('name'));
         $element->setDoc($this->getDocumentation($node));
-
         $this->fillItem($element, $node);
+        $this->fillElement($element, $node);
 
+        return $element;
+    }
+
+    private function fillElement(AbstractElementSingle $element, DOMElement $node): void
+    {
         self::maybeSetMax($element, $node);
         self::maybeSetMin($element, $node);
         self::maybeSetFixed($element, $node);
         self::maybeSetDefault($element, $node);
 
         $xp = new \DOMXPath($node->ownerDocument);
-        $xp->registerNamespace('xs', 'http://www.w3.org/2001/XMLSchema');
+        $xp->registerNamespace('xs', self::XSD_NS);
 
         if ($xp->query('ancestor::xs:choice', $node)->length) {
             $element->setMin(0);
@@ -1411,12 +1405,9 @@ class SchemaReader
         }
 
         $parentNode = $node->parentNode;
-
-        if ($parentNode->localName != 'schema' || $parentNode->namespaceURI != 'http://www.w3.org/2001/XMLSchema') {
+        if ($parentNode->localName != 'schema' || $parentNode->namespaceURI != self::XSD_NS) {
             $element->setLocal(true);
         }
-
-        return $element;
     }
 
     private function addAttributeFromAttributeOrRef(
