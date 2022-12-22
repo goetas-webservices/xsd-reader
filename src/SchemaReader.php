@@ -89,7 +89,11 @@ class SchemaReader
     /**
      * @var string[]
      */
-    protected $knownNamespaceSchemaLocations = [];
+    protected $knownNamespaceSchemaLocations = [
+        'http://www.w3.org/2000/09/xmldsig#' => (
+            __DIR__.'/Resources/xmldsig-core-schema.xsd'
+        ),
+    ];
 
     /**
      * @var string[]
