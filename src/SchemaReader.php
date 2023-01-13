@@ -779,11 +779,7 @@ class SchemaReader
         $type->setExtension($extension);
 
         if ($node->hasAttribute('base')) {
-            $this->findAndSetSomeBase(
-                $type,
-                $extension,
-                $node
-            );
+            $this->findAndSetSomeBase($type, $extension, $node);
         }
         $this->loadExtensionChildNodes($type, $node);
     }
@@ -817,31 +813,38 @@ class SchemaReader
                     case 'choice':
                     case 'all':
                         if ($type instanceof ElementContainer) {
-                            $this->loadSequence(
-                                $type,
-                                $childNode
-                            );
+                            $this->loadSequence($type, $childNode);
                         }
                         break;
-                    case 'attribute':
-                        $this->addAttributeFromAttributeOrRef(
-                            $type,
-                            $childNode,
-                            $type->getSchema(),
-                            $node
-                        );
-                        break;
-                    case 'attributeGroup':
-                        $this->findSomethingLikeAttributeGroup(
-                            $type->getSchema(),
-                            $node,
-                            $childNode,
-                            $type
-                        );
-                        break;
                 }
+                $this->loadChildAttributesAndAttributeGroups($type, $node, $childNode);
             }
         );
+    }
+
+    private function loadChildAttributesAndAttributeGroups(
+        BaseComplexType $type,
+        DOMElement $node,
+        DOMElement $childNode
+    ): void {
+        switch ($childNode->localName) {
+            case 'attribute':
+                $this->addAttributeFromAttributeOrRef(
+                    $type,
+                    $childNode,
+                    $type->getSchema(),
+                    $node
+                );
+                break;
+            case 'attributeGroup':
+                $this->findSomethingLikeAttributeGroup(
+                    $type->getSchema(),
+                    $node,
+                    $childNode,
+                    $type
+                );
+                break;
+        }
     }
 
     private function loadRestriction(Type $type, DOMElement $node): void
@@ -870,14 +873,26 @@ class SchemaReader
                 }
             );
         }
+        $this->loadRestrictionChildNodes($type, $restriction, $node);
+    }
+
+    private function loadRestrictionChildNodes(
+        Type $type,
+        Restriction $restriction,
+        DOMElement $node
+    ): void {
         self::againstDOMNodeList(
             $node,
             function (
                 DOMElement $node,
                 DOMElement $childNode
             ) use (
+                $type,
                 $restriction
             ): void {
+                if ($type instanceof BaseComplexType) {
+                    $this->loadChildAttributesAndAttributeGroups($type, $node, $childNode);
+                }
                 if (
                 in_array(
                     $childNode->localName,
