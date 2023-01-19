@@ -4,9 +4,14 @@ declare(strict_types=1);
 
 namespace GoetasWebservices\XML\XSDReader\Tests;
 
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\Attribute;
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group;
+use GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType;
+
 class AttributesTest extends BaseTest
 {
-    public function testBase()
+    public function testBase(): void
     {
         $schema = $this->reader->readString(
             '
@@ -23,38 +28,39 @@ class AttributesTest extends BaseTest
                 <xs:attributeGroup name="myAttributeGroup2">
                     <xs:attribute name="alone2" type="xs:string"></xs:attribute>
                 </xs:attributeGroup>
-            </xs:schema>');
+            </xs:schema>'
+        );
 
         $myAttribute = $schema->findAttribute('myAttribute', 'http://www.example.com');
-        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef', $myAttribute);
-        //$this->assertEquals('http://www.example.com', $myAttribute->getSchema()->getTargetNamespace());
-        $this->assertEquals('myAttribute', $myAttribute->getName());
-        $this->assertEquals('string', $myAttribute->getType()->getName());
+        self::assertInstanceOf(AttributeDef::class, $myAttribute);
+        //self::assertEquals('http://www.example.com', $myAttribute->getSchema()->getTargetNamespace());
+        self::assertEquals('myAttribute', $myAttribute->getName());
+        self::assertEquals('string', $myAttribute->getType()->getName());
 
         $base1 = $myAttribute->getType();
-        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType', $base1);
-        $this->assertEquals('http://www.w3.org/2001/XMLSchema', $base1->getSchema()->getTargetNamespace());
-        $this->assertEquals('string', $base1->getName());
+        self::assertInstanceOf(SimpleType::class, $base1);
+        self::assertEquals('http://www.w3.org/2001/XMLSchema', $base1->getSchema()->getTargetNamespace());
+        self::assertEquals('string', $base1->getName());
 
         $myAttributeGroup = $schema->findAttributeGroup('myAttributeGroup', 'http://www.example.com');
-        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Attribute\Group', $myAttributeGroup);
-        //$this->assertEquals('http://www.example.com', $myAttribute->getSchema()->getTargetNamespace());
-        $this->assertEquals('myAttributeGroup', $myAttributeGroup->getName());
+        self::assertInstanceOf(Group::class, $myAttributeGroup);
+        //self::assertEquals('http://www.example.com', $myAttribute->getSchema()->getTargetNamespace());
+        self::assertEquals('myAttributeGroup', $myAttributeGroup->getName());
         $attributesInGroup = $myAttributeGroup->getAttributes();
-        $this->assertCount(3, $attributesInGroup);
+        self::assertCount(3, $attributesInGroup);
 
-        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Attribute\Attribute', $attributesInGroup[0]);
-        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef', $attributesInGroup[1]);
-        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Attribute\Group', $attributesInGroup[2]);
+        self::assertInstanceOf(Attribute::class, $attributesInGroup[0]);
+        self::assertInstanceOf(AttributeDef::class, $attributesInGroup[1]);
+        self::assertInstanceOf(Group::class, $attributesInGroup[2]);
 
         $myAttribute = $schema->findAttribute('myAttributeOptions', 'http://www.example.com');
-        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef', $myAttribute);
-        //$this->assertEquals('http://www.example.com', $myAttribute->getSchema()->getTargetNamespace());
-        $this->assertEquals('myAttributeOptions', $myAttribute->getName());
-        $this->assertEquals('string', $myAttribute->getType()->getName());
+        self::assertInstanceOf(AttributeDef::class, $myAttribute);
+        //self::assertEquals('http://www.example.com', $myAttribute->getSchema()->getTargetNamespace());
+        self::assertEquals('myAttributeOptions', $myAttribute->getName());
+        self::assertEquals('string', $myAttribute->getType()->getName());
     }
 
-    public function testAnonym()
+    public function testAnonym(): void
     {
         $schema = $this->reader->readString(
             '
@@ -66,23 +72,24 @@ class AttributesTest extends BaseTest
                     </xs:simpleType>
                 </xs:attribute>
 
-            </xs:schema>');
+            </xs:schema>'
+        );
 
         $myAttributeAnon = $schema->findAttribute('myAttributeAnonType', 'http://www.example.com');
-        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef', $myAttributeAnon);
-        //$this->assertEquals('http://www.example.com', $myAttribute->getSchema()->getTargetNamespace());
-        $this->assertEquals('myAttributeAnonType', $myAttributeAnon->getName());
-        $this->assertNull($myAttributeAnon->getType()->getName());
+        self::assertInstanceOf(AttributeDef::class, $myAttributeAnon);
+        //self::assertEquals('http://www.example.com', $myAttribute->getSchema()->getTargetNamespace());
+        self::assertEquals('myAttributeAnonType', $myAttributeAnon->getName());
+        self::assertNull($myAttributeAnon->getType()->getName());
 
         $base2 = $myAttributeAnon->getType();
-        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType', $base2);
-        $this->assertEquals('http://www.example.com', $base2->getSchema()->getTargetNamespace());
-        $this->assertTrue(!$base2->getName());
+        self::assertInstanceOf(SimpleType::class, $base2);
+        self::assertEquals('http://www.example.com', $base2->getSchema()->getTargetNamespace());
+        self::assertTrue(!$base2->getName());
 
         $restriction1 = $base2->getRestriction();
         $base3 = $restriction1->getBase();
-        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType', $base3);
-        $this->assertEquals('http://www.w3.org/2001/XMLSchema', $base3->getSchema()->getTargetNamespace());
-        $this->assertEquals('string', $base3->getName());
+        self::assertInstanceOf(SimpleType::class, $base3);
+        self::assertEquals('http://www.w3.org/2001/XMLSchema', $base3->getSchema()->getTargetNamespace());
+        self::assertEquals('string', $base3->getName());
     }
 }

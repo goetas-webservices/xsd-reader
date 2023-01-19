@@ -10,13 +10,15 @@ use GoetasWebservices\XML\XSDReader\Schema\Schema;
 
 class ImportTest extends BaseTest
 {
-    public function testBase()
+    public function testBase(): void
     {
         $remoteSchema = $this->reader->readString(
             '
             <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xs:attribute name="myAttribute" type="xs:string"></xs:attribute>
-            </xs:schema>', 'http://www.example.com/xsd.xsd');
+            </xs:schema>',
+            'http://www.example.com/xsd.xsd'
+        );
 
         $schema = $this->reader->readString(
             '
@@ -29,20 +31,20 @@ class ImportTest extends BaseTest
 
             </xs:schema>');
 
-        $this->assertContains($remoteSchema, $schema->getSchemas());
+        self::assertContains($remoteSchema, $schema->getSchemas());
 
         $remoteAttr = $remoteSchema->findAttribute('myAttribute', 'http://www.example.com');
         $localAttr = $schema->findAttribute('myAttribute', 'http://www.example.com');
 
-        $this->assertSame($remoteAttr, $localAttr);
+        self::assertSame($remoteAttr, $localAttr);
 
         $localAttrGroup = $schema->findAttributeGroup('myAttributeGroup', 'http://www.user.com');
         $localAttrs = $localAttrGroup->getAttributes();
 
-        $this->assertSame($remoteAttr, $localAttrs[0]);
+        self::assertSame($remoteAttr, $localAttrs[0]);
     }
 
-    public function testKnownImport()
+    public function testKnownImport(): void
     {
         $schema = $this->reader->readString(
             '
@@ -51,13 +53,14 @@ class ImportTest extends BaseTest
                  <xs:complexType name="t">
                     <xs:attribute name="att"/>
                 </xs:complexType>
-            </xs:schema>');
-        $this->assertInstanceOf(Schema::class, $schema);
+            </xs:schema>'
+        );
+        self::assertInstanceOf(Schema::class, $schema);
     }
 
-    public function testKnownLocationImport()
+    public function testKnownLocationImport(): void
     {
-        $this->reader->addKnownSchemaLocation('http://www.example.com/test.xsd', __DIR__.'/schema/test.xsd');
+        $this->reader->addKnownSchemaLocation('http://www.example.com/test.xsd', __DIR__ . '/schema/test.xsd');
 
         $schema = $this->reader->readString(
             '
@@ -68,36 +71,40 @@ class ImportTest extends BaseTest
                         <xs:element type="ex:in" name="foo"/>
                     </xs:sequence>
                 </xs:complexType>
-            </xs:schema>');
-        $this->assertInstanceOf(Schema::class, $schema);
+            </xs:schema>'
+        );
+        self::assertInstanceOf(Schema::class, $schema);
     }
 
-    public function testKnownNamespaceLocationImport()
+    public function testKnownNamespaceLocationImport(): void
     {
-        $this->reader->addKnownNamespaceSchemaLocation('urn:example:profile-1.1', __DIR__.'/schema/profile-1.1.xsd');
+        $this->reader->addKnownNamespaceSchemaLocation('urn:example:profile-1.1', __DIR__ . '/schema/profile-1.1.xsd');
 
-        $schema = $this->reader->readFile(__DIR__.'/schema/transaction-1.0.xsd');
-        $this->assertInstanceOf(Schema::class, $schema);
+        $schema = $this->reader->readFile(__DIR__ . '/schema/transaction-1.0.xsd');
+        self::assertInstanceOf(Schema::class, $schema);
     }
 
-    public function testBaseNode()
+    public function testBaseNode(): void
     {
         $dom = new \DOMDocument();
-        $dom->loadXML('
+        $dom->loadXML(
+            '
         <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
             <xs:attribute name="myAttribute" type="xs:string"></xs:attribute>
         </xs:schema>
-        ');
+        '
+        );
         $schema = $this->reader->readNode($dom->documentElement);
         $attr = $schema->findAttribute('myAttribute', 'http://www.example.com');
 
-        $this->assertInstanceOf(AttributeItem::class, $attr);
+        self::assertInstanceOf(AttributeItem::class, $attr);
     }
 
-    public function testDependentImport()
+    public function testDependentImport(): void
     {
         $dom = new \DOMDocument();
-        $dom->loadXML('
+        $dom->loadXML(
+            '
         <types xmlns:xs="http://www.w3.org/2001/XMLSchema">
             <xs:schema targetNamespace="http://tempuri.org/1" xmlns:t2="http://tempuri.org/2">
                 <xs:import namespace="http://tempuri.org/2"/>
@@ -112,6 +119,6 @@ class ImportTest extends BaseTest
         ');
         $schema = $this->reader->readNodes(iterator_to_array($dom->documentElement->childNodes), 'file.xsd');
 
-        $this->assertInstanceOf(ElementDef::class, $schema->findElement('outerEl', 'http://tempuri.org/1'));
+        self::assertInstanceOf(ElementDef::class, $schema->findElement('outerEl', 'http://tempuri.org/1'));
     }
 }
