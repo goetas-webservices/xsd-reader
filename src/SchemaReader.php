@@ -14,13 +14,11 @@ use GoetasWebservices\XML\XSDReader\Exception\IOException;
 use GoetasWebservices\XML\XSDReader\Exception\TypeException;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Attribute;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeContainer;
-use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItem;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
 use GoetasWebservices\XML\XSDReader\Schema\Element\AbstractElementSingle;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Element;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementContainer;
-use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementRef;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Group;
 use GoetasWebservices\XML\XSDReader\Schema\Element\GroupRef;
@@ -217,6 +215,13 @@ class SchemaReader
 
     private function fillAttribute(Attribute $attribute, DOMElement $node): void
     {
+        if ($node->hasAttribute('fixed')) {
+            $attribute->setFixed($node->getAttribute('fixed'));
+        }
+        if ($node->hasAttribute('default')) {
+            $attribute->setDefault($node->getAttribute('default'));
+        }
+
         if ($node->hasAttribute('nillable')) {
             $attribute->setNil($node->getAttribute('nillable') == 'true');
         }
@@ -228,23 +233,19 @@ class SchemaReader
         }
     }
 
-    private function loadAttributeOrElementDef(
+    private function loadAttributeOrElement(
         Schema $schema,
         DOMElement $node,
-        bool $attributeDef
+        bool $isAttribute
     ): Closure {
         $name = $node->getAttribute('name');
-        if ($attributeDef) {
-            $attribute = new AttributeDef($schema, $name);
-            if ($node->hasAttribute('fixed')) {
-                $attribute->setFixed($node->getAttribute('fixed'));
-            }
-            if ($node->hasAttribute('default')) {
-                $attribute->setDefault($node->getAttribute('default'));
-            }
+        if ($isAttribute) {
+            $attribute = new Attribute($schema, $name);
+            $attribute->setDoc($this->getDocumentation($node));
+            $this->fillAttribute($attribute, $node);
             $schema->addAttribute($attribute);
         } else {
-            $attribute = new ElementDef($schema, $name);
+            $attribute = new Element($schema, $name);
             $attribute->setDoc($this->getDocumentation($node));
             $this->fillElement($attribute, $node);
             $schema->addElement($attribute);
@@ -253,11 +254,6 @@ class SchemaReader
         return function () use ($attribute, $node): void {
             $this->fillItem($attribute, $node);
         };
-    }
-
-    private function loadAttributeDef(Schema $schema, DOMElement $node): Closure
-    {
-        return $this->loadAttributeOrElementDef($schema, $node, true);
     }
 
     private function getDocumentation(DOMElement $node): string
@@ -293,10 +289,10 @@ class SchemaReader
                         $callback = $this->loadImport($schema, $childNode);
                         break;
                     case 'element':
-                        $callback = $this->loadElementDef($schema, $childNode);
+                        $callback = $this->loadAttributeOrElement($schema, $childNode, false);
                         break;
                     case 'attribute':
-                        $callback = $this->loadAttributeDef($schema, $childNode);
+                        $callback = $this->loadAttributeOrElement($schema, $childNode, true);
                         break;
                     case 'group':
                         $callback = $this->loadGroup($schema, $childNode);
@@ -990,7 +986,7 @@ class SchemaReader
         }
     }
 
-    private function findElement(Schema $schema, DOMElement $node, string $typeName): ElementDef
+    private function findElement(Schema $schema, DOMElement $node, string $typeName): Element
     {
         [$name, $namespace] = static::splitParts($node, $typeName);
 
@@ -1052,11 +1048,6 @@ class SchemaReader
         }
 
         throw new TypeException(sprintf("Can't find %s named {%s}#%s, at line %d in %s ", 'type', $namespace, $name, $node->getLineNo(), $node->ownerDocument->documentURI));
-    }
-
-    private function loadElementDef(Schema $schema, DOMElement $node): Closure
-    {
-        return $this->loadAttributeOrElementDef($schema, $node, false);
     }
 
     private function fillItem(Item $element, DOMElement $node): void

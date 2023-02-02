@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace GoetasWebservices\XML\XSDReader\Tests;
 
 use GoetasWebservices\XML\XSDReader\Exception\IOException;
-use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\Attribute;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
-use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
+use GoetasWebservices\XML\XSDReader\Schema\Element\Element;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Group as ElementGroup;
 use GoetasWebservices\XML\XSDReader\Schema\Element\GroupRef;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\TypeNotFoundException;
@@ -116,7 +116,7 @@ class SchemaTest extends BaseTest
         //self::assertInstanceOf(ComplexType::class, $schema->findType('myType'));
 
         self::assertCount(1, $schema->getElements());
-        self::assertInstanceOf(ElementDef::class, $schema->findElement('myElement', 'http://www.example.com'));
+        self::assertInstanceOf(Element::class, $schema->findElement('myElement', 'http://www.example.com'));
 
         self::assertCount(1, $schema->getGroups());
         self::assertInstanceOf(ElementGroup::class, $schema->findGroup('myGroup', 'http://www.example.com'));
@@ -125,7 +125,7 @@ class SchemaTest extends BaseTest
         self::assertInstanceOf(AttributeGroup::class, $schema->findAttributeGroup('myAttributeGroup', 'http://www.example.com'));
 
         self::assertCount(1, $schema->getAttributes());
-        self::assertInstanceOf(AttributeDef::class, $schema->findAttribute('myAttribute', 'http://www.example.com'));
+        self::assertInstanceOf(Attribute::class, $schema->findAttribute('myAttribute', 'http://www.example.com'));
     }
 
     public function testMultipleSchemasInSameFile(): void
@@ -150,7 +150,7 @@ class SchemaTest extends BaseTest
         self::assertInstanceOf(ComplexType::class, $schema1->findType('myType', 'http://www.example.com'));
 
         self::assertCount(1, $schema1->getElements());
-        self::assertInstanceOf(ElementDef::class, $schema1->findElement('myElement', 'http://www.example.com'));
+        self::assertInstanceOf(Element::class, $schema1->findElement('myElement', 'http://www.example.com'));
 
         //Now use a second schema which imports from the first one, and is in the SAME file
         $schema2 = $this->reader->readString(
@@ -165,7 +165,7 @@ class SchemaTest extends BaseTest
         self::assertCount(0, $schema2->getTypes());
 
         self::assertCount(1, $schema2->getElements());
-        self::assertInstanceOf(ElementDef::class, $schema2->findElement('myElement2', 'http://www.example2.com'));
+        self::assertInstanceOf(Element::class, $schema2->findElement('myElement2', 'http://www.example2.com'));
     }
 
     public function testMultipleSchemasInSameFileWithSameTargetNamespace(): void
@@ -184,7 +184,7 @@ class SchemaTest extends BaseTest
         self::assertInstanceOf(ComplexType::class, $schema1->findType('myType', 'http://www.example.com'));
 
         self::assertCount(1, $schema1->getElements());
-        self::assertInstanceOf(ElementDef::class, $schema1->findElement('myElement', 'http://www.example.com'));
+        self::assertInstanceOf(Element::class, $schema1->findElement('myElement', 'http://www.example.com'));
 
         //Now use a second schema which uses the same targetNamespace
         $schema2 = $this->reader->readString(
@@ -200,11 +200,11 @@ class SchemaTest extends BaseTest
 
         self::assertCount(0, $schema2->getTypes());
         self::assertCount(1, $schema2->getElements());
-        self::assertInstanceOf(ElementDef::class, $schema2->findElement('myElement2', 'http://www.example.com'));
+        self::assertInstanceOf(Element::class, $schema2->findElement('myElement2', 'http://www.example.com'));
 
         self::assertCount(1, $schema1->getTypes());
         self::assertCount(1, $schema2->getElements());
-        self::assertInstanceOf(ElementDef::class, $schema1->findElement('myElement2', 'http://www.example.com'));
+        self::assertInstanceOf(Element::class, $schema1->findElement('myElement2', 'http://www.example.com'));
     }
 
     public function testGroupRefInType(): void
@@ -235,7 +235,7 @@ class SchemaTest extends BaseTest
          * @var $type      ComplexType
          */
         $element = $schema1->findElement('myElement', 'http://www.example.com');
-        self::assertInstanceOf(ElementDef::class, $element);
+        self::assertInstanceOf(Element::class, $element);
 
         $type = $element->getType();
         self::assertCount(1, $type->getElements());
@@ -271,7 +271,7 @@ class SchemaTest extends BaseTest
         );
         $schema = $this->reader->readNodes(iterator_to_array($dom->documentElement->childNodes), 'file.xsd');
 
-        self::assertInstanceOf(ElementDef::class, $schema->findElement('CategoryList', 'http://tempuri.org/2'));
+        self::assertInstanceOf(Element::class, $schema->findElement('CategoryList', 'http://tempuri.org/2'));
         self::assertInstanceOf(ComplexType::class, $schema->findType('Categories', 'http://tempuri.org/1'));
     }
 }

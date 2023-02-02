@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace GoetasWebservices\XML\XSDReader\Schema;
 
-use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\Attribute;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItem;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
-use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
+use GoetasWebservices\XML\XSDReader\Schema\Element\Element;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementItem;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Group;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
@@ -128,7 +128,7 @@ class Schema
     protected $types = [];
 
     /**
-     * @var ElementDef[]
+     * @var Element[]
      */
     protected $elements = [];
 
@@ -143,7 +143,7 @@ class Schema
     protected $attributeGroups = [];
 
     /**
-     * @var AttributeDef[]
+     * @var Attribute[]
      */
     protected $attributes = [];
 
@@ -196,7 +196,7 @@ class Schema
     }
 
     /**
-     * @return ElementDef[]
+     * @return Element[]
      */
     public function getElements(): array
     {
@@ -212,7 +212,7 @@ class Schema
     }
 
     /**
-     * @return AttributeDef[]
+     * @return Attribute[]
      */
     public function getAttributes(): array
     {
@@ -242,7 +242,7 @@ class Schema
         $this->types[(string) $type->getName()] = $type;
     }
 
-    public function addElement(ElementDef $element): void
+    public function addElement(Element $element): void
     {
         $this->elements[$element->getName()] = $element;
     }
@@ -268,7 +268,7 @@ class Schema
         $this->schemas[$namespace] = $schema;
     }
 
-    public function addAttribute(AttributeDef $attribute): void
+    public function addAttribute(Attribute $attribute): void
     {
         $this->attributes[$attribute->getName()] = $attribute;
     }
@@ -363,11 +363,11 @@ class Schema
         return $out;
     }
 
-    public function findElement(string $name, string $namespace = null): ElementDef
+    public function findElement(string $name, string $namespace = null): Element
     {
         $out = $this->findSomething('getElement', $name, $namespace);
 
-        if (!($out instanceof ElementDef)) {
+        if (!($out instanceof Element)) {
             throw new TypeNotFoundException(sprintf("Can't find the %s named {%s}#%s.", 'Element', $namespace, $name));
         }
 

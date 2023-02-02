@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace GoetasWebservices\XML\XSDReader\Tests;
 
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItem;
-use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
+use GoetasWebservices\XML\XSDReader\Schema\Element\Element;
 use GoetasWebservices\XML\XSDReader\Schema\Schema;
 
 class ImportTest extends BaseTest
@@ -119,6 +119,6 @@ class ImportTest extends BaseTest
         ');
         $schema = $this->reader->readNodes(iterator_to_array($dom->documentElement->childNodes), 'file.xsd');
 
-        self::assertInstanceOf(ElementDef::class, $schema->findElement('outerEl', 'http://tempuri.org/1'));
+        self::assertInstanceOf(Element::class, $schema->findElement('outerEl', 'http://tempuri.org/1'));
     }
 }
