@@ -2,7 +2,7 @@ build:
     nodes:
         analysis:
             environment:
-                php: 7.1
+                php: 8.1
             project_setup:
                 override: true
             tests:
