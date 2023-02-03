@@ -6,10 +6,7 @@ namespace GoetasWebservices\XML\XSDReader\Schema;
 
 trait NamedItemTrait
 {
-    /**
-     * @var string
-     */
-    protected $name;
+    protected string $name;
 
     public function getName(): string
     {

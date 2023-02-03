@@ -11,10 +11,7 @@ abstract class Item implements SchemaItem
     use NamedItemTrait;
     use SchemaItemTrait;
 
-    /**
-     * @var Type|null
-     */
-    protected $type;
+    protected ?Type $type;
 
     public function __construct(Schema $schema, string $name)
     {

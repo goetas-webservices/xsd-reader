@@ -8,15 +8,9 @@ abstract class AbstractNamedGroupItem
 {
     use NamedItemTrait;
 
-    /**
-     * @var Schema
-     */
-    protected $schema;
+    protected Schema $schema;
 
-    /**
-     * @var string|null
-     */
-    protected $doc;
+    protected ?string $doc;
 
     public function __construct(Schema $schema, string $name)
     {

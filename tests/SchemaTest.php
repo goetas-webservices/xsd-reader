@@ -11,7 +11,6 @@ use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Group as ElementGroup;
 use GoetasWebservices\XML\XSDReader\Schema\Element\GroupRef;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\TypeNotFoundException;
-use GoetasWebservices\XML\XSDReader\Schema\Schema;
 use GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType;
 use GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType;
 
@@ -65,12 +64,11 @@ class SchemaTest extends BaseTest
     {
         $schema = $this->reader->readString('<xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema"/>');
 
-        self::assertInstanceOf(Schema::class, $schema);
         self::assertEquals('http://www.example.com', $schema->getTargetNamespace());
 
         $schemas = $schema->getSchemas();
 
-        self::assertFalse(empty($schemas));
+        self::assertNotEmpty($schemas);
     }
 
     public function getTypesToSearch(): array
@@ -226,17 +224,12 @@ class SchemaTest extends BaseTest
 
         self::assertCount(1, $schema1->getGroups());
         $group = $schema1->findGroup('myGroup', 'http://www.example.com');
-        self::assertInstanceOf(Group::class, $group);
 
         self::assertCount(1, $schema1->getElements());
 
-        /**
-         * @var ElementDef
-         * @var $type      ComplexType
-         */
         $element = $schema1->findElement('myElement', 'http://www.example.com');
-        self::assertInstanceOf(ElementDef::class, $element);
 
+        /** @var ComplexType $type */
         $type = $element->getType();
         self::assertCount(1, $type->getElements());
 

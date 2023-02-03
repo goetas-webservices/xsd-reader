@@ -30,14 +30,13 @@ class Schema
 
         if (isset($this->typeCache[$cid])) {
             return $this->typeCache[$cid];
-        } elseif (
-            $this->getTargetNamespace() === $namespace
-        ) {
+        }
+
+        if ($this->getTargetNamespace() === $namespace) {
             /**
-             * @var SchemaItem|null
+             * @var SchemaItem|null $item
              */
             $item = $this->$getter($name);
-
             if ($item instanceof SchemaItem) {
                 return $this->typeCache[$cid] = $item;
             }
@@ -102,60 +101,48 @@ class Schema
         throw new TypeNotFoundException(sprintf("Can't find the %s named {%s}#%s.", substr($getter, 3), $namespace, $name));
     }
 
-    /**
-     * @var bool
-     */
-    protected $elementsQualification = false;
+    protected bool $elementsQualification = false;
 
-    /**
-     * @var bool
-     */
-    protected $attributesQualification = false;
+    protected bool $attributesQualification = false;
 
-    /**
-     * @var string|null
-     */
-    protected $targetNamespace;
+    protected ?string $targetNamespace = null;
 
     /**
      * @var Schema[]
      */
-    protected $schemas = [];
+    protected array $schemas = [];
 
     /**
      * @var Type[]
      */
-    protected $types = [];
+    protected array $types = [];
 
     /**
      * @var ElementDef[]
      */
-    protected $elements = [];
+    protected array $elements = [];
 
     /**
      * @var Group[]
      */
-    protected $groups = [];
+    protected array $groups = [];
 
     /**
      * @var AttributeGroup[]
      */
-    protected $attributeGroups = [];
+    protected array $attributeGroups = [];
 
     /**
      * @var AttributeDef[]
      */
-    protected $attributes = [];
+    protected array $attributes = [];
+
+    protected ?string $doc;
 
     /**
-     * @var string|null
+     * @var SchemaItem[]
      */
-    protected $doc;
-
-    /**
-     * @var \GoetasWebservices\XML\XSDReader\Schema\SchemaItem[]
-     */
-    protected $typeCache = [];
+    protected array $typeCache = [];
 
     public function getElementsQualification(): bool
     {
@@ -249,7 +236,7 @@ class Schema
 
     public function addSchema(self $schema, string $namespace = null): void
     {
-        if ($namespace === null) {
+        if (null === $namespace) {
             $this->schemas[] = $schema;
 
             return;

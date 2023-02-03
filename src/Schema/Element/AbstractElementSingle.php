@@ -8,40 +8,19 @@ use GoetasWebservices\XML\XSDReader\Schema\Item;
 
 class AbstractElementSingle extends Item implements ElementSingle
 {
-    /**
-     * @var int
-     */
-    protected $min = 1;
+    protected int $min = 1;
 
-    /**
-     * @var int
-     */
-    protected $max = 1;
+    protected int $max = 1;
 
-    /**
-     * @var bool
-     */
-    protected $qualified = false;
+    protected bool $qualified = false;
 
-    /**
-     * @var bool
-     */
-    protected $local = false;
+    protected bool $local = false;
 
-    /**
-     * @var bool
-     */
-    protected $nil = false;
+    protected bool $nil = false;
 
-    /**
-     * @var string|null
-     */
-    protected $fixed = null;
+    protected ?string $fixed = null;
 
-    /**
-     * @var string|null
-     */
-    protected $default = null;
+    protected ?string $default = null;
 
     public function isQualified(): bool
     {

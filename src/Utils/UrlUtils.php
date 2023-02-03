@@ -10,24 +10,14 @@ class UrlUtils
     {
         if ('' === trim($rel)) {
             return $base;
-        } elseif (
-        /* return if already absolute URL */
-            parse_url($rel, PHP_URL_SCHEME) !== null ||
-            substr($rel, 0, 2) === '//'
-        ) {
+        }
+
+        if (null !== parse_url($rel, PHP_URL_SCHEME) || str_starts_with($rel, '//')) {
             return $rel;
-        } elseif (
-        /* queries and anchors */
-            in_array(
-                $rel[0],
-                [
-                    '#',
-                    '?',
-                ],
-                true
-            )
-        ) {
-            return $base.$rel;
+        }
+
+        if (in_array($rel[0], ['#', '?'], true)) {
+            return $base . $rel;
         }
 
         return static::resolveRelativeUrlAfterEarlyChecks($base, $rel);
@@ -49,7 +39,7 @@ class UrlUtils
         return static::resolveRelativeUrlToAbsoluteUrl(
             $rel,
             (
-                $rel[0] === '/'
+            '/' === $rel[0]
                     ? ''  // destroy path if relative url points to root
                     : ( // remove non-directory element from path
                         isset($parts['path'])
@@ -77,18 +67,18 @@ class UrlUtils
         $abs = '';
 
         if (isset($parts['host'])) {
-            $abs .= (string) $parts['host'];
+            $abs .= $parts['host'];
         }
 
         if (isset($parts['port'])) {
-            $abs .= ':'.(string) $parts['port'];
+            $abs .= ':' . $parts['port'];
         }
 
-        $abs .= $path.'/'.$rel;
+        $abs .= $path . '/' . $rel;
         $abs = static::replaceSuperfluousSlashes($abs);
 
         if (isset($parts['scheme'])) {
-            $abs = (string) $parts['scheme'].'://'.$abs;
+            $abs = $parts['scheme'] . '://' . $abs;
         }
 
         return $abs;

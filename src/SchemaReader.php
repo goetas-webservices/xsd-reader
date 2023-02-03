@@ -32,6 +32,7 @@ use GoetasWebservices\XML\XSDReader\Schema\Exception\TypeNotFoundException;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Base;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Extension;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction;
+use GoetasWebservices\XML\XSDReader\Schema\Inheritance\RestrictionType;
 use GoetasWebservices\XML\XSDReader\Schema\Item;
 use GoetasWebservices\XML\XSDReader\Schema\Schema;
 use GoetasWebservices\XML\XSDReader\Schema\SchemaItem;
@@ -48,33 +49,30 @@ class SchemaReader
 
     public const XML_NS = 'http://www.w3.org/XML/1998/namespace';
 
-    /**
-     * @var DocumentationReader
-     */
-    private $documentationReader;
+    private DocumentationReader $documentationReader;
 
     /**
      * @var Schema[]
      */
-    private $loadedFiles = [];
+    private array $loadedFiles = [];
 
     /**
      * @var Schema[][]
      */
-    private $loadedSchemas = [];
+    private array $loadedSchemas = [];
 
     /**
      * @var string[]
      */
-    protected $knownLocationSchemas = [
+    protected array $knownLocationSchemas = [
         'http://www.w3.org/2001/xml.xsd' => (
-            __DIR__.'/Resources/xml.xsd'
+            __DIR__ . '/Resources/xml.xsd'
         ),
         'http://www.w3.org/2001/XMLSchema.xsd' => (
-            __DIR__.'/Resources/XMLSchema.xsd'
+            __DIR__ . '/Resources/XMLSchema.xsd'
         ),
         'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd' => (
-            __DIR__.'/Resources/oasis-200401-wss-wssecurity-secext-1.0.xsd'
+            __DIR__ . '/Resources/oasis-200401-wss-wssecurity-secext-1.0.xsd'
         ),
         'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd' => (
             __DIR__.'/Resources/oasis-200401-wss-wssecurity-utility-1.0.xsd'
@@ -90,16 +88,16 @@ class SchemaReader
     /**
      * @var string[]
      */
-    protected $knownNamespaceSchemaLocations = [
+    protected array $knownNamespaceSchemaLocations = [
         'http://www.w3.org/2000/09/xmldsig#' => (
-            __DIR__.'/Resources/xmldsig-core-schema.xsd'
+            __DIR__ . '/Resources/xmldsig-core-schema.xsd'
         ),
     ];
 
     /**
      * @var string[]
      */
-    protected static $globalSchemaInfo = [
+    protected static array $globalSchemaInfo = [
         self::XML_NS => 'http://www.w3.org/2001/xml.xsd',
         self::XSD_NS => 'http://www.w3.org/2001/XMLSchema.xsd',
     ];
@@ -225,10 +223,10 @@ class SchemaReader
             $attribute->setDefault($node->getAttribute('default'));
         }
         if ($node->hasAttribute('nillable')) {
-            $attribute->setNil($node->getAttribute('nillable') == 'true');
+            $attribute->setNil('true' === $node->getAttribute('nillable'));
         }
         if ($node->hasAttribute('form')) {
-            $attribute->setQualified($node->getAttribute('form') == 'qualified');
+            $attribute->setQualified('qualified' === $node->getAttribute('form'));
         }
         if ($node->hasAttribute('use')) {
             $attribute->setUse($node->getAttribute('use'));
@@ -340,7 +338,7 @@ class SchemaReader
     private static function maybeSetMax(InterfaceSetMinMax $ref, DOMElement $node): void
     {
         if ($node->hasAttribute('maxOccurs')) {
-            $ref->setMax($node->getAttribute('maxOccurs') == 'unbounded' ? -1 : (int) $node->getAttribute('maxOccurs'));
+            $ref->setMax('unbounded' === $node->getAttribute('maxOccurs') ? -1 : (int) $node->getAttribute('maxOccurs'));
         }
     }
 
@@ -348,7 +346,7 @@ class SchemaReader
     {
         if ($node->hasAttribute('minOccurs')) {
             $ref->setMin((int) $node->getAttribute('minOccurs'));
-            if ($ref->getMin() > $ref->getMax() && $ref->getMax() !== -1) {
+            if (-1 !== $ref->getMax() && $ref->getMin() > $ref->getMax()) {
                 $ref->setMax($ref->getMin());
             }
         }
@@ -373,14 +371,14 @@ class SchemaReader
         $max =
             (
                 (is_int($max) && (bool) $max) ||
-                $node->getAttribute('maxOccurs') == 'unbounded' ||
-                $node->getAttribute('maxOccurs') > 1
+                'unbounded' === $node->getAttribute('maxOccurs') ||
+                1 < $node->getAttribute('maxOccurs')
             )
                 ? 2
                 : null;
         $min =
             (
-                $min === null &&
+                null === $min &&
                 !$node->hasAttribute('minOccurs')
             )
                 ? null
@@ -461,11 +459,11 @@ class SchemaReader
             $element = $this->loadElement($elementContainer->getSchema(), $childNode);
         }
 
-        if ($min !== null) {
+        if (null !== $min) {
             $element->setMin($min);
         }
 
-        if ($max > 1) {
+        if (1 < $max) {
             /*
             * although one might think the typecast is not needed with $max being `? int $max` after passing > 1,
             * phpstan@a4f89fa still thinks it's possibly null.
@@ -894,28 +892,9 @@ class SchemaReader
                 if ($type instanceof BaseComplexType) {
                     $this->loadChildAttributesAndAttributeGroups($type, $node, $childNode);
                 }
-                if (
-                in_array(
-                    $childNode->localName,
-                    [
-                        'enumeration',
-                        'pattern',
-                        'length',
-                        'minLength',
-                        'maxLength',
-                        'minInclusive',
-                        'maxInclusive',
-                        'minExclusive',
-                        'maxExclusive',
-                        'fractionDigits',
-                        'totalDigits',
-                        'whiteSpace',
-                    ],
-                    true
-                )
-                ) {
+                if (null !== ($restrictionType = RestrictionType::tryFrom($childNode->localName))) {
                     $restriction->addCheck(
-                        $childNode->localName,
+                        $restrictionType,
                         [
                             'value' => $childNode->getAttribute('value'),
                             'doc' => $this->getDocumentation($childNode),
@@ -933,7 +912,7 @@ class SchemaReader
     {
         $prefix = null;
         $name = $typeName;
-        if (strpos($typeName, ':') !== false) {
+        if (str_contains($typeName, ':')) {
             [$prefix, $name] = explode(':', $typeName);
         }
 

@@ -9,7 +9,7 @@ trait ElementContainerTrait
     /**
      * @var ElementItem[]
      */
-    protected $elements = [];
+    protected array $elements = [];
 
     /**
      * @return ElementItem[]

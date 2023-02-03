@@ -15,25 +15,13 @@ abstract class Type implements SchemaItem
 {
     use SchemaItemTrait;
 
-    /**
-     * @var string|null
-     */
-    protected $name;
+    protected ?string $name;
 
-    /**
-     * @var bool
-     */
-    protected $abstract = false;
+    protected bool $abstract = false;
 
-    /**
-     * @var Restriction|null
-     */
-    protected $restriction;
+    protected ?Restriction $restriction;
 
-    /**
-     * @var Extension|null
-     */
-    protected $extension;
+    protected ?Extension $extension;
 
     public function __construct(Schema $schema, string $name = null)
     {

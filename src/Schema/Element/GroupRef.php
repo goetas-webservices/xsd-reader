@@ -8,20 +8,11 @@ use BadMethodCallException;
 
 class GroupRef extends Group implements InterfaceSetMinMax
 {
-    /**
-     * @var Group
-     */
-    protected $wrapped;
+    protected Group $wrapped;
 
-    /**
-     * @var int
-     */
-    protected $min = 1;
+    protected int $min = 1;
 
-    /**
-     * @var int
-     */
-    protected $max = 1;
+    protected int $max = 1;
 
     public function __construct(Group $group)
     {
@@ -66,18 +57,18 @@ class GroupRef extends Group implements InterfaceSetMinMax
          */
         foreach ($elements as $k => $element) {
             /**
-             * @var Element|ElementRef|ElementSingle|GroupRef $e
+             * @var Element|ElementRef|ElementSingle|GroupRef $clonedElement
              */
-            $e = clone $element;
-            if ($this->getMax() > 0 || $this->getMax() === -1) {
-                $e->setMax($this->getMax());
+            $clonedElement = clone $element;
+            if (0 < $this->getMax() || -1 === $this->getMax()) {
+                $clonedElement->setMax($this->getMax());
             }
 
-            if ($this->getMin() > 1 && $e->getMin() === 1) {
-                $e->setMin($this->getMin());
+            if (1 < $this->getMin() && 1 === $clonedElement->getMin()) {
+                $clonedElement->setMin($this->getMin());
             }
 
-            $elements[$k] = $e;
+            $elements[$k] = $clonedElement;
         }
 
         return $elements;
