@@ -368,7 +368,7 @@ class Schema
         $out = $this->findSomething('getElement', $name, $namespace);
 
         if (!($out instanceof ElementDef)) {
-            throw new TypeNotFoundException(sprintf("Can't find the %s named {%s}#%s.", 'ElementDef', $namespace, $name));
+            throw new TypeNotFoundException(sprintf("Can't find the %s named {%s}#%s.", 'Element', $namespace, $name));
         }
 
         return $out;

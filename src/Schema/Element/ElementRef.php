@@ -9,11 +9,11 @@ use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
 class ElementRef extends AbstractElementSingle
 {
     /**
-     * @var ElementRef
+     * @var ElementDef
      */
     protected $wrapped;
 
-    public function __construct(ElementRef $element)
+    public function __construct(ElementDef $element)
     {
         parent::__construct($element->getSchema(), $element->getName());
         $this->wrapped = $element;
@@ -24,7 +24,7 @@ class ElementRef extends AbstractElementSingle
         return $this->wrapped->getName();
     }
 
-    public function getReferencedElement(): ElementRef
+    public function getReferencedElement(): ElementDef
     {
         return $this->wrapped;
     }
