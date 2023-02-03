@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace GoetasWebservices\XML\XSDReader\Tests;
 
 use GoetasWebservices\XML\XSDReader\Schema\Element\Element;
+use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementItem;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementSingle;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Group;
@@ -42,7 +43,7 @@ class ElementsTest extends BaseTest
         );
 
         $myElement = $schema->findElement('myElement', 'http://www.example.com');
-        self::assertInstanceOf(Element::class, $myElement);
+        self::assertInstanceOf(ElementDef::class, $myElement);
         //self::assertEquals('http://www.example.com', $myElement->getSchema()->getTargetNamespace());
         self::assertEquals('myElement', $myElement->getName());
         self::assertEquals('string', $myElement->getType()->getName());
@@ -212,7 +213,7 @@ class ElementsTest extends BaseTest
         );
 
         $myElementAnon = $schema->findElement('myElementAnonType', 'http://www.example.com');
-        self::assertInstanceOf(Element::class, $myElementAnon);
+        self::assertInstanceOf(ElementDef::class, $myElementAnon);
         //self::assertEquals('http://www.example.com', $myElement->getSchema()->getTargetNamespace());
         self::assertEquals('myElementAnonType', $myElementAnon->getName());
         self::assertNull($myElementAnon->getType()->getName());

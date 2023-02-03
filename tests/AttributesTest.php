@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace GoetasWebservices\XML\XSDReader\Tests;
 
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Attribute;
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group;
 use GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType;
 
@@ -31,7 +32,7 @@ class AttributesTest extends BaseTest
         );
 
         $myAttribute = $schema->findAttribute('myAttribute', 'http://www.example.com');
-        self::assertInstanceOf(Attribute::class, $myAttribute);
+        self::assertInstanceOf(AttributeDef::class, $myAttribute);
         //self::assertEquals('http://www.example.com', $myAttribute->getSchema()->getTargetNamespace());
         self::assertEquals('myAttribute', $myAttribute->getName());
         self::assertEquals('string', $myAttribute->getType()->getName());
@@ -49,11 +50,11 @@ class AttributesTest extends BaseTest
         self::assertCount(3, $attributesInGroup);
 
         self::assertInstanceOf(Attribute::class, $attributesInGroup[0]);
-        self::assertInstanceOf(Attribute::class, $attributesInGroup[1]);
+        self::assertInstanceOf(AttributeDef::class, $attributesInGroup[1]);
         self::assertInstanceOf(Group::class, $attributesInGroup[2]);
 
         $myAttribute = $schema->findAttribute('myAttributeOptions', 'http://www.example.com');
-        self::assertInstanceOf(Attribute::class, $myAttribute);
+        self::assertInstanceOf(AttributeDef::class, $myAttribute);
         //self::assertEquals('http://www.example.com', $myAttribute->getSchema()->getTargetNamespace());
         self::assertEquals('myAttributeOptions', $myAttribute->getName());
         self::assertEquals('string', $myAttribute->getType()->getName());
@@ -75,7 +76,7 @@ class AttributesTest extends BaseTest
         );
 
         $myAttributeAnon = $schema->findAttribute('myAttributeAnonType', 'http://www.example.com');
-        self::assertInstanceOf(Attribute::class, $myAttributeAnon);
+        self::assertInstanceOf(AttributeDef::class, $myAttributeAnon);
         //self::assertEquals('http://www.example.com', $myAttribute->getSchema()->getTargetNamespace());
         self::assertEquals('myAttributeAnonType', $myAttributeAnon->getName());
         self::assertNull($myAttributeAnon->getType()->getName());
