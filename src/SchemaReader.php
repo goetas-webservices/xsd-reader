@@ -487,10 +487,7 @@ class SchemaReader
         $groupOriginal = $group;
 
         if ($node->hasAttribute('maxOccurs') || $node->hasAttribute('minOccurs')) {
-            $group = new GroupRef($group);
-
-            self::maybeSetMax($group, $node);
-            self::maybeSetMin($group, $node);
+            $group = $this->loadGroupRef($group, $node);
         }
 
         $schema->addGroup($group);
