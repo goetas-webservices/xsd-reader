@@ -223,7 +223,6 @@ class SchemaReader
         if ($node->hasAttribute('default')) {
             $attribute->setDefault($node->getAttribute('default'));
         }
-
         if ($node->hasAttribute('nillable')) {
             $attribute->setNil($node->getAttribute('nillable') == 'true');
         }
