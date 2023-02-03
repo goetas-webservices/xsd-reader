@@ -11,7 +11,7 @@ namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 class ElementDef extends AbstractElementSingle
 {
     /**
-     * @var ElementRef[]
+     * @var AbstractElementSingle[]
      */
     private array $substitutionCandidates = [];
 
@@ -21,7 +21,7 @@ class ElementDef extends AbstractElementSingle
     }
 
     /**
-     * @return ElementRef[]
+     * @return AbstractElementSingle[]
      */
     public function getSubstitutionCandidates(): array
     {
@@ -29,7 +29,7 @@ class ElementDef extends AbstractElementSingle
     }
 
     /**
-     * @param ElementRef[] $substitutionCandidates
+     * @param AbstractElementSingle[] $substitutionCandidates
      */
     public function setSubstitutionCandidates(array $substitutionCandidates): void
     {
@@ -37,7 +37,7 @@ class ElementDef extends AbstractElementSingle
     }
 
     /**
-     * @param ElementRef $substitutionCandidate
+     * @param AbstractElementSingle $substitutionCandidate
      */
     public function addSubstitutionCandidate(AbstractElementSingle $substitutionCandidate): void
     {
