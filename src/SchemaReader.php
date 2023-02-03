@@ -16,6 +16,7 @@ use GoetasWebservices\XML\XSDReader\Schema\Attribute\Attribute;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeContainer;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItem;
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeSingle;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
 use GoetasWebservices\XML\XSDReader\Schema\Element\AbstractElementSingle;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Element;
@@ -215,8 +216,14 @@ class SchemaReader
         return $attribute;
     }
 
-    private function fillAttribute(Attribute $attribute, DOMElement $node): void
+    private function fillAttribute(AttributeSingle $attribute, DOMElement $node): void
     {
+        if ($node->hasAttribute('fixed')) {
+            $attribute->setFixed($node->getAttribute('fixed'));
+        }
+        if ($node->hasAttribute('default')) {
+            $attribute->setDefault($node->getAttribute('default'));
+        }
         if ($node->hasAttribute('nillable')) {
             $attribute->setNil($node->getAttribute('nillable') == 'true');
         }
@@ -231,17 +238,13 @@ class SchemaReader
     private function loadAttributeOrElementDef(
         Schema $schema,
         DOMElement $node,
-        bool $attributeDef
+        bool $isAttribute
     ): Closure {
         $name = $node->getAttribute('name');
-        if ($attributeDef) {
+        if ($isAttribute) {
             $attribute = new AttributeDef($schema, $name);
-            if ($node->hasAttribute('fixed')) {
-                $attribute->setFixed($node->getAttribute('fixed'));
-            }
-            if ($node->hasAttribute('default')) {
-                $attribute->setDefault($node->getAttribute('default'));
-            }
+            $attribute->setDoc($this->getDocumentation($node));
+            $this->fillAttribute($attribute, $node);
             $schema->addAttribute($attribute);
         } else {
             $attribute = new ElementDef($schema, $name);
@@ -253,6 +256,11 @@ class SchemaReader
         return function () use ($attribute, $node): void {
             $this->fillItem($attribute, $node);
         };
+    }
+
+    private function loadElementDef(Schema $schema, DOMElement $node): Closure
+    {
+        return $this->loadAttributeOrElementDef($schema, $node, false);
     }
 
     private function loadAttributeDef(Schema $schema, DOMElement $node): Closure
@@ -490,15 +498,8 @@ class SchemaReader
         $group->setDoc($this->getDocumentation($node));
         $groupOriginal = $group;
 
-        if ($node->hasAttribute('maxOccurs') || $node->hasAttribute('maxOccurs')) {
-            $group = new GroupRef($group);
-
-            if ($node->hasAttribute('maxOccurs')) {
-                self::maybeSetMax($group, $node);
-            }
-            if ($node->hasAttribute('minOccurs')) {
-                self::maybeSetMin($group, $node);
-            }
+        if ($node->hasAttribute('maxOccurs') || $node->hasAttribute('minOccurs')) {
+            $group = $this->loadGroupRef($group, $node);
         }
 
         $schema->addGroup($group);
@@ -1052,11 +1053,6 @@ class SchemaReader
         }
 
         throw new TypeException(sprintf("Can't find %s named {%s}#%s, at line %d in %s ", 'type', $namespace, $name, $node->getLineNo(), $node->ownerDocument->documentURI));
-    }
-
-    private function loadElementDef(Schema $schema, DOMElement $node): Closure
-    {
-        return $this->loadAttributeOrElementDef($schema, $node, false);
     }
 
     private function fillItem(Item $element, DOMElement $node): void
