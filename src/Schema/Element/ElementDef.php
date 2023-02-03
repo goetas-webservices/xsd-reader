@@ -6,7 +6,7 @@ namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
 /**
  * An ElementDef represents a root concept of a schema.
- * It must not be referenced by an ElementRef.
+ * It can be referenced by an ElementRef.
  */
 class ElementDef extends AbstractElementSingle implements ElementItem
 {

@@ -6,7 +6,7 @@ namespace GoetasWebservices\XML\XSDReader\Schema\Attribute;
 
 /**
  * An AttributeDef represents a root concept of a schema.
- * It must not be referenced by an AttributeRef.
+ * It can be referenced by an AttributeRef.
  */
 class AttributeDef extends AbstractAttributeItem
 {

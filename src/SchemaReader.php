@@ -233,19 +233,19 @@ class SchemaReader
         }
     }
 
-    private function loadAttributeOrElement(
+    private function loadAttributeOrElementDef(
         Schema $schema,
         DOMElement $node,
         bool $isAttribute
     ): Closure {
         $name = $node->getAttribute('name');
         if ($isAttribute) {
-            $attribute = new Attribute($schema, $name);
+            $attribute = new AttributeDef($schema, $name);
             $attribute->setDoc($this->getDocumentation($node));
             $this->fillAttribute($attribute, $node);
             $schema->addAttribute($attribute);
         } else {
-            $attribute = new Element($schema, $name);
+            $attribute = new ElementDef($schema, $name);
             $attribute->setDoc($this->getDocumentation($node));
             $this->fillElement($attribute, $node);
             $schema->addElement($attribute);
@@ -254,6 +254,16 @@ class SchemaReader
         return function () use ($attribute, $node): void {
             $this->fillItem($attribute, $node);
         };
+    }
+
+    private function loadElementDef(Schema $schema, DOMElement $node): Closure
+    {
+        return $this->loadAttributeOrElementDef($schema, $node, false);
+    }
+
+    private function loadAttributeDef(Schema $schema, DOMElement $node): Closure
+    {
+        return $this->loadAttributeOrElementDef($schema, $node, true);
     }
 
     private function getDocumentation(DOMElement $node): string
@@ -289,10 +299,10 @@ class SchemaReader
                         $callback = $this->loadImport($schema, $childNode);
                         break;
                     case 'element':
-                        $callback = $this->loadAttributeOrElement($schema, $childNode, false);
+                        $callback = $this->loadAttributeOrElementDef($schema, $childNode, false);
                         break;
                     case 'attribute':
-                        $callback = $this->loadAttributeOrElement($schema, $childNode, true);
+                        $callback = $this->loadAttributeOrElementDef($schema, $childNode, true);
                         break;
                     case 'group':
                         $callback = $this->loadGroup($schema, $childNode);
@@ -441,8 +451,8 @@ class SchemaReader
         ?int $min
     ): void {
         if ($childNode->hasAttribute('ref')) {
-            $element = $this->findElement($elementContainer->getSchema(), $node, $childNode->getAttribute('ref'));
-            $element = new ElementRef($element);
+            $elementDef = $this->findElement($elementContainer->getSchema(), $node, $childNode->getAttribute('ref'));
+            $element = new ElementRef($elementDef);
             $element->setDoc($this->getDocumentation($childNode));
             $this->fillElement($element, $childNode);
         } else {
@@ -979,7 +989,7 @@ class SchemaReader
         }
     }
 
-    private function findElement(Schema $schema, DOMElement $node, string $typeName): Element
+    private function findElement(Schema $schema, DOMElement $node, string $typeName): ElementDef
     {
         [$name, $namespace] = static::splitParts($node, $typeName);
 

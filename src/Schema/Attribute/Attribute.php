@@ -6,7 +6,7 @@ namespace GoetasWebservices\XML\XSDReader\Schema\Attribute;
 
 /**
  * An Attribute represents an element inside a type.
- * It can be referenced by an AttributeRef.
+ * It must not be referenced by an AttributeRef.
  */
 class Attribute extends AbstractAttributeItem implements AttributeSingle
 {
