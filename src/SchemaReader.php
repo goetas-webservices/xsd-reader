@@ -486,7 +486,7 @@ class SchemaReader
         $group->setDoc($this->getDocumentation($node));
         $groupOriginal = $group;
 
-        if ($node->hasAttribute('maxOccurs') || $node->hasAttribute('maxOccurs')) {
+        if ($node->hasAttribute('maxOccurs') || $node->hasAttribute('minOccurs')) {
             $group = new GroupRef($group);
 
             if ($node->hasAttribute('maxOccurs')) {
