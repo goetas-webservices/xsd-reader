@@ -14,11 +14,13 @@ use GoetasWebservices\XML\XSDReader\Exception\IOException;
 use GoetasWebservices\XML\XSDReader\Exception\TypeException;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Attribute;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeContainer;
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItem;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
 use GoetasWebservices\XML\XSDReader\Schema\Element\AbstractElementSingle;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Element;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementContainer;
+use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementRef;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Group;
 use GoetasWebservices\XML\XSDReader\Schema\Element\GroupRef;
@@ -299,10 +301,10 @@ class SchemaReader
                         $callback = $this->loadImport($schema, $childNode);
                         break;
                     case 'element':
-                        $callback = $this->loadAttributeOrElementDef($schema, $childNode, false);
+                        $callback = $this->loadElementDef($schema, $childNode);
                         break;
                     case 'attribute':
-                        $callback = $this->loadAttributeOrElementDef($schema, $childNode, true);
+                        $callback = $this->loadAttributeDef($schema, $childNode);
                         break;
                     case 'group':
                         $callback = $this->loadGroup($schema, $childNode);
