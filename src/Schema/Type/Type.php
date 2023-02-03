@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace GoetasWebservices\XML\XSDReader\Schema\Type;
 
+use GoetasWebservices\XML\XSDReader\Schema\Element\InterfaceSetAbstract;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Base;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Extension;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction;
@@ -11,7 +12,7 @@ use GoetasWebservices\XML\XSDReader\Schema\Schema;
 use GoetasWebservices\XML\XSDReader\Schema\SchemaItem;
 use GoetasWebservices\XML\XSDReader\Schema\SchemaItemTrait;
 
-abstract class Type implements SchemaItem
+abstract class Type implements SchemaItem, InterfaceSetAbstract
 {
     use SchemaItemTrait;
 

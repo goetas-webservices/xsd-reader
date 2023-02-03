@@ -237,34 +237,36 @@ class SchemaReader
     private function loadAttributeOrElementDef(
         Schema $schema,
         DOMElement $node,
+        DOMElement $childNode,
         bool $isAttribute
     ): Closure {
-        $name = $node->getAttribute('name');
+        $name = $childNode->getAttribute('name');
         if ($isAttribute) {
             $attribute = new AttributeDef($schema, $name);
-            $attribute->setDoc($this->getDocumentation($node));
-            $this->fillAttribute($attribute, $node);
+            $attribute->setDoc($this->getDocumentation($childNode));
+            $this->fillAttribute($attribute, $childNode);
             $schema->addAttribute($attribute);
         } else {
             $attribute = new ElementDef($schema, $name);
-            $attribute->setDoc($this->getDocumentation($node));
-            $this->fillElement($attribute, $node);
+            $attribute->setDoc($this->getDocumentation($childNode));
+            $this->fillElement($attribute, $childNode);
             $schema->addElement($attribute);
+            $this->resolveSubstitutionGroup($schema, $node, $childNode, $attribute);
         }
 
-        return function () use ($attribute, $node): void {
-            $this->fillItem($attribute, $node);
+        return function () use ($attribute, $childNode): void {
+            $this->fillItem($attribute, $childNode);
         };
     }
 
-    private function loadElementDef(Schema $schema, DOMElement $node): Closure
+    private function loadElementDef(Schema $schema, DOMElement $node, DOMElement $childNode): Closure
     {
-        return $this->loadAttributeOrElementDef($schema, $node, false);
+        return $this->loadAttributeOrElementDef($schema, $node, $childNode, false);
     }
 
-    private function loadAttributeDef(Schema $schema, DOMElement $node): Closure
+    private function loadAttributeDef(Schema $schema, DOMElement $node, DOMElement $childNode): Closure
     {
-        return $this->loadAttributeOrElementDef($schema, $node, true);
+        return $this->loadAttributeOrElementDef($schema, $node, $childNode, true);
     }
 
     private function getDocumentation(DOMElement $node): string
@@ -294,10 +296,10 @@ class SchemaReader
                         $callback = $this->loadImport($schema, $childNode);
                         break;
                     case 'element':
-                        $callback = $this->loadElementDef($schema, $childNode);
+                        $callback = $this->loadElementDef($schema, $node, $childNode);
                         break;
                     case 'attribute':
-                        $callback = $this->loadAttributeDef($schema, $childNode);
+                        $callback = $this->loadAttributeDef($schema, $node, $childNode);
                         break;
                     case 'group':
                         $callback = $this->loadGroup($schema, $childNode);
@@ -443,14 +445,21 @@ class SchemaReader
         ?int $max,
         ?int $min
     ): void {
+        $schema = $elementContainer->getSchema();
         if ($childNode->hasAttribute('ref')) {
-            $elementDef = $this->findElement($elementContainer->getSchema(), $node, $childNode->getAttribute('ref'));
+            $elementDef = $this->findElement($schema, $node, $childNode->getAttribute('ref'));
             $element = new ElementRef($elementDef);
             $element->setDoc($this->getDocumentation($childNode));
             $this->fillElement($element, $childNode);
+
+            if ($node->hasAttribute('name')) {
+                $element->setName($node->getAttribute('name'));
+            }
         } else {
-            $element = $this->loadElement($elementContainer->getSchema(), $childNode);
+            $element = $this->createElement($schema, $childNode);
         }
+
+        $this->resolveSubstitutionGroup($schema, $node, $childNode, $element);
 
         if (null !== $min) {
             $element->setMin($min);
@@ -465,6 +474,19 @@ class SchemaReader
             $element->setMax((int) $max);
         }
         $elementContainer->addElement($element);
+    }
+
+    private function resolveSubstitutionGroup(
+        Schema $schema,
+        DOMElement $node,
+        DOMElement $childNode,
+        AbstractElementSingle $element
+    ): void {
+        if ($childNode->hasAttribute('substitutionGroup')) {
+            $substitutionGroup = $childNode->getAttribute('substitutionGroup');
+            $elementDef = $this->findElement($schema, $node, $substitutionGroup);
+            $elementDef->addSubstitutionCandidate($element);
+        }
     }
 
     private function addGroupAsElement(
@@ -725,11 +747,7 @@ class SchemaReader
                 /**
                  * @var SimpleType
                  */
-                $unionType = $this->findSomeTypeFromAttribute(
-                    $type,
-                    $node,
-                    $typeName
-                );
+                $unionType = $this->findSomeTypeFromAttribute($type, $node, $typeName);
                 $type->addUnion($unionType);
             }
         }
@@ -785,11 +803,8 @@ class SchemaReader
         $this->loadExtensionChildNodes($type, $node);
     }
 
-    private function findAndSetSomeBase(
-        Type $type,
-        Base $setBaseOnThis,
-        DOMElement $node
-    ): void {
+    private function findAndSetSomeBase(Type $type, Base $setBaseOnThis, DOMElement $node): void
+    {
         /**
          * @var Type
          */
@@ -879,13 +894,7 @@ class SchemaReader
     ): void {
         self::againstDOMNodeList(
             $node,
-            function (
-                DOMElement $node,
-                DOMElement $childNode
-            ) use (
-                $type,
-                $restriction
-            ): void {
+            function (DOMElement $node, DOMElement $childNode) use ($type, $restriction): void {
                 if ($type instanceof BaseComplexType) {
                     $this->loadChildAttributesAndAttributeGroups($type, $node, $childNode);
                 }
@@ -1129,11 +1138,9 @@ class SchemaReader
         return $this->loadImportFresh($namespace, $schema, $file);
     }
 
-    private function createOrUseSchemaForNs(
-        Schema $schema,
-        string $namespace
-    ): Schema {
-        if (('' !== trim($namespace))) {
+    private function createOrUseSchemaForNs(Schema $schema, string $namespace): Schema
+    {
+        if ('' !== trim($namespace)) {
             $newSchema = new Schema();
             $newSchema->addSchema($this->getGlobalSchema());
             $schema->addSchema($newSchema);
@@ -1316,10 +1323,8 @@ class SchemaReader
         return $xml;
     }
 
-    private static function againstDOMNodeList(
-        DOMElement $node,
-        Closure $againstNodeList
-    ): void {
+    private static function againstDOMNodeList(DOMElement $node, Closure $againstNodeList): void
+    {
         $limit = $node->childNodes->length;
         for ($i = 0; $i < $limit; ++$i) {
             /**
@@ -1333,11 +1338,8 @@ class SchemaReader
         }
     }
 
-    private function loadTypeWithCallback(
-        Schema $schema,
-        DOMElement $childNode,
-        Closure $callback
-    ): void {
+    private function loadTypeWithCallback(Schema $schema, DOMElement $childNode, Closure $callback): void
+    {
         /**
          * @var Closure|null $func
          */
@@ -1357,7 +1359,7 @@ class SchemaReader
         }
     }
 
-    private function loadElement(Schema $schema, DOMElement $node): Element
+    private function createElement(Schema $schema, DOMElement $node): Element
     {
         $element = new Element($schema, $node->getAttribute('name'));
         $element->setDoc($this->getDocumentation($node));
