@@ -6,7 +6,7 @@ namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
 use GoetasWebservices\XML\XSDReader\Schema\AbstractNamedGroupItem;
 
-class Choice extends AbstractNamedGroupItem implements ElementItem, ElementContainer
+class Choice extends AbstractNamedGroupItem implements ElementItem, ElementContainer, InterfaceSetMinMax
 {
     use ElementContainerTrait;
 
