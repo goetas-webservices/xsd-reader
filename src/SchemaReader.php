@@ -441,8 +441,8 @@ class SchemaReader
         ?int $min
     ): void {
         if ($childNode->hasAttribute('ref')) {
-            $elementDef = $this->findElement($elementContainer->getSchema(), $node, $childNode->getAttribute('ref'));
-            $element = new ElementRef($elementDef);
+            $element = $this->findElement($elementContainer->getSchema(), $node, $childNode->getAttribute('ref'));
+            $element = new ElementRef($element);
             $element->setDoc($this->getDocumentation($childNode));
             $this->fillElement($element, $childNode);
         } else {
