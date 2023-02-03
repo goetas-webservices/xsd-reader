@@ -19,9 +19,9 @@ abstract class Type implements SchemaItem
 
     protected bool $abstract = false;
 
-    protected ?Restriction $restriction;
+    protected ?Restriction $restriction = null;
 
-    protected ?Extension $extension;
+    protected ?Extension $extension = null;
 
     public function __construct(Schema $schema, string $name = null)
     {
