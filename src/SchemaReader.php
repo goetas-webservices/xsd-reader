@@ -16,6 +16,7 @@ use GoetasWebservices\XML\XSDReader\Schema\Attribute\Attribute;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeContainer;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItem;
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeSingle;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
 use GoetasWebservices\XML\XSDReader\Schema\Element\AbstractElementSingle;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Element;
@@ -215,7 +216,7 @@ class SchemaReader
         return $attribute;
     }
 
-    private function fillAttribute(Attribute $attribute, DOMElement $node): void
+    private function fillAttribute(AttributeSingle $attribute, DOMElement $node): void
     {
         if ($node->hasAttribute('fixed')) {
             $attribute->setFixed($node->getAttribute('fixed'));

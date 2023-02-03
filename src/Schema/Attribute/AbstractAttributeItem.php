@@ -6,7 +6,7 @@ namespace GoetasWebservices\XML\XSDReader\Schema\Attribute;
 
 use GoetasWebservices\XML\XSDReader\Schema\Item;
 
-abstract class AbstractAttributeItem extends Item implements AttributeItem
+abstract class AbstractAttributeItem extends Item implements AttributeSingle
 {
     /**
      * @var string|null
