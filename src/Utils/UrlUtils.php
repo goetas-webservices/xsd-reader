@@ -36,33 +36,26 @@ class UrlUtils
          */
         $parts = parse_url($base);
 
-        return static::resolveRelativeUrlToAbsoluteUrl(
-            $rel,
+        $path = '/' === $rel[0]
+            ? ''  // destroy path if relative url points to root
+            : ( // remove non-directory element from path
+                isset($parts['path'])
+                    ? preg_replace(
+                        '#/[^/]*$#',
+                        '',
+                        (string) $parts['path']
+                    )
+                    : ''
+            );
 
-                '/' === $rel[0]
-                        ? ''  // destroy path if relative url points to root
-                        : ( // remove non-directory element from path
-                            isset($parts['path'])
-                                ? preg_replace(
-                                    '#/[^/]*$#',
-                                    '',
-                                    (string) $parts['path']
-                                )
-                                : ''
-                        )
-            ,
-            $parts
-        );
+        return static::resolveRelativeUrlToAbsoluteUrl($rel, $path, $parts);
     }
 
     /**
      * @param array<string, string> $parts
      */
-    protected static function resolveRelativeUrlToAbsoluteUrl(
-        string $rel,
-        string $path,
-        array $parts
-    ): string {
+    protected static function resolveRelativeUrlToAbsoluteUrl(string $rel, string $path, array $parts): string
+    {
         /* Build absolute URL */
         $abs = '';
 
@@ -108,7 +101,7 @@ class UrlUtils
                 -1,
                 $n
             );
-        } while ($n > 0);
+        } while (0 < $n);
 
         return $abs;
     }
