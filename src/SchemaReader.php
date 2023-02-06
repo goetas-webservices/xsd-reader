@@ -26,6 +26,7 @@ use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementRef;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Group;
 use GoetasWebservices\XML\XSDReader\Schema\Element\GroupRef;
+use GoetasWebservices\XML\XSDReader\Schema\Element\InterfaceSetAbstract;
 use GoetasWebservices\XML\XSDReader\Schema\Element\InterfaceSetDefault;
 use GoetasWebservices\XML\XSDReader\Schema\Element\InterfaceSetFixed;
 use GoetasWebservices\XML\XSDReader\Schema\Element\InterfaceSetMinMax;
@@ -363,6 +364,13 @@ class SchemaReader
     {
         if ($node->hasAttribute('default')) {
             $ref->setDefault($node->getAttribute('default'));
+        }
+    }
+
+    private static function maybeSetAbstract(InterfaceSetAbstract $ref, DOMElement $node): void
+    {
+        if ($node->hasAttribute('abstract')) {
+            $ref->setAbstract(in_array($node->getAttribute('abstract'), ['true', '1'], true));
         }
     }
 
@@ -768,7 +776,7 @@ class SchemaReader
     private function fillTypeNode(Type $type, DOMElement $node, bool $checkAbstract = false): void
     {
         if ($checkAbstract) {
-            $type->setAbstract('true' === $node->getAttribute('abstract') || '1' === $node->getAttribute('abstract'));
+            self::maybeSetAbstract($type, $node);
         }
 
         self::againstDOMNodeList(
@@ -1375,6 +1383,7 @@ class SchemaReader
         self::maybeSetMin($element, $node);
         self::maybeSetFixed($element, $node);
         self::maybeSetDefault($element, $node);
+        self::maybeSetAbstract($type, $node);
 
         $xp = new \DOMXPath($node->ownerDocument);
         $xp->registerNamespace('xs', self::XSD_NS);
