@@ -56,7 +56,7 @@ jobs:
         run: ./vendor/bin/phpunit --coverage-text
 
       - name: Determine coverage badge
-        uses: timkrase/phpunit-coverage-badge@v1
+        uses: timkrase/phpunit-coverage-badge@main
         with:
           push_badge: true
           repo_token: ${{ secrets.GITHUB_TOKEN }}
