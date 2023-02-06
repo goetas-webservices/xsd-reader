@@ -132,7 +132,7 @@ jobs:
   create-artifacts:
     name: Package
     runs-on: ubuntu-latest
-    needs: [build, test, qa]
+    needs: [build, test, qa-phpstan, qa-psalm, qa-phpcpd, qa-php-cs-fixer]
     steps:
       - name: Checkout sources
         uses: actions/checkout@v3
