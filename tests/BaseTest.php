@@ -9,12 +9,9 @@ use PHPUnit\Framework\TestCase;
 
 abstract class BaseTest extends TestCase
 {
-    /**
-     * @var SchemaReader
-     */
-    protected $reader;
+    protected SchemaReader $reader;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->reader = new SchemaReader();
         error_reporting(error_reporting() & ~E_NOTICE);

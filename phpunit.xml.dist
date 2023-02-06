@@ -8,23 +8,13 @@
             <directory>./tests/</directory>
         </testsuite>
     </testsuites>
-    <logging>
-        <log
-            type="coverage-html"
-            target="phpunit"
-        />
-        <log
-            type="coverage-text"
-            target="php://stdout"
-            showUncoveredFiles="true"
-            showOnlySummary="false"
-        />
-    </logging>
 
-    <filter>
-        <whitelist>
-            <directory>src</directory>
-        </whitelist>
-    </filter>
-
+    <coverage cacheDirectory=".phpunit.cache/code-coverage" processUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+        <report>
+            <clover outputFile="clover.xml" />
+        </report>
+    </coverage>
 </phpunit>

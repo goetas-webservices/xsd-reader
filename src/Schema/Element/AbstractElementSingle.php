@@ -6,42 +6,23 @@ namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
 use GoetasWebservices\XML\XSDReader\Schema\Item;
 
-class AbstractElementSingle extends Item implements ElementSingle
+class AbstractElementSingle extends Item implements ElementSingle, InterfaceSetAbstract
 {
-    /**
-     * @var int
-     */
-    protected $min = 1;
+    protected int $min = 1;
 
-    /**
-     * @var int
-     */
-    protected $max = 1;
+    protected int $max = 1;
 
-    /**
-     * @var bool
-     */
-    protected $qualified = false;
+    protected bool $qualified = false;
 
-    /**
-     * @var bool
-     */
-    protected $local = false;
+    protected bool $local = false;
 
-    /**
-     * @var bool
-     */
-    protected $nil = false;
+    protected bool $nil = false;
 
-    /**
-     * @var string|null
-     */
-    protected $fixed = null;
+    protected ?string $fixed = null;
 
-    /**
-     * @var string|null
-     */
-    protected $default = null;
+    protected ?string $default = null;
+
+    protected bool $abstract = false;
 
     public function isQualified(): bool
     {
@@ -111,5 +92,15 @@ class AbstractElementSingle extends Item implements ElementSingle
     public function setDefault(string $default): void
     {
         $this->default = $default;
+    }
+
+    public function isAbstract(): bool
+    {
+        return $this->abstract;
+    }
+
+    public function setAbstract(bool $abstract): void
+    {
+        $this->abstract = $abstract;
     }
 }

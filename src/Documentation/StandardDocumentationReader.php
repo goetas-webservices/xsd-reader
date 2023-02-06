@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace GoetasWebservices\XML\XSDReader\Documentation;
 
-use DOMElement;
-
 class StandardDocumentationReader implements DocumentationReader
 {
-    public function get(DOMElement $node): string
+    public function get(\DOMElement $node): string
     {
         $doc = '';
 
@@ -16,16 +14,16 @@ class StandardDocumentationReader implements DocumentationReader
          * @var \DOMNode $childNode
          */
         foreach ($node->childNodes as $childNode) {
-            if ($childNode instanceof DOMElement && $childNode->localName == 'annotation') {
+            if ($childNode instanceof \DOMElement && 'annotation' === $childNode->localName) {
                 /**
                  * @var \DOMNode $subChildNode
                  */
                 foreach ($childNode->childNodes as $subChildNode) {
-                    if ($subChildNode instanceof DOMElement && $subChildNode->localName == 'documentation') {
+                    if ($subChildNode instanceof \DOMElement && 'documentation' === $subChildNode->localName) {
                         if (!empty($doc)) {
-                            $doc .= "\n".($subChildNode->nodeValue);
+                            $doc .= "\n" . $subChildNode->nodeValue;
                         } else {
-                            $doc .= ($subChildNode->nodeValue);
+                            $doc .= $subChildNode->nodeValue;
                         }
                     }
                 }

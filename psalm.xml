@@ -16,17 +16,16 @@
     <issueHandlers>
         <LessSpecificReturnType errorLevel="error" />
 
-        <!-- level 3 issues - slightly lazy code writing, but provably low false-negatives -->
+        <!-- level 3 issues - slightly lazy code writing, but probably low false-negatives -->
         <DeprecatedMethod errorLevel="error" />
 
         <MissingClosureReturnType errorLevel="error" />
         <MissingReturnType errorLevel="error" />
         <MissingPropertyType errorLevel="error" />
         <InvalidDocblock errorLevel="error" />
-        <MisplacedRequiredParam errorLevel="error" />
 
-        <PropertyNotSetInConstructor errorLevel="error" />
-        <MissingConstructor errorLevel="error" />
+        <!-- disabled for now since there seems to be quite many false positives -->
+        <!-- PropertyNotSetInConstructor errorLevel="error" / -->
+        <!-- MissingConstructor errorLevel="error" / -->
     </issueHandlers>
-
 </psalm>

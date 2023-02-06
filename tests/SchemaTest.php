@@ -11,7 +11,6 @@ use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Group as ElementGroup;
 use GoetasWebservices\XML\XSDReader\Schema\Element\GroupRef;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\TypeNotFoundException;
-use GoetasWebservices\XML\XSDReader\Schema\Schema;
 use GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType;
 use GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType;
 
@@ -65,12 +64,11 @@ class SchemaTest extends BaseTest
     {
         $schema = $this->reader->readString('<xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema"/>');
 
-        self::assertInstanceOf(Schema::class, $schema);
         self::assertEquals('http://www.example.com', $schema->getTargetNamespace());
 
         $schemas = $schema->getSchemas();
 
-        self::assertFalse(empty($schemas));
+        self::assertNotEmpty($schemas);
     }
 
     public function getTypesToSearch(): array
@@ -113,7 +111,7 @@ class SchemaTest extends BaseTest
 
         self::assertCount(1, $schema->getTypes());
         self::assertInstanceOf(ComplexType::class, $schema->findType('myType', 'http://www.example.com'));
-        //self::assertInstanceOf(ComplexType::class, $schema->findType('myType'));
+        // self::assertInstanceOf(ComplexType::class, $schema->findType('myType'));
 
         self::assertCount(1, $schema->getElements());
         self::assertInstanceOf(ElementDef::class, $schema->findElement('myElement', 'http://www.example.com'));
@@ -152,7 +150,7 @@ class SchemaTest extends BaseTest
         self::assertCount(1, $schema1->getElements());
         self::assertInstanceOf(ElementDef::class, $schema1->findElement('myElement', 'http://www.example.com'));
 
-        //Now use a second schema which imports from the first one, and is in the SAME file
+        // Now use a second schema which imports from the first one, and is in the SAME file
         $schema2 = $this->reader->readString(
             '
             <xs:schema targetNamespace="http://www.example2.com" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ns1="http://www.example.com">
@@ -186,7 +184,7 @@ class SchemaTest extends BaseTest
         self::assertCount(1, $schema1->getElements());
         self::assertInstanceOf(ElementDef::class, $schema1->findElement('myElement', 'http://www.example.com'));
 
-        //Now use a second schema which uses the same targetNamespace
+        // Now use a second schema which uses the same targetNamespace
         $schema2 = $this->reader->readString(
             '
             <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
@@ -226,17 +224,12 @@ class SchemaTest extends BaseTest
 
         self::assertCount(1, $schema1->getGroups());
         $group = $schema1->findGroup('myGroup', 'http://www.example.com');
-        self::assertInstanceOf(Group::class, $group);
 
         self::assertCount(1, $schema1->getElements());
 
-        /**
-         * @var ElementDef
-         * @var $type      ComplexType
-         */
         $element = $schema1->findElement('myElement', 'http://www.example.com');
-        self::assertInstanceOf(ElementDef::class, $element);
 
+        /** @var ComplexType $type */
         $type = $element->getType();
         self::assertCount(1, $type->getElements());
 

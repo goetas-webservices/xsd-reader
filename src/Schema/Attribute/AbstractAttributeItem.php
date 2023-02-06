@@ -8,30 +8,15 @@ use GoetasWebservices\XML\XSDReader\Schema\Item;
 
 abstract class AbstractAttributeItem extends Item implements AttributeSingle
 {
-    /**
-     * @var string|null
-     */
-    protected $fixed;
+    protected ?string $fixed;
 
-    /**
-     * @var string|null
-     */
-    protected $default;
+    protected ?string $default;
 
-    /**
-     * @var bool
-     */
-    protected $qualified = true;
+    protected bool $qualified = true;
 
-    /**
-     * @var bool
-     */
-    protected $nil = false;
+    protected bool $nil = false;
 
-    /**
-     * @var string
-     */
-    protected $use = self::USE_OPTIONAL;
+    protected string $use = self::USE_OPTIONAL;
 
     public function getFixed(): ?string
     {

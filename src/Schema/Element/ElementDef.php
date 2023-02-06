@@ -10,4 +10,34 @@ namespace GoetasWebservices\XML\XSDReader\Schema\Element;
  */
 class ElementDef extends AbstractElementSingle
 {
+    /**
+     * @var AbstractElementSingle[]
+     */
+    private array $substitutionCandidates = [];
+
+    public function hasSubstitutionCandidates(): bool
+    {
+        return 0 < count($this->getSubstitutionCandidates());
+    }
+
+    /**
+     * @return AbstractElementSingle[]
+     */
+    public function getSubstitutionCandidates(): array
+    {
+        return $this->substitutionCandidates;
+    }
+
+    /**
+     * @param AbstractElementSingle[] $substitutionCandidates
+     */
+    public function setSubstitutionCandidates(array $substitutionCandidates): void
+    {
+        $this->substitutionCandidates = $substitutionCandidates;
+    }
+
+    public function addSubstitutionCandidate(AbstractElementSingle $substitutionCandidate): void
+    {
+        $this->substitutionCandidates[] = $substitutionCandidate;
+    }
 }
