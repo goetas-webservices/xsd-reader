@@ -534,7 +534,7 @@ class SchemaReader
         return function () use ($groupOriginal, $node): void {
             self::againstDOMNodeList(
                 $node,
-                function (\DOMelement $node, \DOMElement $childNode) use ($groupOriginal): void {
+                function (\DOMElement $node, \DOMElement $childNode) use ($groupOriginal): void {
                     switch ($childNode->localName) {
                         case 'sequence':
                         case 'all':
