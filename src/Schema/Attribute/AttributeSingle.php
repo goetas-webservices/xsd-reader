@@ -16,6 +16,14 @@ interface AttributeSingle extends AttributeItem
 
     public function getType(): ?Type;
 
+    public function getFixed(): ?string;
+
+    public function setFixed(string $fixed): void;
+
+    public function getDefault(): ?string;
+
+    public function setDefault(string $default): void;
+
     public function isQualified(): bool;
 
     public function setQualified(bool $qualified): void;

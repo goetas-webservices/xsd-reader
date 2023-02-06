@@ -157,15 +157,9 @@ class SchemaReader
         $schema->addAttributeGroup($attGroup);
 
         return function () use ($schema, $node, $attGroup): void {
-            SchemaReader::againstDOMNodeList(
+            self::againstDOMNodeList(
                 $node,
-                function (
-                    DOMElement $node,
-                    DOMElement $childNode
-                ) use (
-                    $schema,
-                    $attGroup
-                ): void {
+                function (DOMElement $node, DOMElement $childNode) use ($schema, $attGroup): void {
                     switch ($childNode->localName) {
                         case 'attribute':
                             $attribute = $this->getAttributeFromAttributeOrRef(
@@ -602,7 +596,7 @@ class SchemaReader
 
         self::againstDOMNodeList(
             $node,
-            function (DOMElement $node, DOMElement $childNode) use (&$isSimple): void {
+            static function (DOMElement $node, DOMElement $childNode) use (&$isSimple): void {
                 if ($isSimple) {
                     return;
                 }
