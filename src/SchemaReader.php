@@ -943,7 +943,7 @@ class SchemaReader
 
     private function findAttributeItem(Schema $schema, DOMElement $node, string $typeName): AttributeItem
     {
-        [$name, $namespace] = static::splitParts($node, $typeName);
+        [$name, $namespace] = self::splitParts($node, $typeName);
 
         /**
          * @var string|null $namespace
@@ -964,7 +964,7 @@ class SchemaReader
 
     private function findAttributeGroup(Schema $schema, DOMElement $node, string $typeName): AttributeGroup
     {
-        [$name, $namespace] = static::splitParts($node, $typeName);
+        [$name, $namespace] = self::splitParts($node, $typeName);
 
         /**
          * @var string|null $namespace
@@ -985,7 +985,7 @@ class SchemaReader
 
     private function findElement(Schema $schema, DOMElement $node, string $typeName): ElementDef
     {
-        [$name, $namespace] = static::splitParts($node, $typeName);
+        [$name, $namespace] = self::splitParts($node, $typeName);
 
         /**
          * @var string|null $namespace
@@ -1001,7 +1001,7 @@ class SchemaReader
 
     private function findGroup(Schema $schema, DOMElement $node, string $typeName): Group
     {
-        [$name, $namespace] = static::splitParts($node, $typeName);
+        [$name, $namespace] = self::splitParts($node, $typeName);
 
         /**
          * @var string|null $namespace
@@ -1022,7 +1022,7 @@ class SchemaReader
 
     private function findType(Schema $schema, DOMElement $node, string $typeName): SchemaItem
     {
-        [$name, $namespace] = static::splitParts($node, $typeName);
+        [$name, $namespace] = self::splitParts($node, $typeName);
 
         /**
          * @var string|null $namespace
