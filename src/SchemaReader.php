@@ -541,7 +541,7 @@ class SchemaReader
         $schema->addGroup($group);
 
         return function () use ($groupOriginal, $node): void {
-            static::againstDOMNodeList(
+            self::againstDOMNodeList(
                 $node,
                 function (DOMelement $node, DOMElement $childNode) use ($groupOriginal): void {
                     switch ($childNode->localName) {
