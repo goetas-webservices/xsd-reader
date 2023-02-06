@@ -22,7 +22,7 @@ class Schema
     protected function findSomethingNoThrow(
         string $getter,
         string $name,
-        string $namespace = null,
+        ?string $namespace = null,
         array &$calling = []
     ): ?SchemaItem {
         $calling[spl_object_hash($this)] = true;
@@ -54,14 +54,14 @@ class Schema
 
     /**
      * @param Schema[] $schemas
-     * @param bool[]   $calling
+     * @param bool[] $calling
      */
     protected function findSomethingNoThrowSchemas(
         array $schemas,
         string $cid,
         string $getter,
         string $name,
-        string $namespace = null,
+        ?string $namespace = null,
         array &$calling = []
     ): ?SchemaItem {
         foreach ($schemas as $childSchema) {
@@ -85,7 +85,7 @@ class Schema
      *
      * @throws TypeNotFoundException
      */
-    protected function findSomething(string $getter, string $name, string $namespace = null, array &$calling = []): SchemaItem
+    protected function findSomething(string $getter, string $name, ?string $namespace = null, array &$calling = []): SchemaItem
     {
         $in = $this->findSomethingNoThrow(
             $getter,
@@ -98,7 +98,7 @@ class Schema
             return $in;
         }
 
-        throw new TypeNotFoundException(sprintf("Can't find the %s named {%s}#%s.", substr($getter, 3), $namespace, $name));
+        throw new TypeNotFoundException(sprintf("Can't find the %s named {%s}#%s.", mb_substr($getter, 3), $namespace, $name));
     }
 
     protected bool $elementsQualification = false;
@@ -234,7 +234,7 @@ class Schema
         $this->elements[$element->getName()] = $element;
     }
 
-    public function addSchema(self $schema, string $namespace = null): void
+    public function addSchema(self $schema, ?string $namespace = null): void
     {
         if (null === $namespace) {
             $this->schemas[] = $schema;
@@ -328,7 +328,7 @@ class Schema
         return sprintf('Target namespace %s', $this->getTargetNamespace());
     }
 
-    public function findType(string $name, string $namespace = null): Type
+    public function findType(string $name, ?string $namespace = null): Type
     {
         $out = $this->findSomething('getType', $name, $namespace);
 
@@ -339,7 +339,7 @@ class Schema
         return $out;
     }
 
-    public function findGroup(string $name, string $namespace = null): Group
+    public function findGroup(string $name, ?string $namespace = null): Group
     {
         $out = $this->findSomething('getGroup', $name, $namespace);
 
@@ -350,7 +350,7 @@ class Schema
         return $out;
     }
 
-    public function findElement(string $name, string $namespace = null): ElementDef
+    public function findElement(string $name, ?string $namespace = null): ElementDef
     {
         $out = $this->findSomething('getElement', $name, $namespace);
 
@@ -361,7 +361,7 @@ class Schema
         return $out;
     }
 
-    public function findAttribute(string $name, string $namespace = null): AttributeItem
+    public function findAttribute(string $name, ?string $namespace = null): AttributeItem
     {
         $out = $this->findSomething('getAttribute', $name, $namespace);
 
@@ -372,7 +372,7 @@ class Schema
         return $out;
     }
 
-    public function findAttributeGroup(string $name, string $namespace = null): AttributeGroup
+    public function findAttributeGroup(string $name, ?string $namespace = null): AttributeGroup
     {
         $out = $this->findSomething('getAttributeGroup', $name, $namespace);
 

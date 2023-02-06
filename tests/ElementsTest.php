@@ -44,13 +44,13 @@ class ElementsTest extends BaseTest
 
         $myElement = $schema->findElement('myElement', 'http://www.example.com');
         self::assertInstanceOf(ElementDef::class, $myElement);
-        //self::assertEquals('http://www.example.com', $myElement->getSchema()->getTargetNamespace());
+        // self::assertEquals('http://www.example.com', $myElement->getSchema()->getTargetNamespace());
         self::assertEquals('myElement', $myElement->getName());
         self::assertEquals('string', $myElement->getType()->getName());
 
         $myGroup = $schema->findGroup('myGroup', 'http://www.example.com');
         self::assertInstanceOf(Group::class, $myGroup);
-        //self::assertEquals('http://www.example.com', $myElement->getSchema()->getTargetNamespace());
+        // self::assertEquals('http://www.example.com', $myElement->getSchema()->getTargetNamespace());
         self::assertEquals('myGroup', $myGroup->getName());
         $elementsInGroup = $myGroup->getElements();
         self::assertCount(3, $elementsInGroup);
@@ -101,7 +101,7 @@ class ElementsTest extends BaseTest
         self::assertInstanceOf(GroupRef::class, $myGroupRef);
 
         $wrappedEls = $myGroupRef->getElements();
-        if ($max === -1 || $max > 0) {
+        if (-1 === $max || $max > 0) {
             self::assertEquals($max, $wrappedEls[0]->getMax());
         } else {
             self::assertEquals(1, $wrappedEls[0]->getMax());
@@ -214,7 +214,7 @@ class ElementsTest extends BaseTest
 
         $myElementAnon = $schema->findElement('myElementAnonType', 'http://www.example.com');
         self::assertInstanceOf(ElementDef::class, $myElementAnon);
-        //self::assertEquals('http://www.example.com', $myElement->getSchema()->getTargetNamespace());
+        // self::assertEquals('http://www.example.com', $myElement->getSchema()->getTargetNamespace());
         self::assertEquals('myElementAnonType', $myElementAnon->getName());
         self::assertNull($myElementAnon->getType()->getName());
 

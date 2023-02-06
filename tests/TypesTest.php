@@ -212,7 +212,7 @@ class TypesTest extends BaseTest
     public function getMaxOccurencesOverride(): array
     {
         return [
-            ['0', 5], //maxOccurs=0 is ignored
+            ['0', 5], // maxOccurs=0 is ignored
             ['1', 5],
             ['2', 2], // 2 in this case just means "many"
             ['unbounded', 2], // 2 in this case just means "many"

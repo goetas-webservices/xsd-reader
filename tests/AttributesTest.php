@@ -33,7 +33,7 @@ class AttributesTest extends BaseTest
 
         $myAttribute = $schema->findAttribute('myAttribute', 'http://www.example.com');
         self::assertInstanceOf(AttributeDef::class, $myAttribute);
-        //self::assertEquals('http://www.example.com', $myAttribute->getSchema()->getTargetNamespace());
+        // self::assertEquals('http://www.example.com', $myAttribute->getSchema()->getTargetNamespace());
         self::assertEquals('myAttribute', $myAttribute->getName());
         self::assertEquals('string', $myAttribute->getType()->getName());
 
@@ -44,7 +44,7 @@ class AttributesTest extends BaseTest
 
         $myAttributeGroup = $schema->findAttributeGroup('myAttributeGroup', 'http://www.example.com');
         self::assertInstanceOf(Group::class, $myAttributeGroup);
-        //self::assertEquals('http://www.example.com', $myAttribute->getSchema()->getTargetNamespace());
+        // self::assertEquals('http://www.example.com', $myAttribute->getSchema()->getTargetNamespace());
         self::assertEquals('myAttributeGroup', $myAttributeGroup->getName());
         $attributesInGroup = $myAttributeGroup->getAttributes();
         self::assertCount(3, $attributesInGroup);
@@ -55,7 +55,7 @@ class AttributesTest extends BaseTest
 
         $myAttribute = $schema->findAttribute('myAttributeOptions', 'http://www.example.com');
         self::assertInstanceOf(AttributeDef::class, $myAttribute);
-        //self::assertEquals('http://www.example.com', $myAttribute->getSchema()->getTargetNamespace());
+        // self::assertEquals('http://www.example.com', $myAttribute->getSchema()->getTargetNamespace());
         self::assertEquals('myAttributeOptions', $myAttribute->getName());
         self::assertEquals('string', $myAttribute->getType()->getName());
     }
@@ -77,7 +77,7 @@ class AttributesTest extends BaseTest
 
         $myAttributeAnon = $schema->findAttribute('myAttributeAnonType', 'http://www.example.com');
         self::assertInstanceOf(AttributeDef::class, $myAttributeAnon);
-        //self::assertEquals('http://www.example.com', $myAttribute->getSchema()->getTargetNamespace());
+        // self::assertEquals('http://www.example.com', $myAttribute->getSchema()->getTargetNamespace());
         self::assertEquals('myAttributeAnonType', $myAttributeAnon->getName());
         self::assertNull($myAttributeAnon->getType()->getName());
 

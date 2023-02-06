@@ -24,7 +24,7 @@ abstract class Type implements SchemaItem, InterfaceSetAbstract
 
     protected ?Extension $extension = null;
 
-    public function __construct(Schema $schema, string $name = null)
+    public function __construct(Schema $schema, ?string $name = null)
     {
         $this->name = $name ?: null;
         $this->schema = $schema;
@@ -37,7 +37,7 @@ abstract class Type implements SchemaItem, InterfaceSetAbstract
 
     public function __toString(): string
     {
-        return strval($this->name);
+        return (string) $this->name;
     }
 
     public function isAbstract(): bool

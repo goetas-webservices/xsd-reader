@@ -111,7 +111,7 @@ class SchemaTest extends BaseTest
 
         self::assertCount(1, $schema->getTypes());
         self::assertInstanceOf(ComplexType::class, $schema->findType('myType', 'http://www.example.com'));
-        //self::assertInstanceOf(ComplexType::class, $schema->findType('myType'));
+        // self::assertInstanceOf(ComplexType::class, $schema->findType('myType'));
 
         self::assertCount(1, $schema->getElements());
         self::assertInstanceOf(ElementDef::class, $schema->findElement('myElement', 'http://www.example.com'));
@@ -150,7 +150,7 @@ class SchemaTest extends BaseTest
         self::assertCount(1, $schema1->getElements());
         self::assertInstanceOf(ElementDef::class, $schema1->findElement('myElement', 'http://www.example.com'));
 
-        //Now use a second schema which imports from the first one, and is in the SAME file
+        // Now use a second schema which imports from the first one, and is in the SAME file
         $schema2 = $this->reader->readString(
             '
             <xs:schema targetNamespace="http://www.example2.com" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ns1="http://www.example.com">
@@ -184,7 +184,7 @@ class SchemaTest extends BaseTest
         self::assertCount(1, $schema1->getElements());
         self::assertInstanceOf(ElementDef::class, $schema1->findElement('myElement', 'http://www.example.com'));
 
-        //Now use a second schema which uses the same targetNamespace
+        // Now use a second schema which uses the same targetNamespace
         $schema2 = $this->reader->readString(
             '
             <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">

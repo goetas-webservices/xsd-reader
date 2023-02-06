@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
-use BadMethodCallException;
-
 class GroupRef extends Group implements InterfaceSetMinMax
 {
     protected Group $wrapped;
@@ -76,6 +74,6 @@ class GroupRef extends Group implements InterfaceSetMinMax
 
     public function addElement(ElementItem $element): void
     {
-        throw new BadMethodCallException("Can't add an element for a ref group");
+        throw new \BadMethodCallException("Can't add an element for a ref group");
     }
 }

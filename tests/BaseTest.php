@@ -11,7 +11,7 @@ abstract class BaseTest extends TestCase
 {
     protected SchemaReader $reader;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->reader = new SchemaReader();
         error_reporting(error_reporting() & ~E_NOTICE);

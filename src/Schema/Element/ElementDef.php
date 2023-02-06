@@ -36,9 +36,6 @@ class ElementDef extends AbstractElementSingle
         $this->substitutionCandidates = $substitutionCandidates;
     }
 
-    /**
-     * @param AbstractElementSingle $substitutionCandidate
-     */
     public function addSubstitutionCandidate(AbstractElementSingle $substitutionCandidate): void
     {
         $this->substitutionCandidates[] = $substitutionCandidate;

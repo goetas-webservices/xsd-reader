@@ -38,19 +38,19 @@ class UrlUtils
 
         return static::resolveRelativeUrlToAbsoluteUrl(
             $rel,
-            (
-            '/' === $rel[0]
-                    ? ''  // destroy path if relative url points to root
-                    : ( // remove non-directory element from path
-                        isset($parts['path'])
-                            ? preg_replace(
-                                '#/[^/]*$#',
-                                '',
-                                (string) $parts['path']
-                            )
-                            : ''
-                    )
-            ),
+
+                '/' === $rel[0]
+                        ? ''  // destroy path if relative url points to root
+                        : ( // remove non-directory element from path
+                            isset($parts['path'])
+                                ? preg_replace(
+                                    '#/[^/]*$#',
+                                    '',
+                                    (string) $parts['path']
+                                )
+                                : ''
+                        )
+            ,
             $parts
         );
     }
