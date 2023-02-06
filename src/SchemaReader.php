@@ -1401,7 +1401,11 @@ class SchemaReader
 
         $parentNode = $node->parentNode;
         if ('schema' !== $parentNode->localName || self::XSD_NS !== $parentNode->namespaceURI) {
-            $element->setLocal(true);
+            if ($element instanceof ElementRef) {
+                $element->setLocal($element->getReferencedElement()->isLocal());
+            } else {
+                $element->setLocal(true);
+            }
         }
     }
 
