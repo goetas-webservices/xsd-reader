@@ -1,4 +1,4 @@
-[![Build status](https://github.com/goetwas-webservices/xsd-reader/workflows/Build%20and%20test/badge.svg)](https://github.com/goetas-webservices/xsd-reader/actions?query=workflow%3A"Build+and+test")
+[![Build status](https://github.com/goetas-webservices/xsd-reader/workflows/Build%20and%20test/badge.svg)](https://github.com/goetas-webservices/xsd-reader/actions?query=workflow%3A"Build+and+test")
 ![Code Coverage Badge](./badge.svg)
 
 
