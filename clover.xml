@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1675680509">
-  <project timestamp="1675680509">
+<coverage generated="1675681184">
+  <project timestamp="1675681184">
     <file name="/home/runner/work/xsd-reader/xsd-reader/src/Documentation/DocumentationReader.php">
       <metrics loc="11" ncloc="11" classes="0" methods="0" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="0" coveredstatements="0" elements="0" coveredelements="0"/>
     </file>
