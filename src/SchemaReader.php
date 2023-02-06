@@ -1383,7 +1383,7 @@ class SchemaReader
         self::maybeSetMin($element, $node);
         self::maybeSetFixed($element, $node);
         self::maybeSetDefault($element, $node);
-        self::maybeSetAbstract($type, $node);
+        self::maybeSetAbstract($element, $node);
 
         $xp = new \DOMXPath($node->ownerDocument);
         $xp->registerNamespace('xs', self::XSD_NS);
