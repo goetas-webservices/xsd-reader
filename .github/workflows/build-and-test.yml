@@ -53,7 +53,7 @@ jobs:
         run: composer install --no-progress --prefer-dist --optimize-autoloader
 
       - name: Run unit tests with coverage
-        run: ./vendor/bin/phpunit --coverage-text
+        run: ./vendor/bin/phpunit
 
       - name: Determine coverage badge
         uses: timkrase/phpunit-coverage-badge@main
