@@ -1274,7 +1274,7 @@ class SchemaReader
         $rootSchema = new Schema();
         $rootSchema->addSchema($this->getGlobalSchema());
 
-        if ($file !== null) {
+        if (null !== $file) {
             $this->setLoadedFile($file, $rootSchema);
         }
 

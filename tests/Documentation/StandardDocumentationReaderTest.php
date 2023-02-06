@@ -9,10 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class StandardDocumentationReaderTest extends TestCase
 {
-    /**
-     * @var StandardDocumentationReader
-     */
-    private $reader;
+    private StandardDocumentationReader $reader;
 
     public function setUp(): void
     {
