@@ -252,11 +252,10 @@ class SchemaReader
             $attribute->setDoc($this->getDocumentation($childNode));
             $this->fillElement($attribute, $childNode);
             $schema->addElement($attribute);
-            $this->resolveSubstitutionGroup($schema, $node, $childNode, $attribute);
         }
 
-        return function () use ($attribute, $childNode): void {
-            $this->fillItem($attribute, $childNode);
+        return function () use ($attribute, $childNode, $node): void {
+            $this->fillItem($attribute, $childNode, $node);
         };
     }
 
@@ -1048,8 +1047,12 @@ class SchemaReader
         throw new TypeException(sprintf("Can't find %s named {%s}#%s, at line %d in %s ", 'type', $namespace, $name, $node->getLineNo(), $node->ownerDocument->documentURI));
     }
 
-    private function fillItem(Item $element, DOMElement $node): void
+    private function fillItem(Item $element, DOMElement $node, ?DOMElement $parentNode = null): void
     {
+        if ($element instanceof ElementDef) {
+            $this->resolveSubstitutionGroup($element->getSchema(), $parentNode, $node, $element);
+        }
+
         /**
          * @var bool
          */

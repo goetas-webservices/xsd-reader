@@ -54,6 +54,52 @@ class SubstitutionGroupTest extends BaseTest
         self::assertEquals('spanish', $element->getSubstitutionCandidates()[2]->getName());
     }
 
+    public function testSubstitutionGroupChangedOrder(): void
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+                <xs:element name="german"  substitutionGroup="language"/>
+                <xs:element name="english" substitutionGroup="language"/>
+                <xs:element name="spanish" substitutionGroup="language"/>
+                <xs:element name="language" abstract="true"/>
+                <xs:complexType name="Languages">
+                    <xs:sequence>
+                        <xs:element ref="language" minOccurs="1" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+
+                <xs:element name="root">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="myLanguages" type="Languages"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+
+            </xs:schema>'
+        );
+
+        $rootType = $schema->getElements()['root']->getType();
+        self::assertInstanceOf(ComplexType::class, $rootType);
+        $element = $rootType->getElements()[0];
+        self::assertEquals('myLanguages', $element->getName());
+        $elementType = $element->getType();
+        self::assertEquals('Languages', $elementType->getName());
+
+        self::assertCount(1, $elementType->getElements());
+        $element = $elementType->getElements()[0];
+        self::assertEquals(1, $element->getMin());
+        self::assertEquals(-1, $element->getMax());
+        $element = $element->getReferencedElement();
+        self::assertTrue($element->isAbstract());
+        self::assertCount(3, $element->getSubstitutionCandidates());
+        self::assertEquals('german', $element->getSubstitutionCandidates()[0]->getName());
+        self::assertEquals('english', $element->getSubstitutionCandidates()[1]->getName());
+        self::assertEquals('spanish', $element->getSubstitutionCandidates()[2]->getName());
+    }
+
     public function testSubstitutionGroup2(): void
     {
         $schema = $this->reader->readString(
