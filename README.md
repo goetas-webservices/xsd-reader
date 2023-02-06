@@ -1,6 +1,5 @@
-[![Build Status](https://travis-ci.org/goetas-webservices/xsd-reader.svg?branch=master)](https://travis-ci.org/goetas-webservices/xsd-reader)
-[![Code Coverage](https://scrutinizer-ci.com/g/goetas-webservices/xsd-reader/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/goetas-webservices/xsd-reader/?branch=master)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/goetas-webservices/xsd-reader/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/goetas-webservices/xsd-reader/?branch=master)
+[![Build status](https://github.com/goetwas-webservices/xsd-reader/workflows/Build%20and%20test/badge.svg)](https://github.com/goetas-webservices/xsd-reader/actions?query=workflow%3A"Build+and+test")
+![Code Coverage Badge](./badge.svg)
 
 
 # PHP XSD Reader
@@ -21,7 +20,7 @@ composer require 'goetas-webservices/xsd-reader'
 use GoetasWebservices\XML\XSDReader\SchemaReader;
 
 $reader = new SchemaReader();
-$schema = $reader->readFile("http://www.example.com/exaple.xsd");
+$schema = $reader->readFile("http://www.example.com/example.xsd");
 
 // $schema is instance of GoetasWebservices\XML\XSDReader\Schema\Schema;
 
