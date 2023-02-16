@@ -6,7 +6,10 @@ namespace GoetasWebservices\XML\XSDReader\Tests;
 
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Attribute;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeRef;
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeSingle;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group;
+use GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType;
 use GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType;
 
 class AttributesTest extends BaseTest
@@ -17,7 +20,7 @@ class AttributesTest extends BaseTest
             '
             <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xs:attribute name="myAttribute" type="xs:string"></xs:attribute>
-                <xs:attribute name="myAttributeOptions" type="xs:string" use="reuqired" nil="true"></xs:attribute>
+                <xs:attribute name="myAttributeOptions" type="xs:string" use="required" nil="true"></xs:attribute>
 
                 <xs:attributeGroup name="myAttributeGroup">
                     <xs:attribute name="alone" type="xs:string"></xs:attribute>
@@ -50,7 +53,8 @@ class AttributesTest extends BaseTest
         self::assertCount(3, $attributesInGroup);
 
         self::assertInstanceOf(Attribute::class, $attributesInGroup[0]);
-        self::assertInstanceOf(AttributeDef::class, $attributesInGroup[1]);
+        self::assertInstanceOf(AttributeRef::class, $attributesInGroup[1]);
+        self::assertInstanceOf(AttributeDef::class, $attributesInGroup[1]->getReferencedAttribute());
         self::assertInstanceOf(Group::class, $attributesInGroup[2]);
 
         $myAttribute = $schema->findAttribute('myAttributeOptions', 'http://www.example.com');
@@ -91,5 +95,53 @@ class AttributesTest extends BaseTest
         self::assertInstanceOf(SimpleType::class, $base3);
         self::assertEquals('http://www.w3.org/2001/XMLSchema', $base3->getSchema()->getTargetNamespace());
         self::assertEquals('string', $base3->getName());
+    }
+
+    public function testAttributeUseOverriding(): void
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xs:attribute name="lang" use="optional" type="xs:language"/>
+                <xs:element name="Name">
+                    <xs:complexType mixed="true">
+                        <xs:attribute ref="lang" use="required"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:complexType name="MyNameType">
+                    <xs:sequence>
+                        <xs:element ref="Name"/>
+                    </xs:sequence>
+                </xs:complexType>
+                <xs:element name="root">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="myName" type="MyNameType"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:schema>'
+        );
+
+        $rootType = $schema->getElements()['root']->getType();
+        self::assertInstanceOf(ComplexType::class, $rootType);
+        $element = $rootType->getElements()[0];
+
+        self::assertEquals('myName', $element->getName());
+        $elementType = $element->getType();
+        self::assertEquals('MyNameType', $elementType->getName());
+
+        self::assertCount(1, $elementType->getElements());
+        $subElement = $elementType->getElements()[0];
+        self::assertEquals('Name', $subElement->getName());
+        $subElementType = $subElement->getType();
+        self::assertInstanceOf(ComplexType::class, $subElementType);
+        self::assertTrue($subElementType->isMixed());
+
+        self::assertCount(1, $subElementType->getAttributes());
+        $attribute = $subElementType->getAttributes()[0];
+        self::assertEquals('lang', $attribute->getName());
+        self::assertEquals('language', $attribute->getType()->getName());
+        self::assertEquals(AttributeSingle::USE_REQUIRED, $attribute->getUse());
     }
 }

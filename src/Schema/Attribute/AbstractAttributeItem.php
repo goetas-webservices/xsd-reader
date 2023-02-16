@@ -8,9 +8,9 @@ use GoetasWebservices\XML\XSDReader\Schema\Item;
 
 abstract class AbstractAttributeItem extends Item implements AttributeSingle
 {
-    protected ?string $fixed;
+    protected ?string $fixed = null;
 
-    protected ?string $default;
+    protected ?string $default = null;
 
     protected bool $qualified = true;
 

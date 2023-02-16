@@ -12,6 +12,7 @@ use GoetasWebservices\XML\XSDReader\Schema\Attribute\Attribute;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeContainer;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItem;
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeRef;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeSingle;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
 use GoetasWebservices\XML\XSDReader\Schema\Element\AbstractElementSingle;
@@ -185,18 +186,25 @@ class SchemaReader
         \DOMElement $node
     ): AttributeItem {
         if ($childNode->hasAttribute('ref')) {
-            $attribute = $this->findAttributeItem($schema, $node, $childNode->getAttribute('ref'));
+            $attributeDef = $this->findAttributeItem($schema, $node, $childNode->getAttribute('ref'));
+            $attribute = new AttributeRef($attributeDef);
+            $attribute->setDoc($this->getDocumentation($childNode));
+            $this->fillAttribute($attribute, $childNode);
+
+            if ($node->hasAttribute('name')) {
+                $attribute->setName($node->getAttribute('name'));
+            }
         } else {
             /**
              * @var Attribute
              */
-            $attribute = $this->loadAttribute($schema, $childNode);
+            $attribute = $this->createAttribute($schema, $childNode);
         }
 
         return $attribute;
     }
 
-    private function loadAttribute(Schema $schema, \DOMElement $node): Attribute
+    private function createAttribute(Schema $schema, \DOMElement $node): Attribute
     {
         $attribute = new Attribute($schema, $node->getAttribute('name'));
         $attribute->setDoc($this->getDocumentation($node));
@@ -761,6 +769,11 @@ class SchemaReader
     {
         if ($checkAbstract) {
             self::maybeSetAbstract($type, $node);
+        }
+        if ($type instanceof ComplexType) {
+            if ($node->hasAttribute('mixed')) {
+                $type->setMixed(in_array($node->getAttribute('mixed'), ['true', '1'], true));
+            }
         }
 
         self::againstDOMNodeList(

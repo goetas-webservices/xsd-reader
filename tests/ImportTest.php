@@ -41,7 +41,7 @@ class ImportTest extends BaseTest
         $localAttrGroup = $schema->findAttributeGroup('myAttributeGroup', 'http://www.user.com');
         $localAttrs = $localAttrGroup->getAttributes();
 
-        self::assertSame($remoteAttr, $localAttrs[0]);
+        self::assertSame($remoteAttr, $localAttrs[0]->getReferencedAttribute());
     }
 
     public function testKnownImport(): void
