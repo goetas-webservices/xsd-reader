@@ -187,12 +187,16 @@ class SchemaReader
     ): AttributeItem {
         if ($childNode->hasAttribute('ref')) {
             $attributeDef = $this->findAttributeItem($schema, $node, $childNode->getAttribute('ref'));
-            $attribute = new AttributeRef($attributeDef);
-            $attribute->setDoc($this->getDocumentation($childNode));
-            $this->fillAttribute($attribute, $childNode);
+            if ($attributeDef instanceof AttributeDef) {
+                $attribute = new AttributeRef($attributeDef);
+                $attribute->setDoc($this->getDocumentation($childNode));
+                $this->fillAttribute($attribute, $childNode);
 
-            if ($node->hasAttribute('name')) {
-                $attribute->setName($node->getAttribute('name'));
+                if ($node->hasAttribute('name')) {
+                    $attribute->setName($node->getAttribute('name'));
+                }
+            } else {
+                $attribute = $attributeDef;
             }
         } else {
             /**

@@ -30,5 +30,4 @@ class AttributeRef extends AbstractAttributeItem
     {
         return $this->wrapped->getType();
     }
-
 }
