@@ -11,7 +11,7 @@ class SimpleType extends Type
      */
     protected array $unions = [];
 
-    protected ?SimpleType $list;
+    protected ?SimpleType $list = null;
 
     public function addUnion(self $type): void
     {
