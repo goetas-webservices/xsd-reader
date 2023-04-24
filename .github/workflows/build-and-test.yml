@@ -110,7 +110,7 @@ jobs:
         run: composer install --no-progress --prefer-dist --optimize-autoloader
 
       - name: Run phpcpd
-        run: ./vendor/sebastian/phpcpd/phpcpd ./src/
+        run: ./vendor/bin/phpcpd --exclude vendor ./src/
 
   qa-cs-fixer:
     name: QA - Run php-cs-fixer (PHP ${{ matrix.php-versions }})
@@ -127,4 +127,4 @@ jobs:
         run: composer install --no-progress --prefer-dist --optimize-autoloader
 
       - name: Run php-cs-fixer
-        run: ./vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix --verbose --allow-risky=yes --dry-run --config ".php-cs-fixer.dist"
+        run: ./vendor/bin/php-cs-fixer fix --verbose --allow-risky=yes --dry-run --config ".php-cs-fixer.dist"
