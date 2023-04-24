@@ -110,7 +110,7 @@ jobs:
         run: composer install --no-progress --prefer-dist --optimize-autoloader
 
       - name: Run phpcpd
-        run: ./vendor/bin/phpcpd --exclude vendor ./src/
+        run: ./vendor/bin/phpcpd ./src/
 
   qa-cs-fixer:
     name: QA - Run php-cs-fixer (PHP ${{ matrix.php-versions }})
