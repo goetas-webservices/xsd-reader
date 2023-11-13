@@ -1407,6 +1407,13 @@ class SchemaReader
         self::maybeSetDefault($element, $node);
         self::maybeSetAbstract($element, $node);
 
+        $xp = new \DOMXPath($node->ownerDocument);
+        $xp->registerNamespace('xs', self::XSD_NS);
+
+        if ($xp->query('ancestor::xs:choice', $node)->length) {
+            $element->setMin(0);
+        }
+
         if ($node->hasAttribute('nillable')) {
             $element->setNil('true' === $node->getAttribute('nillable'));
         }
