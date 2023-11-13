@@ -27,6 +27,7 @@ use GoetasWebservices\XML\XSDReader\Schema\Element\InterfaceSetAbstract;
 use GoetasWebservices\XML\XSDReader\Schema\Element\InterfaceSetDefault;
 use GoetasWebservices\XML\XSDReader\Schema\Element\InterfaceSetFixed;
 use GoetasWebservices\XML\XSDReader\Schema\Element\InterfaceSetMinMax;
+use GoetasWebservices\XML\XSDReader\Schema\Element\Sequence;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\TypeNotFoundException;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Base;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Extension;
@@ -379,9 +380,9 @@ class SchemaReader
     {
         $max =
             (
-                (is_int($max) && (bool) $max) ||
-                'unbounded' === $node->getAttribute('maxOccurs') ||
-                1 < $node->getAttribute('maxOccurs')
+                (is_int($max) && (bool) $max)
+                || 'unbounded' === $node->getAttribute('maxOccurs')
+                || 1 < $node->getAttribute('maxOccurs')
             )
                 ? 2
                 : null;
@@ -417,8 +418,14 @@ class SchemaReader
         switch ($childNode->localName) {
             case 'sequence':
             case 'all':
+                $sequence = null;
+                if ($elementContainer instanceof Choice) {
+                    // add sequence explicitly to avoid competing sequences within the choice
+                    $sequence = $this->createSequence($elementContainer->getSchema(), $node);
+                    $elementContainer->addElement($sequence);
+                }
                 $this->loadSequence(
-                    $elementContainer,
+                    $sequence ?? $elementContainer,
                     $childNode,
                     $max,
                     $min
@@ -588,6 +595,16 @@ class SchemaReader
         self::maybeSetMin($choice, $node);
 
         return $choice;
+    }
+
+    private function createSequence(Schema $schema, \DOMElement $node): Sequence
+    {
+        $sequence = new Sequence($schema, '');
+        $sequence->setDoc($this->getDocumentation($node));
+        self::maybeSetMax($sequence, $node);
+        self::maybeSetMin($sequence, $node);
+
+        return $sequence;
     }
 
     private function loadComplexType(Schema $schema, \DOMElement $node, ?\Closure $callback = null): \Closure
