@@ -388,8 +388,8 @@ class SchemaReader
                 : null;
         $min =
             (
-                null === $min &&
-                !$node->hasAttribute('minOccurs')
+                null === $min
+                && !$node->hasAttribute('minOccurs')
             )
                 ? null
                 : (int) max((int) $min, $node->getAttribute('minOccurs'));
@@ -1080,8 +1080,8 @@ class SchemaReader
             $node,
             function (\DOMElement $node, \DOMElement $childNode) use ($element, &$skip): void {
                 if (
-                    !$skip &&
-                    in_array(
+                    !$skip
+                    && in_array(
                         $childNode->localName,
                         [
                             'complexType',
