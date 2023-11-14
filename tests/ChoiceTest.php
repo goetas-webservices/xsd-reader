@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace GoetasWebservices\XML\XSDReader\Tests;
 
 use GoetasWebservices\XML\XSDReader\Schema\Element\Choice;
+use GoetasWebservices\XML\XSDReader\Schema\Element\Sequence;
 use GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType;
+use GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType;
 
 class ChoiceTest extends BaseTest
 {
@@ -277,5 +279,74 @@ class ChoiceTest extends BaseTest
         self::assertInstanceOf(Choice::class, $dessertChoice);
         self::assertEquals(0, $dessertChoice->getMin());
         self::assertEquals(-1, $dessertChoice->getMax());
+    }
+
+    public function testChoiceWithSequences(): void
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+                <xs:element name="root">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element minOccurs="1" name="Intro" type="xs:string"/>
+                        <xs:choice>
+                          <xs:sequence>
+                            <xs:choice>
+                              <xs:element name="Red" type="xs:string"/>
+                              <xs:element name="Green" type="xs:string"/>
+                              <xs:element name="Blue" type="xs:string"/>
+                            </xs:choice>
+                            <xs:element name="Outro1" type="xs:string"/>
+                          </xs:sequence>
+                          <xs:sequence>
+                            <xs:element name="AlternateElement"/>
+                            <xs:element name="Outro2" type="xs:string"/>
+                          </xs:sequence>
+                        </xs:choice>
+                      </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+
+            </xs:schema>
+        ');
+
+        $rootType = $schema->getElements()['root']->getType();
+        self::assertInstanceOf(ComplexType::class, $rootType);
+
+        $elements = $rootType->getElements();
+        self::assertCount(2, $elements);
+
+        self::assertEquals('Intro', $elements[0]->getName());
+        self::assertInstanceOf(SimpleType::class, $elements[0]->getType());
+
+        $choice = $elements[1];
+        self::assertInstanceOf(Choice::class, $choice);
+        self::assertEquals(1, $choice->getMin());
+        self::assertEquals(1, $choice->getMax());
+
+        $choiceElements = $choice->getElements();
+        self::assertCount(2, $choiceElements);
+
+        $sequence1 = $choiceElements[0];
+        self::assertInstanceOf(Sequence::class, $sequence1);
+        $sequence2 = $choiceElements[1];
+        self::assertInstanceOf(Sequence::class, $sequence2);
+
+        $sequence1Elements = $sequence1->getElements();
+        $innerChoice = $sequence1Elements[0];
+        self::assertInstanceOf(Choice::class, $innerChoice);
+        $innerChoiceElements = $innerChoice->getElements();
+        self::assertCount(3, $innerChoiceElements);
+        self::assertEquals('Red', $innerChoiceElements[0]->getName());
+        self::assertEquals('Green', $innerChoiceElements[1]->getName());
+        self::assertEquals('Blue', $innerChoiceElements[2]->getName());
+        self::assertEquals('Outro1', $sequence1Elements[1]->getName());
+
+        $sequence2Elements = $sequence2->getElements();
+        self::assertCount(2, $sequence2Elements);
+        self::assertEquals('AlternateElement', $sequence2Elements[0]->getName());
+        self::assertEquals('Outro2', $sequence2Elements[1]->getName());
     }
 }
