@@ -381,9 +381,9 @@ class SchemaReader
         $max =
             (
                 (is_int($max) && (bool) $max) ||
-                1 < $node->getAttribute('maxOccurs')
+                0 < $node->getAttribute('maxOccurs')
             ) && ('unbounded' !== $node->getAttribute('maxOccurs'))
-                ? 2
+                ? (int) min((int) $max, $node->getAttribute('maxOccurs'))
                 : null;
         $min =
             (
