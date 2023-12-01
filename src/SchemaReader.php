@@ -378,13 +378,8 @@ class SchemaReader
 
     private function loadSequence(ElementContainer $elementContainer, \DOMElement $node, ?int $max = null, ?int $min = null): void
     {
-        $max =
-            (
-                (is_int($max) && (bool) $max) ||
-                0 < $node->getAttribute('maxOccurs')
-            ) && ('unbounded' !== $node->getAttribute('maxOccurs'))
-                ? (int) min((int) $max, $node->getAttribute('maxOccurs'))
-                : null;
+        $max = $this->loadMaxFromNode($node, $max);
+
         $min =
             (
                 null === $min
@@ -405,6 +400,29 @@ class SchemaReader
                 );
             }
         );
+    }
+
+    private function loadMaxFromNode(\DOMElement $node, ?int $max): ?int 
+    {
+        $maxOccurs = $node->getAttribute('maxOccurs');
+
+        if ('unbounded' === $maxOccurs && null === $max) {
+            return null;
+        }
+
+        if (is_numeric($maxOccurs)) {
+            $maxOccurs = intval($maxOccurs);
+
+            if (null !== $max) {
+                return min($max, $maxOccurs);
+            }
+
+            if (0 < $maxOccurs) {
+                return $maxOccurs;
+            }
+        }
+
+        return $max;
     }
 
     private function loadSequenceChildNode(

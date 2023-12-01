@@ -190,14 +190,14 @@ class TypesTest extends BaseTest
     /**
      * @dataProvider getMaxOccurencesOverride
      */
-    public function testSequencMaxOccursOverride($xml, $expected): void
+    public function testSequencMaxOccursOverride($sequenceMaxOccurs, $childMaxOccurs, $expected): void
     {
         $schema = $this->reader->readString(
             '
             <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xs:complexType name="complexType">
-                    <xs:sequence maxOccurs="' . $xml . '" >
-                        <xs:element name="el1" maxOccurs="5" type="xs:string"></xs:element>
+                    <xs:sequence maxOccurs="' . $sequenceMaxOccurs . '" >
+                        <xs:element name="el1" maxOccurs="' . $childMaxOccurs . '" type="xs:string"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:schema>'
@@ -212,10 +212,13 @@ class TypesTest extends BaseTest
     public function getMaxOccurencesOverride(): array
     {
         return [
-            ['0', 5], // maxOccurs=0 is ignored
-            ['1', 5],
-            ['2', 2], // 2 in this case just means "many"
-            ['unbounded', 2], // 2 in this case just means "many"
+            ['0', '5', 5], // maxOccurs=0 is ignored
+            ['1', '5', 5],
+            ['2', '5', 2], // 2 in this case just means "many"
+            ['4', '5', 4],
+            ['6', '5', 6],
+            ['unbounded', '5', 5],
+            ['5', 'unbounded', 5],
         ];
     }
 
