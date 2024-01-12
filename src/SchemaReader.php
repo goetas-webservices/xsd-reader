@@ -378,15 +378,8 @@ class SchemaReader
 
     private function loadSequence(ElementContainer $elementContainer, \DOMElement $node, ?int $max = null, ?int $min = null): void
     {
+        $min = $this->loadMinFromNode($node, $min);
         $max = $this->loadMaxFromNode($node, $max);
-
-        $min =
-            (
-                null === $min
-                && !$node->hasAttribute('minOccurs')
-            )
-                ? null
-                : (int) max((int) $min, $node->getAttribute('minOccurs'));
 
         self::againstDOMNodeList(
             $node,
@@ -402,11 +395,22 @@ class SchemaReader
         );
     }
 
-    private function loadMaxFromNode(\DOMElement $node, ?int $max): ?int 
+    private function loadMinFromNode(\DOMElement $node, ?int $min): ?int
+    {
+        if (null === $min && !$node->hasAttribute('minOccurs')) {
+            return null;
+        }
+
+        $minOccurs = intval($node->getAttribute('minOccurs'));
+
+        return max($min, $minOccurs);
+    }
+
+    private function loadMaxFromNode(\DOMElement $node, ?int $max): ?int
     {
         $maxOccurs = $node->getAttribute('maxOccurs');
 
-        if ('unbounded' === $maxOccurs && null === $max) {
+        if (null === $max && 'unbounded' === $maxOccurs) {
             return null;
         }
 
