@@ -403,7 +403,8 @@ class SchemaReader
 
         $minOccurs = (int) $node->getAttribute('minOccurs');
 
-        return max($min, $minOccurs);
+        // NOTE must not pass "null" to max() function, because "max(null, 0)" returns "null" instead of "0"
+        return max((int) $min, $minOccurs);
     }
 
     private function loadMaxFromNode(\DOMElement $node, ?int $max): ?int
@@ -499,7 +500,8 @@ class SchemaReader
         $this->resolveSubstitutionGroup($schema, $node, $childNode, $element);
 
         if (null !== $min) {
-            $element->setMin($min);
+            // NOTE must not pass "null" to max() function, because "max(null, 0)" returns "null" instead of "0"
+            $element->setMin(max((int) $element->getMin(), $min));
         }
 
         if (null !== $max && 1 < $max) {
