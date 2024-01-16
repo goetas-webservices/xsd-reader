@@ -137,14 +137,14 @@ class TypesTest extends BaseTest
     /**
      * @dataProvider getMaxOccurences
      */
-    public function testElementMaxOccurences($xml, $expected): void
+    public function testElementMaxOccurences($maxOccurs, $expected): void
     {
         $schema = $this->reader->readString(
             '
             <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xs:complexType name="complexType">
                     <xs:sequence>
-                        <xs:element name="el1" maxOccurs="' . $xml . '" type="xs:string"></xs:element>
+                        <xs:element name="el1" maxOccurs="' . $maxOccurs . '" type="xs:string"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:schema>'
@@ -159,14 +159,14 @@ class TypesTest extends BaseTest
     /**
      * @dataProvider getMinOccurencesOverride
      */
-    public function testSequencMinOccursOverride($xml, $expected): void
+    public function testSequenceMinOccursOverride($sequenceMinOccurs, $childMinOccurs, $expected): void
     {
         $schema = $this->reader->readString(
             '
             <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xs:complexType name="complexType">
-                    <xs:sequence minOccurs="' . $xml . '" >
-                        <xs:element name="el1" minOccurs="1" type="xs:string"></xs:element>
+                    <xs:sequence minOccurs="' . $sequenceMinOccurs . '" >
+                        <xs:element name="el1" minOccurs="' . $childMinOccurs . '" type="xs:string"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:schema>'
@@ -181,16 +181,20 @@ class TypesTest extends BaseTest
     public function getMinOccurencesOverride(): array
     {
         return [
-            ['2', 2],
-            ['1', 1],
-            ['0', 0],
+            ['0', '2', 2],
+            ['3', '2', 3],
+            ['0', '1', 1],
+            ['1', '1', 1],
+            ['2', '1', 2],
+            ['0', '0', 0],
+            ['3', '0', 3],
         ];
     }
 
     /**
      * @dataProvider getMaxOccurencesOverride
      */
-    public function testSequencMaxOccursOverride($sequenceMaxOccurs, $childMaxOccurs, $expected): void
+    public function testSequenceMaxOccursOverride($sequenceMaxOccurs, $childMaxOccurs, $expected): void
     {
         $schema = $this->reader->readString(
             '
@@ -233,14 +237,14 @@ class TypesTest extends BaseTest
     /**
      * @dataProvider getMinOccurences
      */
-    public function testElementMinOccurences($xml, $expected): void
+    public function testElementMinOccurences($minOccurs, $expected): void
     {
         $schema = $this->reader->readString(
             '
             <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xs:complexType name="complexType">
                     <xs:sequence>
-                        <xs:element name="el1" minOccurs="' . $xml . '" type="xs:string"></xs:element>
+                        <xs:element name="el1" minOccurs="' . $minOccurs . '" type="xs:string"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:schema>'
