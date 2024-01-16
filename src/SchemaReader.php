@@ -500,7 +500,7 @@ class SchemaReader
         $this->resolveSubstitutionGroup($schema, $node, $childNode, $element);
 
         if (null !== $min) {
-            $element->setMin(max($element->getMin(), $min));
+            $element->setMin($min);
         }
 
         if (null !== $max && 1 < $max) {
