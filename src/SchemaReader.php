@@ -401,7 +401,7 @@ class SchemaReader
             return null;
         }
 
-        $minOccurs = intval($node->getAttribute('minOccurs'));
+        $minOccurs = (int) $node->getAttribute('minOccurs');
 
         return max($min, $minOccurs);
     }
@@ -415,7 +415,7 @@ class SchemaReader
         }
 
         if (is_numeric($maxOccurs)) {
-            $maxOccurs = intval($maxOccurs);
+            $maxOccurs = (int) $maxOccurs;
 
             if (null !== $max) {
                 return min($max, $maxOccurs);
