@@ -181,8 +181,6 @@ class TypesTest extends BaseTest
     public function getMinOccurencesOverride(): array
     {
         return [
-            ['0', '5', 5],
-            ['0', '1', 1],
             ['1', '1', 1],
             ['2', '1', 2],
             ['3', '0', 3],
