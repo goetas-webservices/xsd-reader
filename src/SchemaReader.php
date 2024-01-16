@@ -500,8 +500,7 @@ class SchemaReader
         $this->resolveSubstitutionGroup($schema, $node, $childNode, $element);
 
         if (null !== $min) {
-            // NOTE must not pass "null" to max() function, because "max(null, 0)" returns "null" instead of "0"
-            $element->setMin(max((int) $element->getMin(), $min));
+            $element->setMin(max($element->getMin(), $min));
         }
 
         if (null !== $max && 1 < $max) {
