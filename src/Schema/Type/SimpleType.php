@@ -4,34 +4,14 @@ declare(strict_types=1);
 
 namespace GoetasWebservices\XML\XSDReader\Schema\Type;
 
-use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction;
-
 class SimpleType extends Type
 {
     /**
-     * @var Restriction|null
-     */
-    protected $restriction;
-
-    /**
      * @var SimpleType[]
      */
-    protected $unions = array();
+    protected array $unions = [];
 
-    /**
-     * @var SimpleType|null
-     */
-    protected $list;
-
-    public function getRestriction(): ?Restriction
-    {
-        return $this->restriction;
-    }
-
-    public function setRestriction(Restriction $restriction): void
-    {
-        $this->restriction = $restriction;
-    }
+    protected ?SimpleType $list = null;
 
     public function addUnion(self $type): void
     {

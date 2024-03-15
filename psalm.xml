@@ -1,28 +1,31 @@
 <?xml version="1.0"?>
 <psalm
-    name="Example Psalm config with recommended defaults"
-    stopOnFirstError="false"
-    useDocblockTypes="true"
-    totallyTyped="true"
-    requireVoidReturnType="true"
+    errorLevel="4"
+    resolveFromConfigFile="true"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
 >
     <projectFiles>
         <directory name="src" />
+        <ignoreFiles>
+            <directory name="vendor" />
+        </ignoreFiles>
     </projectFiles>
 
     <issueHandlers>
         <LessSpecificReturnType errorLevel="error" />
 
-        <!-- level 3 issues - slightly lazy code writing, but provably low false-negatives -->
+        <!-- level 3 issues - slightly lazy code writing, but probably low false-negatives -->
         <DeprecatedMethod errorLevel="error" />
 
         <MissingClosureReturnType errorLevel="error" />
         <MissingReturnType errorLevel="error" />
         <MissingPropertyType errorLevel="error" />
         <InvalidDocblock errorLevel="error" />
-        <MisplacedRequiredParam errorLevel="error" />
 
-        <PropertyNotSetInConstructor errorLevel="error" />
-        <MissingConstructor errorLevel="error" />
+        <!-- disabled for now since there seems to be quite many false positives -->
+        <!-- PropertyNotSetInConstructor errorLevel="error" / -->
+        <!-- MissingConstructor errorLevel="error" / -->
     </issueHandlers>
 </psalm>

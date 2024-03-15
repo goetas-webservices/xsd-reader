@@ -6,17 +6,17 @@ namespace GoetasWebservices\XML\XSDReader\Schema\Attribute;
 
 use GoetasWebservices\XML\XSDReader\Schema\Item;
 
-abstract class AbstractAttributeItem extends Item implements AttributeItem
+abstract class AbstractAttributeItem extends Item implements AttributeSingle
 {
-    /**
-     * @var string|null
-     */
-    protected $fixed;
+    protected ?string $fixed = null;
 
-    /**
-     * @var string|null
-     */
-    protected $default;
+    protected ?string $default = null;
+
+    protected bool $qualified = true;
+
+    protected bool $nil = false;
+
+    protected string $use = self::USE_OPTIONAL;
 
     public function getFixed(): ?string
     {
@@ -36,5 +36,35 @@ abstract class AbstractAttributeItem extends Item implements AttributeItem
     public function setDefault(string $default): void
     {
         $this->default = $default;
+    }
+
+    public function isQualified(): bool
+    {
+        return $this->qualified;
+    }
+
+    public function setQualified(bool $qualified): void
+    {
+        $this->qualified = $qualified;
+    }
+
+    public function isNil(): bool
+    {
+        return $this->nil;
+    }
+
+    public function setNil(bool $nil): void
+    {
+        $this->nil = $nil;
+    }
+
+    public function getUse(): string
+    {
+        return $this->use;
+    }
+
+    public function setUse(string $use): void
+    {
+        $this->use = $use;
     }
 }

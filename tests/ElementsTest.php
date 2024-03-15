@@ -5,14 +5,17 @@ declare(strict_types=1);
 namespace GoetasWebservices\XML\XSDReader\Tests;
 
 use GoetasWebservices\XML\XSDReader\Schema\Element\Element;
+use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
+use GoetasWebservices\XML\XSDReader\Schema\Element\ElementItem;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementSingle;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Group;
 use GoetasWebservices\XML\XSDReader\Schema\Element\GroupRef;
 use GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType;
+use GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType;
 
 class ElementsTest extends BaseTest
 {
-    public function testBase()
+    public function testBase(): void
     {
         $schema = $this->reader->readString(
             '
@@ -36,47 +39,48 @@ class ElementsTest extends BaseTest
                 <xs:group name="myGroup2">
                     <xs:element name="alone2" type="xs:string"></xs:element>
                 </xs:group>
-            </xs:schema>');
+            </xs:schema>'
+        );
 
         $myElement = $schema->findElement('myElement', 'http://www.example.com');
-        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef', $myElement);
-        //$this->assertEquals('http://www.example.com', $myElement->getSchema()->getTargetNamespace());
-        $this->assertEquals('myElement', $myElement->getName());
-        $this->assertEquals('string', $myElement->getType()->getName());
+        self::assertInstanceOf(ElementDef::class, $myElement);
+        // self::assertEquals('http://www.example.com', $myElement->getSchema()->getTargetNamespace());
+        self::assertEquals('myElement', $myElement->getName());
+        self::assertEquals('string', $myElement->getType()->getName());
 
         $myGroup = $schema->findGroup('myGroup', 'http://www.example.com');
-        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\Group', $myGroup);
-        //$this->assertEquals('http://www.example.com', $myElement->getSchema()->getTargetNamespace());
-        $this->assertEquals('myGroup', $myGroup->getName());
+        self::assertInstanceOf(Group::class, $myGroup);
+        // self::assertEquals('http://www.example.com', $myElement->getSchema()->getTargetNamespace());
+        self::assertEquals('myGroup', $myGroup->getName());
         $elementsInGroup = $myGroup->getElements();
-        $this->assertCount(3, $elementsInGroup);
+        self::assertCount(3, $elementsInGroup);
 
-        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\Element', $elementsInGroup[0]);
-        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\ElementItem', $elementsInGroup[1]);
-        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\Group', $elementsInGroup[2]);
+        self::assertInstanceOf(Element::class, $elementsInGroup[0]);
+        self::assertInstanceOf(ElementItem::class, $elementsInGroup[1]);
+        self::assertInstanceOf(Group::class, $elementsInGroup[2]);
     }
 
     /**
      * @dataProvider getGroupCounts
      */
-    public function testGroupOccurrences($item, $min, $max)
+    public function testGroupOccurrences($item, $min, $max): void
     {
         $schema = $this->reader->readString(
             '
             <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xs:complexType name="myType">
-                    <xs:sequence>     
+                    <xs:sequence>
                         <xs:group ref="myGroup" minOccurs="1" />
                         <xs:group ref="myGroup" minOccurs="2" />
-                        
+
                         <xs:group ref="myGroup" maxOccurs="1" />
                         <xs:group ref="myGroup" maxOccurs="unbounded" />
-                        
+
                         <xs:group ref="myGroup" minOccurs="1" maxOccurs="1"/>
                         <xs:group ref="myGroup" minOccurs="2" maxOccurs="2"/>
-                        
+
                         <xs:group ref="myGroup" minOccurs="1" maxOccurs="unbounded"/>
-                        
+
                     </xs:sequence>
                 </xs:complexType>
 
@@ -88,34 +92,34 @@ class ElementsTest extends BaseTest
             </xs:schema>');
 
         $myType = $schema->findType('myType', 'http://www.example.com');
-        $this->assertInstanceOf(ComplexType::class, $myType);
+        self::assertInstanceOf(ComplexType::class, $myType);
 
         $myGroup = $schema->findGroup('myGroup', 'http://www.example.com');
-        $this->assertInstanceOf(Group::class, $myGroup);
+        self::assertInstanceOf(Group::class, $myGroup);
 
         $myGroupRef = $myType->getElements()[$item];
-        $this->assertInstanceOf(GroupRef::class, $myGroupRef);
+        self::assertInstanceOf(GroupRef::class, $myGroupRef);
 
         $wrappedEls = $myGroupRef->getElements();
-        if ($max === -1 || $max > 0) {
-            $this->assertEquals($max, $wrappedEls[0]->getMax());
+        if (-1 === $max || $max > 0) {
+            self::assertEquals($max, $wrappedEls[0]->getMax());
         } else {
-            $this->assertEquals(1, $wrappedEls[0]->getMax());
+            self::assertEquals(1, $wrappedEls[0]->getMax());
         }
 
         if ($min > 1) {
-            $this->assertEquals($max, $wrappedEls[0]->getMin());
+            self::assertEquals($max, $wrappedEls[0]->getMin());
         } else {
-            $this->assertEquals(1, $wrappedEls[0]->getMin());
+            self::assertEquals(1, $wrappedEls[0]->getMin());
         }
 
-        $this->assertEquals('myGroup', $myGroupRef->getName());
+        self::assertEquals('myGroup', $myGroupRef->getName());
 
-        $this->assertEquals($min, $myGroupRef->getMin());
-        $this->assertEquals($max, $myGroupRef->getMax());
+        self::assertEquals($min, $myGroupRef->getMin());
+        self::assertEquals($max, $myGroupRef->getMax());
     }
 
-    public function getGroupCounts()
+    public function getGroupCounts(): array
     {
         return [
             // item, min, max
@@ -129,11 +133,11 @@ class ElementsTest extends BaseTest
         ];
     }
 
-    public function testNotQualifiedTargetQualifiedElement()
+    public function testNotQualifiedTargetQualifiedElement(): void
     {
         $schema = $this->reader->readString(
             '
-            <xs:schema version="1.0" targetNamespace="http://www.example.com" 
+            <xs:schema version="1.0" targetNamespace="http://www.example.com"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified">
                 <xs:complexType name="root">
                     <xs:sequence>
@@ -142,30 +146,31 @@ class ElementsTest extends BaseTest
                     </xs:sequence>
                 </xs:complexType>
             </xs:schema>
-            ');
+            '
+        );
 
         $myType = $schema->findType('root', 'http://www.example.com');
-        $this->assertInstanceOf(ComplexType::class, $myType);
-        $this->assertFalse($schema->getElementsQualification());
+        self::assertInstanceOf(ComplexType::class, $myType);
+        self::assertFalse($schema->getElementsQualification());
 
         /**
          * @var $element ElementSingle
          */
         $element = $myType->getElements()[0];
-        $this->assertFalse($element->isQualified());
+        self::assertFalse($element->isQualified());
 
         $element = $myType->getElements()[1];
-        $this->assertTrue($element->isQualified());
+        self::assertTrue($element->isQualified());
     }
 
-    public function testGroupRefOccurrences()
+    public function testGroupRefOccurrences(): void
     {
         $schema = $this->reader->readString(
             '
             <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xs:complexType name="myType">
-                    <xs:sequence>     
-                        <xs:group ref="myGroup" />                        
+                    <xs:sequence>
+                        <xs:group ref="myGroup" />
                     </xs:sequence>
                 </xs:complexType>
 
@@ -177,21 +182,21 @@ class ElementsTest extends BaseTest
             </xs:schema>');
 
         $myType = $schema->findType('myType', 'http://www.example.com');
-        $this->assertInstanceOf(ComplexType::class, $myType);
+        self::assertInstanceOf(ComplexType::class, $myType);
 
         $myGroup = $schema->findGroup('myGroup', 'http://www.example.com');
-        $this->assertInstanceOf(Group::class, $myGroup);
+        self::assertInstanceOf(Group::class, $myGroup);
 
         $myGroupRef = $myType->getElements()[0];
-        $this->assertInstanceOf(GroupRef::class, $myGroupRef);
+        self::assertInstanceOf(GroupRef::class, $myGroupRef);
 
-        $this->assertEquals('myGroup', $myGroupRef->getName());
+        self::assertEquals('myGroup', $myGroupRef->getName());
         // @todo this is not yet really working
-        //        $this->assertEquals(2, $myGroupRef->getMin());
-        //        $this->assertEquals(5, $myGroupRef->getMax());
+        //        self::assertEquals(2, $myGroupRef->getMin());
+        //        self::assertEquals(5, $myGroupRef->getMax());
     }
 
-    public function testAnonym()
+    public function testAnonym(): void
     {
         $schema = $this->reader->readString(
             '
@@ -204,27 +209,28 @@ class ElementsTest extends BaseTest
                     </xs:simpleType>
                 </xs:element>
 
-            </xs:schema>');
+            </xs:schema>'
+        );
 
         $myElementAnon = $schema->findElement('myElementAnonType', 'http://www.example.com');
-        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef', $myElementAnon);
-        //$this->assertEquals('http://www.example.com', $myElement->getSchema()->getTargetNamespace());
-        $this->assertEquals('myElementAnonType', $myElementAnon->getName());
-        $this->assertNull($myElementAnon->getType()->getName());
+        self::assertInstanceOf(ElementDef::class, $myElementAnon);
+        // self::assertEquals('http://www.example.com', $myElement->getSchema()->getTargetNamespace());
+        self::assertEquals('myElementAnonType', $myElementAnon->getName());
+        self::assertNull($myElementAnon->getType()->getName());
 
         $base2 = $myElementAnon->getType();
-        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType', $base2);
-        $this->assertEquals('http://www.example.com', $base2->getSchema()->getTargetNamespace());
-        $this->assertTrue(!$base2->getName());
+        self::assertInstanceOf(SimpleType::class, $base2);
+        self::assertEquals('http://www.example.com', $base2->getSchema()->getTargetNamespace());
+        self::assertTrue(!$base2->getName());
 
         $restriction1 = $base2->getRestriction();
         $base3 = $restriction1->getBase();
-        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType', $base3);
-        $this->assertEquals('http://www.w3.org/2001/XMLSchema', $base3->getSchema()->getTargetNamespace());
-        $this->assertEquals('string', $base3->getName());
+        self::assertInstanceOf(SimpleType::class, $base3);
+        self::assertEquals('http://www.w3.org/2001/XMLSchema', $base3->getSchema()->getTargetNamespace());
+        self::assertEquals('string', $base3->getName());
     }
 
-    public function testElementSimpleTypeDocs()
+    public function testElementSimpleTypeDocs(): void
     {
         $schema = $this->reader->readString(
             '
@@ -239,13 +245,13 @@ class ElementsTest extends BaseTest
             </xs:schema>');
 
         $myElement = $schema->findElement('myElementType', 'http://www.example.com');
-        $this->assertSame(
+        self::assertSame(
             'Element type description',
             $myElement->getType()->getDoc()
         );
     }
 
-    public function testSequenceElementDocs()
+    public function testSequenceElementDocs(): void
     {
         $schema = $this->reader->readString(
             '
@@ -264,6 +270,6 @@ class ElementsTest extends BaseTest
         $myGroup = $schema->findGroup('myGroup', 'http://www.example.com');
         /** @var Element $aloneElement */
         $aloneElement = $myGroup->getElements()[0];
-        $this->assertSame('Alone description', $aloneElement->getDoc());
+        self::assertSame('Alone description', $aloneElement->getDoc());
     }
 }

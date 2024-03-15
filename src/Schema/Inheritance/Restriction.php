@@ -9,15 +9,14 @@ class Restriction extends Base
     /**
      * @var mixed[][]
      */
-    protected $checks = array();
+    protected array $checks = [];
 
     /**
-     * @param string  $type
      * @param mixed[] $value
      */
-    public function addCheck(string $type, array $value): void
+    public function addCheck(RestrictionType $type, array $value): void
     {
-        $this->checks[$type][] = $value;
+        $this->checks[$type->value][] = $value;
     }
 
     /**
@@ -29,12 +28,10 @@ class Restriction extends Base
     }
 
     /**
-     * @param string $type
-     *
      * @return mixed[]
      */
-    public function getChecksByType(string $type): array
+    public function getChecksByType(RestrictionType $type): array
     {
-        return isset($this->checks[$type]) ? $this->checks[$type] : array();
+        return $this->checks[$type->value] ?? [];
     }
 }

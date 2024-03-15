@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace GoetasWebservices\XML\XSDReader\Tests;
 
+use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeSingle;
+use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction;
+use GoetasWebservices\XML\XSDReader\Schema\Type\BaseComplexType;
+use GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType;
+
 /**
  * @group Restriction
  */
@@ -12,7 +17,7 @@ class RestrictionsTest extends BaseTest
     /**
      * Test the correct detection an Enumeration-restriction.
      */
-    public function testRestriction_1()
+    public function testRestriction1(): void
     {
         $schema = $this->reader->readString(
             '
@@ -32,27 +37,27 @@ class RestrictionsTest extends BaseTest
         $element = $schema->findElement('enumeration', 'http://www.example.com');
         $simpleType = $element->getType();
         $restriction = $simpleType->getRestriction();
-        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction', $restriction);
+        self::assertInstanceOf(Restriction::class, $restriction);
 
-        $expectedChecks = array(
-            'enumeration' => array(
-                array(
+        $expectedChecks = [
+            'enumeration' => [
+                [
                     'value' => 'foo',
                     'doc' => '',
-                ),
-                array(
+                ],
+                [
                     'value' => 'bar',
                     'doc' => '',
-                ),
-            ),
-        );
-        $this->assertEquals($expectedChecks, $restriction->getChecks());
+                ],
+            ],
+        ];
+        self::assertEquals($expectedChecks, $restriction->getChecks());
     }
 
     /**
      * Test the correct detection a pattern-restriction.
      */
-    public function testRestriction_2()
+    public function testRestriction2(): void
     {
         $schema = $this->reader->readString(
             '
@@ -71,23 +76,23 @@ class RestrictionsTest extends BaseTest
         $element = $schema->findElement('pattern', 'http://www.example.com');
         $simpleType = $element->getType();
         $restriction = $simpleType->getRestriction();
-        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction', $restriction);
+        self::assertInstanceOf(Restriction::class, $restriction);
 
-        $expectedChecks = array(
-            'pattern' => array(
-                array(
+        $expectedChecks = [
+            'pattern' => [
+                [
                     'value' => '[a-zA-Z0-9]',
                     'doc' => '',
-                ),
-            ),
-        );
-        $this->assertEquals($expectedChecks, $restriction->getChecks());
+                ],
+            ],
+        ];
+        self::assertEquals($expectedChecks, $restriction->getChecks());
     }
 
     /**
      * Test the correct detection a length-restriction.
      */
-    public function testRestriction_3()
+    public function testRestriction3(): void
     {
         $schema = $this->reader->readString(
             '
@@ -106,23 +111,23 @@ class RestrictionsTest extends BaseTest
         $element = $schema->findElement('length', 'http://www.example.com');
         $simpleType = $element->getType();
         $restriction = $simpleType->getRestriction();
-        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction', $restriction);
+        self::assertInstanceOf(Restriction::class, $restriction);
 
-        $expectedChecks = array(
-            'length' => array(
-                array(
+        $expectedChecks = [
+            'length' => [
+                [
                     'value' => '10',
                     'doc' => '',
-                ),
-            ),
-        );
-        $this->assertEquals($expectedChecks, $restriction->getChecks());
+                ],
+            ],
+        ];
+        self::assertEquals($expectedChecks, $restriction->getChecks());
     }
 
     /**
      * Test the correct detection a minLength- and maxLength-restriction.
      */
-    public function testRestriction_4()
+    public function testRestriction4(): void
     {
         $schema = $this->reader->readString(
             '
@@ -142,29 +147,29 @@ class RestrictionsTest extends BaseTest
         $element = $schema->findElement('minMaxLength', 'http://www.example.com');
         $simpleType = $element->getType();
         $restriction = $simpleType->getRestriction();
-        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction', $restriction);
+        self::assertInstanceOf(Restriction::class, $restriction);
 
-        $expectedChecks = array(
-            'minLength' => array(
-                array(
+        $expectedChecks = [
+            'minLength' => [
+                [
                     'value' => '5',
                     'doc' => '',
-                ),
-            ),
-            'maxLength' => array(
-                array(
+                ],
+            ],
+            'maxLength' => [
+                [
                     'value' => '8',
                     'doc' => '',
-                ),
-            ),
-        );
-        $this->assertEquals($expectedChecks, $restriction->getChecks());
+                ],
+            ],
+        ];
+        self::assertEquals($expectedChecks, $restriction->getChecks());
     }
 
     /**
      * Test the correct detection a minInclusive- and maxInclusive-restriction.
      */
-    public function testRestriction_5()
+    public function testRestriction5(): void
     {
         $schema = $this->reader->readString(
             '
@@ -184,29 +189,29 @@ class RestrictionsTest extends BaseTest
         $element = $schema->findElement('minMaxInclusive', 'http://www.example.com');
         $simpleType = $element->getType();
         $restriction = $simpleType->getRestriction();
-        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction', $restriction);
+        self::assertInstanceOf(Restriction::class, $restriction);
 
-        $expectedChecks = array(
-            'minInclusive' => array(
-                array(
+        $expectedChecks = [
+            'minInclusive' => [
+                [
                     'value' => '1',
                     'doc' => '',
-                ),
-            ),
-            'maxInclusive' => array(
-                array(
+                ],
+            ],
+            'maxInclusive' => [
+                [
                     'value' => '10',
                     'doc' => '',
-                ),
-            ),
-        );
-        $this->assertEquals($expectedChecks, $restriction->getChecks());
+                ],
+            ],
+        ];
+        self::assertEquals($expectedChecks, $restriction->getChecks());
     }
 
     /**
      * Test the correct detection a minExclusive- and maxExclusive-restriction.
      */
-    public function testRestriction_6()
+    public function testRestriction6(): void
     {
         $schema = $this->reader->readString(
             '
@@ -226,29 +231,29 @@ class RestrictionsTest extends BaseTest
         $element = $schema->findElement('minMaxExclusive', 'http://www.example.com');
         $simpleType = $element->getType();
         $restriction = $simpleType->getRestriction();
-        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction', $restriction);
+        self::assertInstanceOf(Restriction::class, $restriction);
 
-        $expectedChecks = array(
-            'minExclusive' => array(
-                array(
+        $expectedChecks = [
+            'minExclusive' => [
+                [
                     'value' => '1',
                     'doc' => '',
-                ),
-            ),
-            'maxExclusive' => array(
-                array(
+                ],
+            ],
+            'maxExclusive' => [
+                [
                     'value' => '10',
                     'doc' => '',
-                ),
-            ),
-        );
-        $this->assertEquals($expectedChecks, $restriction->getChecks());
+                ],
+            ],
+        ];
+        self::assertEquals($expectedChecks, $restriction->getChecks());
     }
 
     /**
      * Test the correct detection a fractionDigits-restriction.
      */
-    public function testRestriction_7()
+    public function testRestriction7(): void
     {
         $schema = $this->reader->readString(
             '
@@ -267,23 +272,23 @@ class RestrictionsTest extends BaseTest
         $element = $schema->findElement('fractionDigits', 'http://www.example.com');
         $simpleType = $element->getType();
         $restriction = $simpleType->getRestriction();
-        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction', $restriction);
+        self::assertInstanceOf(Restriction::class, $restriction);
 
-        $expectedChecks = array(
-            'fractionDigits' => array(
-                array(
+        $expectedChecks = [
+            'fractionDigits' => [
+                [
                     'value' => '2',
                     'doc' => '',
-                ),
-            ),
-        );
-        $this->assertEquals($expectedChecks, $restriction->getChecks());
+                ],
+            ],
+        ];
+        self::assertEquals($expectedChecks, $restriction->getChecks());
     }
 
     /**
      * Test the correct detection a totalDigits-restriction.
      */
-    public function testRestriction_8()
+    public function testRestriction8(): void
     {
         $schema = $this->reader->readString(
             '
@@ -302,23 +307,23 @@ class RestrictionsTest extends BaseTest
         $element = $schema->findElement('totalDigits', 'http://www.example.com');
         $simpleType = $element->getType();
         $restriction = $simpleType->getRestriction();
-        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction', $restriction);
+        self::assertInstanceOf(Restriction::class, $restriction);
 
-        $expectedChecks = array(
-            'totalDigits' => array(
-                array(
+        $expectedChecks = [
+            'totalDigits' => [
+                [
                     'value' => '4',
                     'doc' => '',
-                ),
-            ),
-        );
-        $this->assertEquals($expectedChecks, $restriction->getChecks());
+                ],
+            ],
+        ];
+        self::assertEquals($expectedChecks, $restriction->getChecks());
     }
 
     /**
      * Test the correct detection a totalDigits- and fractionDigits-restriction.
      */
-    public function testRestriction_9()
+    public function testRestriction9(): void
     {
         $schema = $this->reader->readString(
             '
@@ -338,29 +343,29 @@ class RestrictionsTest extends BaseTest
         $element = $schema->findElement('totalFractionDigits', 'http://www.example.com');
         $simpleType = $element->getType();
         $restriction = $simpleType->getRestriction();
-        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction', $restriction);
+        self::assertInstanceOf(Restriction::class, $restriction);
 
-        $expectedChecks = array(
-            'totalDigits' => array(
-                array(
+        $expectedChecks = [
+            'totalDigits' => [
+                [
                     'value' => '4',
                     'doc' => '',
-                ),
-            ),
-            'fractionDigits' => array(
-                array(
+                ],
+            ],
+            'fractionDigits' => [
+                [
                     'value' => '2',
                     'doc' => '',
-                ),
-            ),
-        );
-        $this->assertEquals($expectedChecks, $restriction->getChecks());
+                ],
+            ],
+        ];
+        self::assertEquals($expectedChecks, $restriction->getChecks());
     }
 
     /**
      * Test the correct detection a whiteSpace-restriction.
      */
-    public function testRestriction_10()
+    public function testRestriction10(): void
     {
         $schema = $this->reader->readString(
             '
@@ -379,16 +384,198 @@ class RestrictionsTest extends BaseTest
         $element = $schema->findElement('whiteSpace', 'http://www.example.com');
         $simpleType = $element->getType();
         $restriction = $simpleType->getRestriction();
-        $this->assertInstanceOf('GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction', $restriction);
+        self::assertInstanceOf(Restriction::class, $restriction);
 
-        $expectedChecks = array(
-            'whiteSpace' => array(
-                array(
+        $expectedChecks = [
+            'whiteSpace' => [
+                [
                     'value' => 'replace',
                     'doc' => '',
-                ),
-            ),
+                ],
+            ],
+        ];
+        self::assertEquals($expectedChecks, $restriction->getChecks());
+    }
+
+    public function testRestrictionOverridingAttribute(): void
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+                <xs:complexType name="BaseAmountType">
+                  <xs:simpleContent>
+                     <xs:extension base="xs:decimal">
+                        <xs:attribute name="currencyID" type="xs:string" use="optional">
+                        </xs:attribute>
+                        <xs:attribute name="currencyCodeListVersionID" type="xs:normalizedString" use="optional">
+                        </xs:attribute>
+                     </xs:extension>
+                  </xs:simpleContent>
+                </xs:complexType>
+
+                <xs:complexType name="AmountType">
+                  <xs:simpleContent>
+                      <xs:restriction base="BaseAmountType">
+                        <xs:attribute name="currencyID" type="xs:string" use="required">
+                        </xs:attribute>
+                      </xs:restriction>
+                  </xs:simpleContent>
+                </xs:complexType>
+
+                <xs:element name="root">
+                    <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="myAmount" type="AmountType"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+
+            </xs:schema>'
         );
-        $this->assertEquals($expectedChecks, $restriction->getChecks());
+
+        $rootType = $schema->getElements()['root']->getType();
+        self::assertInstanceOf(ComplexType::class, $rootType);
+        $element = $rootType->getElements()[0];
+        self::assertEquals('myAmount', $element->getName());
+        $elementType = $element->getType();
+        self::assertEquals('AmountType', $elementType->getName());
+        self::assertInstanceOf(BaseComplexType::class, $elementType);
+
+        $baseType = $elementType->getRestriction()->getBase();
+        self::assertEquals('BaseAmountType', $baseType->getName());
+        self::assertInstanceOf(BaseComplexType::class, $baseType);
+
+        self::assertCount(1, $elementType->getAttributes());
+        $attribute = $elementType->getAttributes()[0];
+        self::assertInstanceOf(AttributeSingle::class, $attribute);
+        self::assertEquals('currencyID', $attribute->getName());
+        self::assertEquals('string', $attribute->getType()->getName());
+        self::assertEquals(AttributeSingle::USE_REQUIRED, $attribute->getUse());
+    }
+
+    public function testRestrictionInRestrictionOverridingAttribute(): void
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+                <xs:complexType name="BaseAmountType">
+                  <xs:simpleContent>
+                     <xs:extension base="xs:decimal">
+                        <xs:attribute name="currencyID" type="xs:string" use="optional">
+                        </xs:attribute>
+                        <xs:attribute name="currencyCodeListVersionID" type="xs:normalizedString" use="optional">
+                        </xs:attribute>
+                     </xs:extension>
+                  </xs:simpleContent>
+                </xs:complexType>
+
+                <xs:complexType name="AmountType">
+                  <xs:simpleContent>
+                      <xs:restriction base="BaseAmountType">
+                        <xs:attribute name="currencyID" type="xs:string" use="required">
+                        </xs:attribute>
+                      </xs:restriction>
+                    </xs:simpleContent>
+                  </xs:complexType>
+
+                <xs:complexType name="MyAmountType">
+                  <xs:simpleContent>
+                    <xs:restriction base="AmountType"/>
+                  </xs:simpleContent>
+                </xs:complexType>
+
+                <xs:element name="root">
+                    <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="myAmount" type="MyAmountType"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+
+            </xs:schema>'
+        );
+
+        $rootType = $schema->getElements()['root']->getType();
+        self::assertInstanceOf(ComplexType::class, $rootType);
+        $element = $rootType->getElements()[0];
+        self::assertEquals('myAmount', $element->getName());
+        $elementType = $element->getType();
+        self::assertEquals('MyAmountType', $elementType->getName());
+        self::assertInstanceOf(BaseComplexType::class, $elementType);
+
+        $baseType = $elementType->getRestriction()->getBase();
+        self::assertEquals('AmountType', $baseType->getName());
+        self::assertInstanceOf(BaseComplexType::class, $baseType);
+        $baseTypeTwo = $baseType->getRestriction()->getBase();
+        self::assertEquals('BaseAmountType', $baseTypeTwo->getName());
+
+        self::assertCount(1, $baseType->getAttributes());
+        $attribute = $baseType->getAttributes()[0];
+        self::assertInstanceOf(AttributeSingle::class, $attribute);
+        self::assertEquals('currencyID', $attribute->getName());
+        self::assertEquals('string', $attribute->getType()->getName());
+        self::assertEquals(AttributeSingle::USE_REQUIRED, $attribute->getUse());
+    }
+
+    public function testAttributeInExtensionInRestriction(): void
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+                <xs:complexType name="BaseQuantityType">
+                  <xs:simpleContent>
+                    <xs:extension base="xs:decimal">
+                      <xs:attribute name="unitCode" type="xs:string" use="optional" />
+                    </xs:extension>
+                  </xs:simpleContent>
+                </xs:complexType>
+
+                <xs:complexType name="QuantityType">
+                  <xs:simpleContent>
+                    <xs:extension base="BaseQuantityType"/>
+                  </xs:simpleContent>
+                </xs:complexType>
+
+                <xs:complexType name="MyQuantityType">
+                  <xs:simpleContent>
+                    <xs:restriction base="QuantityType"/>
+                  </xs:simpleContent>
+                </xs:complexType>
+
+                <xs:element name="root">
+                    <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="myQuantity" type="MyQuantityType"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+
+            </xs:schema>'
+        );
+
+        $rootType = $schema->getElements()['root']->getType();
+        self::assertInstanceOf(ComplexType::class, $rootType);
+        $element = $rootType->getElements()[0];
+        self::assertEquals('myQuantity', $element->getName());
+        $elementType = $element->getType();
+        self::assertEquals('MyQuantityType', $elementType->getName());
+        self::assertInstanceOf(BaseComplexType::class, $elementType);
+
+        $baseType = $elementType->getRestriction()->getBase();
+        self::assertEquals('QuantityType', $baseType->getName());
+        self::assertInstanceOf(BaseComplexType::class, $baseType);
+        $baseTypeTwo = $baseType->getExtension()->getBase();
+        self::assertEquals('BaseQuantityType', $baseTypeTwo->getName());
+        self::assertInstanceOf(BaseComplexType::class, $baseTypeTwo);
+
+        self::assertCount(1, $baseTypeTwo->getAttributes());
+        $attribute = $baseTypeTwo->getAttributes()[0];
+        self::assertInstanceOf(AttributeSingle::class, $attribute);
+        self::assertEquals('unitCode', $attribute->getName());
+        self::assertEquals('string', $attribute->getType()->getName());
+        self::assertEquals(AttributeSingle::USE_OPTIONAL, $attribute->getUse());
     }
 }

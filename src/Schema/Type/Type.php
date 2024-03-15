@@ -4,38 +4,27 @@ declare(strict_types=1);
 
 namespace GoetasWebservices\XML\XSDReader\Schema\Type;
 
+use GoetasWebservices\XML\XSDReader\Schema\Element\InterfaceSetAbstract;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Base;
+use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Extension;
+use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction;
 use GoetasWebservices\XML\XSDReader\Schema\Schema;
 use GoetasWebservices\XML\XSDReader\Schema\SchemaItem;
 use GoetasWebservices\XML\XSDReader\Schema\SchemaItemTrait;
-use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Extension;
-use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction;
 
-abstract class Type implements SchemaItem
+abstract class Type implements SchemaItem, InterfaceSetAbstract
 {
     use SchemaItemTrait;
 
-    /**
-     * @var string|null
-     */
-    protected $name;
+    protected ?string $name;
 
-    /**
-     * @var bool
-     */
-    protected $abstract = false;
+    protected bool $abstract = false;
 
-    /**
-     * @var Restriction|null
-     */
-    protected $restriction;
+    protected ?Restriction $restriction = null;
 
-    /**
-     * @var Extension|null
-     */
-    protected $extension;
+    protected ?Extension $extension = null;
 
-    public function __construct(Schema $schema, string $name = null)
+    public function __construct(Schema $schema, ?string $name = null)
     {
         $this->name = $name ?: null;
         $this->schema = $schema;
@@ -48,7 +37,7 @@ abstract class Type implements SchemaItem
 
     public function __toString(): string
     {
-        return strval($this->name);
+        return (string) $this->name;
     }
 
     public function isAbstract(): bool

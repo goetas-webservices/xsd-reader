@@ -1,0 +1,41 @@
+<?php
+
+declare(strict_types=1);
+
+// see also https://github.com/symfony/symfony/blob/6.1/.php-cs-fixer.dist.php
+
+return (new PhpCsFixer\Config())
+    ->setRules([
+        '@PHP81Migration' => true,
+        '@PHPUnit84Migration:risky' => true,
+        '@Symfony' => true,
+        '@Symfony:risky' => true,
+        'combine_nested_dirname' => true,
+        'concat_space' => ['spacing' => 'one'],
+        'fopen_flags' => false,
+        'mb_str_functions' => true,
+        'native_constant_invocation' => false,
+        'native_function_invocation' => false,
+        'no_short_bool_cast' => true,
+        'nullable_type_declaration_for_default_null_value' => true,
+        'phpdoc_align' => ['align' => 'left'],
+        'phpdoc_to_comment' => false, // for custom annotations (e.g. php-translation)
+        'phpdoc_to_param_type' => true,
+        'phpdoc_to_return_type' => true,
+        'php_unit_test_annotation' => false, // breaks "@depends App\Something::testFooBar()"
+        'protected_to_private' => false,
+        'simplified_null_return' => true,
+        'no_unreachable_default_argument_value' => false,
+    ])
+    ->setRiskyAllowed(true)
+    ->setFinder(
+        (new PhpCsFixer\Finder())
+            ->in([
+              'src',
+              'tests'
+            ])
+            ->notPath('#/Fixtures/#')
+            ->notPath('#/vendor/#')
+    )
+    ->setCacheFile('.php-cs-fixer.cache')
+;

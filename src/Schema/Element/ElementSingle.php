@@ -6,16 +6,17 @@ namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
 use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
 
-interface ElementSingle extends ElementItem, InterfaceSetMinMax, InterfaceSetDefault
+interface ElementSingle extends ElementItem, InterfaceSetMinMax, InterfaceSetFixed, InterfaceSetDefault
 {
-    public function getType(): ? Type;
+    public function getType(): ?Type;
 
     public function isQualified(): bool;
 
-    /**
-     * @param bool $qualified
-     */
     public function setQualified(bool $qualified): void;
+
+    public function isLocal(): bool;
+
+    public function setLocal(bool $local): void;
 
     public function isNil(): bool;
 

@@ -6,15 +6,9 @@ namespace GoetasWebservices\XML\XSDReader\Schema;
 
 trait SchemaItemTrait
 {
-    /**
-     * @var Schema
-     */
-    protected $schema;
+    protected Schema $schema;
 
-    /**
-     * @var string
-     */
-    protected $doc = '';
+    protected string $doc = '';
 
     public function getSchema(): Schema
     {

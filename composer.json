@@ -16,18 +16,20 @@
         }
     ],
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true
+        }
     },
     "require" : {
-        "php": "^7.1"
+        "php": "^8.1"
     },
     "require-dev" : {
-        "friendsofphp/php-cs-fixer": "^2.10",
-        "phpstan/phpstan": "^0.9.1",
-        "phpstan/phpstan-strict-rules": "^0.9.0",
-        "phpunit/phpunit": "^6.5",
-        "sebastian/phpcpd": "^3.0",
-        "vimeo/psalm": "^0.3.85"
+        "friendsofphp/php-cs-fixer": "^3.14",
+        "phpstan/phpstan": "^1.9",
+        "phpunit/phpunit": "^9.6",
+        "sebastian/phpcpd": "^6.0",
+        "vimeo/psalm": "^5.6"
     },
     "autoload" : {
         "psr-4" : {

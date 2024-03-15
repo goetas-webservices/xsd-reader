@@ -10,35 +10,19 @@ class UrlUtils
     {
         if ('' === trim($rel)) {
             return $base;
-        } elseif (
-        /* return if already absolute URL */
-            parse_url($rel, PHP_URL_SCHEME) !== null ||
-            substr($rel, 0, 2) === '//'
-        ) {
+        }
+
+        if (null !== parse_url($rel, PHP_URL_SCHEME) || str_starts_with($rel, '//')) {
             return $rel;
-        } elseif (
-        /* queries and anchors */
-            in_array(
-                $rel[0],
-                [
-                    '#',
-                    '?',
-                ],
-                true
-            )
-        ) {
-            return $base.$rel;
+        }
+
+        if (in_array($rel[0], ['#', '?'], true)) {
+            return $base . $rel;
         }
 
         return static::resolveRelativeUrlAfterEarlyChecks($base, $rel);
     }
 
-    /**
-     * @param string $base
-     * @param string $rel
-     *
-     * @return string
-     */
     protected static function resolveRelativeUrlAfterEarlyChecks(string $base, string $rel): string
     {
         /* fix url file for Windows */
@@ -52,46 +36,42 @@ class UrlUtils
          */
         $parts = parse_url($base);
 
-        return static::resolveRelativeUrlToAbsoluteUrl(
-            $rel,
-            (
-                $rel[0] === '/'
-                    ? ''  // destroy path if relative url points to root
-                    : ( // remove non-directory element from path
-                        isset($parts['path'])
-                            ? preg_replace(
-                                '#/[^/]*$#',
-                                '',
-                                (string) $parts['path']
-                            )
-                            : ''
+        $path = '/' === $rel[0]
+            ? ''  // destroy path if relative url points to root
+            : ( // remove non-directory element from path
+                isset($parts['path'])
+                    ? preg_replace(
+                        '#/[^/]*$#',
+                        '',
+                        (string) $parts['path']
                     )
-            ),
-            $parts
-        );
+                    : ''
+            );
+
+        return static::resolveRelativeUrlToAbsoluteUrl($rel, $path, $parts);
     }
 
-    protected static function resolveRelativeUrlToAbsoluteUrl(
-        string $rel,
-        string $path,
-        array $parts
-    ): string {
+    /**
+     * @param array<string, string> $parts
+     */
+    protected static function resolveRelativeUrlToAbsoluteUrl(string $rel, string $path, array $parts): string
+    {
         /* Build absolute URL */
         $abs = '';
 
         if (isset($parts['host'])) {
-            $abs .= (string) $parts['host'];
+            $abs .= $parts['host'];
         }
 
         if (isset($parts['port'])) {
-            $abs .= ':'.(string) $parts['port'];
+            $abs .= ':' . $parts['port'];
         }
 
-        $abs .= $path.'/'.$rel;
+        $abs .= $path . '/' . $rel;
         $abs = static::replaceSuperfluousSlashes($abs);
 
         if (isset($parts['scheme'])) {
-            $abs = (string) $parts['scheme'].'://'.$abs;
+            $abs = $parts['scheme'] . '://' . $abs;
         }
 
         return $abs;
@@ -99,13 +79,19 @@ class UrlUtils
 
     /**
      * replace superfluous slashes with a single slash.
-     * covers:
+     * covers:.
      * //
      * /./
      * /foo/../.
      */
     protected static function replaceSuperfluousSlashes(string $abs): string
     {
+        /* Use realpath to deal with multiple levels if the path exists */
+        $rp = realpath($abs);
+        if ($rp) {
+            return $rp;
+        }
+
         $n = 1;
         do {
             $abs = preg_replace(
@@ -115,7 +101,7 @@ class UrlUtils
                 -1,
                 $n
             );
-        } while ($n > 0);
+        } while (0 < $n);
 
         return $abs;
     }

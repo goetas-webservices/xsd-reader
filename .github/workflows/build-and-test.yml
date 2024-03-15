@@ -1,0 +1,130 @@
+name: Build and test
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Build (PHP ${{ matrix.php-versions }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-versions: ['8.1', '8.2']
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: |
+          dir="$(composer config cache-files-dir)"
+          echo "dir=$dir" >> $GITHUB_OUTPUT
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install composer dependencies
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+  test:
+    name: Tests (PHP ${{ matrix.php-versions }})
+    runs-on: ubuntu-latest
+    needs: build
+    strategy:
+      matrix:
+        php-versions: ['8.1', '8.2']
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+
+      # Docs: https://github.com/shivammathur/setup-php
+      - name: Setup PHP with PCOV
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          tools: php-cs-fixer, phpunit-bridge
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql
+          coverage: pcov
+          #ini-values: post_max_size=256M, max_execution_time=180
+
+      - name: Install composer dependencies
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Run unit tests with coverage
+        run: ./vendor/bin/phpunit
+
+      - name: Determine coverage badge
+        uses: timkrase/phpunit-coverage-badge@main
+        with:
+          push_badge: true
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+
+  qa-phpstan:
+    name: QA - Run phpstan (PHP ${{ matrix.php-versions }})
+    runs-on: ubuntu-latest
+    needs: test
+    strategy:
+      matrix:
+        php-versions: ['8.1']#, '8.2']
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+
+      - name: Install composer dependencies
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Run phpstan
+        run: ./vendor/bin/phpstan analyse -c ./phpstan.neon --level 6 src
+
+  qa-psalm:
+    name: QA - Run psalm (PHP ${{ matrix.php-versions }})
+    runs-on: ubuntu-latest
+    needs: test
+    strategy:
+      matrix:
+        php-versions: ['8.1']#, '8.2']
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+
+      - name: Install composer dependencies
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Run psalm
+        run: ./vendor/bin/psalm
+
+  qa-phpcpd:
+    name: QA - Run phpcpd (PHP ${{ matrix.php-versions }})
+    runs-on: ubuntu-latest
+    needs: test
+    strategy:
+      matrix:
+        php-versions: ['8.1']#, '8.2']
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+
+      - name: Install composer dependencies
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Run phpcpd
+        run: ./vendor/bin/phpcpd ./src/
+
+  qa-cs-fixer:
+    name: QA - Run php-cs-fixer (PHP ${{ matrix.php-versions }})
+    runs-on: ubuntu-latest
+    needs: test
+    strategy:
+      matrix:
+        php-versions: ['8.1']#, '8.2']
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+
+      - name: Install composer dependencies
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Run php-cs-fixer
+        run: ./vendor/bin/php-cs-fixer fix --verbose --allow-risky=yes --dry-run --config ".php-cs-fixer.dist"

@@ -9,12 +9,9 @@ use PHPUnit\Framework\TestCase;
 
 class StandardDocumentationReaderTest extends TestCase
 {
-    /**
-     * @var StandardDocumentationReader
-     */
-    private $reader;
+    private StandardDocumentationReader $reader;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->reader = new StandardDocumentationReader();
     }
@@ -25,7 +22,11 @@ class StandardDocumentationReaderTest extends TestCase
 
         $result = $this->reader->get($element);
 
-        $this->assertInternalType('string', $result);
+        if (method_exists($this, 'assertIsString')) {
+            $this->assertIsString($result);
+        } else {
+            $this->assertIsString($result);
+        }
     }
 
     public function testItReturnsTheTrimmedAnnotationDocumentationText()
@@ -67,22 +68,19 @@ class StandardDocumentationReaderTest extends TestCase
         $this->assertSame('', $result);
     }
 
-    /**
-     * @return \DOMElement
-     */
-    private function getSampleElement($text)
+    private function getSampleElement($text): \DOMElement
     {
         $xml = <<<XML
-<xs:schema targetNamespace="http://www.w3.org/2001/XMLSchema" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-<xs:simpleType name="fooBar">
-    <xs:annotation>
-        <xs:documentation>
-            $text
-        </xs:documentation>
-    </xs:annotation>
-</xs:simpleType>
-</xs:schema>
-XML;
+            <xs:schema targetNamespace="http://www.w3.org/2001/XMLSchema" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:simpleType name="fooBar">
+                <xs:annotation>
+                    <xs:documentation>
+                        $text
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:simpleType>
+            </xs:schema>
+            XML;
         $doc = new \DOMDocument('1.0', 'UTF-8');
         $doc->loadXML($xml);
         $element = $doc->getElementsByTagName('simpleType');
@@ -93,13 +91,13 @@ XML;
     private function getSampleElementWithoutDocumentation()
     {
         $xml = <<<XML
-<xs:schema targetNamespace="http://www.w3.org/2001/XMLSchema" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-<xs:simpleType name="fooBar">
-    <xs:annotation>
-    </xs:annotation>
-</xs:simpleType>
-</xs:schema>
-XML;
+            <xs:schema targetNamespace="http://www.w3.org/2001/XMLSchema" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:simpleType name="fooBar">
+                <xs:annotation>
+                </xs:annotation>
+            </xs:simpleType>
+            </xs:schema>
+            XML;
         $doc = new \DOMDocument('1.0', 'UTF-8');
         $doc->loadXML($xml);
         $element = $doc->getElementsByTagName('simpleType');
