@@ -298,6 +298,9 @@ class SchemaReader
                     case 'import':
                         $callback = $this->loadImport($schema, $childNode);
                         break;
+                    case 'redefine':
+                        $callback = $this->loadRedefine($schema, $childNode);
+                        break;
                     case 'element':
                         $callback = $this->loadElementDef($schema, $node, $childNode);
                         break;
@@ -1188,6 +1191,32 @@ class SchemaReader
         }
 
         return $this->loadImportFresh($namespace, $schema, $file);
+    }
+
+    private function loadRedefine(Schema $schema, DOMElement $node): Closure
+    {
+        $base = urldecode($node->ownerDocument->documentURI);
+        $file = UrlUtils::resolveRelativeUrl($base, $node->getAttribute('schemaLocation'));
+
+        if (isset($this->loadedFiles[$file])) {
+            /* @var $redefined Schema */
+            $redefined = clone $this->loadedFiles[$file];
+
+            if ($schema->getTargetNamespace() !== $redefined->getTargetNamespace()) {
+                $redefined->setTargetNamespace($schema->getTargetNamespace());
+            }
+
+            $schema->addSchema($redefined);
+
+            return function () use ($redefined, $node, $schema): void {
+                $callbacks = $this->schemaNode($redefined, $node, $schema);
+                foreach ($callbacks as $callback) {
+                    $callback();
+                }
+            };
+        }
+
+        return $this->loadImportFresh((string) $schema->getTargetNamespace(), $schema, $file);
     }
 
     private function createOrUseSchemaForNs(Schema $schema, string $namespace): Schema

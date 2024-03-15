@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns="spec:example:xsd:CommonBasicComponents-1.0"
+    targetNamespace="spec:example:xsd:CommonBasicComponents-1.0"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
+
+  <xsd:redefine schemaLocation="base-components.xsd">
+  </xsd:redefine>
+
+  <xsd:element name="DeliveryDate" type="DateType">
+     <xsd:annotation><xsd:documentation>Lieferdatum</xsd:documentation>
+     </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="BacklogIndicator" type="IndicatorType">
+     <xsd:annotation><xsd:documentation>Indikator</xsd:documentation>
+     </xsd:annotation>
+  </xsd:element>
+</xsd:schema>
