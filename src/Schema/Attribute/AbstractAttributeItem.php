@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace GoetasWebservices\XML\XSDReader\Schema\Attribute;
 
 use GoetasWebservices\XML\XSDReader\Schema\Item;
+use GoetasWebservices\XML\XSDReader\Schema\MetaInformation;
 
 abstract class AbstractAttributeItem extends Item implements AttributeSingle
 {
@@ -17,6 +18,11 @@ abstract class AbstractAttributeItem extends Item implements AttributeSingle
     protected bool $nil = false;
 
     protected string $use = self::USE_OPTIONAL;
+
+    /**
+     * @var list<MetaInformation>
+     */
+    protected array $meta = [];
 
     public function getFixed(): ?string
     {
@@ -66,5 +72,21 @@ abstract class AbstractAttributeItem extends Item implements AttributeSingle
     public function setUse(string $use): void
     {
         $this->use = $use;
+    }
+
+    /**
+     * @return list<MetaInformation>
+     */
+    public function getMeta(): array
+    {
+        return $this->meta;
+    }
+
+    /**
+     * @param list<MetaInformation> $meta
+     */
+    public function setMeta(array $meta): void
+    {
+        $this->meta = $meta;
     }
 }

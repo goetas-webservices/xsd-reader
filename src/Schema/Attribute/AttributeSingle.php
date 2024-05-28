@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace GoetasWebservices\XML\XSDReader\Schema\Attribute;
 
+use GoetasWebservices\XML\XSDReader\Schema\MetaInformation;
 use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
 
 interface AttributeSingle extends AttributeItem
@@ -35,4 +36,14 @@ interface AttributeSingle extends AttributeItem
     public function getUse(): ?string;
 
     public function setUse(string $use): void;
+
+    /**
+     * @param list<MetaInformation> $meta
+     */
+    public function setMeta(array $meta): void;
+
+    /**
+     * @return list<MetaInformation>
+     */
+    public function getMeta(): array;
 }
