@@ -578,4 +578,42 @@ class RestrictionsTest extends BaseTest
         self::assertEquals('string', $attribute->getType()->getName());
         self::assertEquals(AttributeSingle::USE_OPTIONAL, $attribute->getUse());
     }
+
+    public function testElementOverrideInRestriction(): void
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.example.com" xlmns:tns="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <!-- SOAP 1.1 enc:Array-->
+                <xs:group name="Array">
+                    <xs:sequence>
+                        <xs:any namespace="##any" minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+                    </xs:sequence>
+                </xs:group>
+                <xs:element name="Array" type="tns:Array"/>
+                <xs:complexType name="Array">
+                </xs:complexType>
+
+                <xs:complexType name="testType">
+                    <xs:complexContent>
+                        <xs:restriction base="tns:Array">
+                            <xs:all>
+                                <xs:element name="x_item" type="xs:int" maxOccurs="unbounded" />
+                            </xs:all>
+                        </xs:restriction>
+                    </xs:complexContent>
+                </xs:complexType>
+            </xs:schema>'
+        );
+
+        $rootType = $schema->getTypes()['testType'];
+        self::assertInstanceOf(ComplexType::class, $rootType);
+
+        $element = $rootType->getElements()[0];
+        self::assertEquals('x_item', $element->getName());
+
+        $baseType = $rootType->getRestriction()->getBase();
+        self::assertInstanceOf(ComplexType::class, $baseType);
+        self::assertEquals('Array', $baseType->getName());
+    }
 }
