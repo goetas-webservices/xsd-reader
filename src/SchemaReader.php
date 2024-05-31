@@ -252,6 +252,7 @@ class SchemaReader
             if (null !== $attr->namespaceURI && self::XSD_NS !== $attr->namespaceURI) {
                 $meta[] = new MetaInformation(
                     $this->findSchemaForNamespace($item->getSchema(), $attr->namespaceURI),
+                    $this->findSchemaForNamespace($item->getSchema(), $attr->parentNode->namespaceURI),
                     $attr->name,
                     $attr->value
                 );
