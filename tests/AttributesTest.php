@@ -162,7 +162,8 @@ class AttributesTest extends BaseTest
         self::assertCount(1, $meta);
         self::assertEquals('meta', $meta[0]->getName());
         self::assertEquals('hello', $meta[0]->getValue());
-        self::assertSame($myAttribute->getSchema(), $meta[0]->getSchema());
+        self::assertEquals('http://www.example.com', $meta[0]->getNamespaceURI());
+        self::assertSame(SchemaReader::XSD_NS, $meta[0]->getContextSchema()->getTargetNamespace());
     }
 
     public function testExternalSchemaReferencingMetaInformationPrefixed(): void
@@ -191,7 +192,7 @@ class AttributesTest extends BaseTest
         self::assertEquals('xs:string', $meta[0]->getValue());
 
         $refAttr = $schema->findAttribute('metaType', 'http://www.ref.com');
-        self::assertSame($refAttr->getSchema(), $meta[0]->getSchema());
+        self::assertSame($refAttr->getSchema()->getTargetNamespace(), $meta[0]->getNamespaceURI());
         self::assertSame(SchemaReader::XSD_NS, $meta[0]->getContextSchema()->getTargetNamespace());
     }
 
@@ -222,7 +223,7 @@ class AttributesTest extends BaseTest
         self::assertEquals('string', $meta[0]->getValue());
 
         $refAttr = $schema->findAttribute('metaType', 'http://www.ref.com');
-        self::assertSame($refAttr->getSchema(), $meta[0]->getSchema());
+        self::assertSame($refAttr->getSchema()->getTargetNamespace(), $meta[0]->getNamespaceURI());
         self::assertSame(SchemaReader::XSD_NS, $meta[0]->getContextSchema()->getTargetNamespace());
     }
 }
