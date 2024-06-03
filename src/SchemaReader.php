@@ -946,6 +946,11 @@ class SchemaReader
                 if ($type instanceof BaseComplexType) {
                     $this->loadChildAttributesAndAttributeGroups($type, $node, $childNode);
                 }
+
+                if ($type instanceof ElementContainer) {
+                    $this->loadSequenceChildNode($type, $node, $childNode, null, null);
+                }
+
                 if (null !== ($restrictionType = RestrictionType::tryFrom($childNode->localName))) {
                     $restriction->addCheck(
                         $restrictionType,
