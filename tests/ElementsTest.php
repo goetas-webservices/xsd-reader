@@ -12,6 +12,7 @@ use GoetasWebservices\XML\XSDReader\Schema\Element\Group;
 use GoetasWebservices\XML\XSDReader\Schema\Element\GroupRef;
 use GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType;
 use GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType;
+use GoetasWebservices\XML\XSDReader\SchemaReader;
 
 class ElementsTest extends BaseTest
 {
@@ -271,5 +272,71 @@ class ElementsTest extends BaseTest
         /** @var Element $aloneElement */
         $aloneElement = $myGroup->getElements()[0];
         self::assertSame('Alone description', $aloneElement->getDoc());
+    }
+
+    public function testMetaInformation(): void
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.example.com" xmlns:tns="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xs:element name="myElement" type="xs:string" tns:meta="hello" />
+            </xs:schema>'
+        );
+
+        $myElement = $schema->findElement('myElement', 'http://www.example.com');
+        self::assertInstanceOf(ElementDef::class, $myElement);
+
+        $meta = $myElement->getMeta();
+        self::assertCount(1, $meta);
+        self::assertEquals('meta', $meta[0]->getName());
+        self::assertEquals('hello', $meta[0]->getValue());
+        self::assertEquals('http://www.example.com', $meta[0]->getNamespaceURI());
+        self::assertSame(SchemaReader::XSD_NS, $meta[0]->getContextSchema()->getTargetNamespace());
+    }
+
+    public function testDfdlElementMetaInformation(): void
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.example.com" xmlns:tns="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xs:element
+                xmlns:dfdl="http://www.ogf.org/dfdl/dfdl-1.0/extensions"
+                dfdl:encoding="iso-8859-1"
+                dfdl:initiator="UNA"
+                dfdl:length="6"
+                dfdl:lengthKind="explicit"
+                dfdl:terminator="%NL;%WSP*; %WSP*;"
+                minOccurs="0"
+                name="myElement"
+                type="xs:string" />
+            </xs:schema>'
+        );
+
+        $myElement = $schema->findElement('myElement', 'http://www.example.com');
+        self::assertInstanceOf(ElementDef::class, $myElement);
+
+        $meta = $myElement->getMeta();
+        $namespaceUri = 'http://www.ogf.org/dfdl/dfdl-1.0/extensions';
+
+        self::assertCount(5, $meta);
+        self::assertEquals($namespaceUri, $meta[0]->getNamespaceURI());
+        self::assertEquals('encoding', $meta[0]->getName());
+        self::assertEquals('iso-8859-1', $meta[0]->getValue());
+
+        self::assertEquals($namespaceUri, $meta[1]->getNamespaceURI());
+        self::assertEquals('initiator', $meta[1]->getName());
+        self::assertEquals('UNA', $meta[1]->getValue());
+
+        self::assertEquals($namespaceUri, $meta[2]->getNamespaceURI());
+        self::assertEquals('length', $meta[2]->getName());
+        self::assertEquals('6', $meta[2]->getValue());
+
+        self::assertEquals($namespaceUri, $meta[3]->getNamespaceURI());
+        self::assertEquals('lengthKind', $meta[3]->getName());
+        self::assertEquals('explicit', $meta[3]->getValue());
+
+        self::assertEquals($namespaceUri, $meta[4]->getNamespaceURI());
+        self::assertEquals('terminator', $meta[4]->getName());
+        self::assertEquals('%NL;%WSP*; %WSP*;', $meta[4]->getValue());
     }
 }

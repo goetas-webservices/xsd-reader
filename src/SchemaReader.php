@@ -1493,6 +1493,8 @@ class SchemaReader
                 $element->setLocal(true);
             }
         }
+
+        $element->setMeta($this->loadMetaAttributesForElement($element, $node));
     }
 
     private function addAttributeFromAttributeOrRef(

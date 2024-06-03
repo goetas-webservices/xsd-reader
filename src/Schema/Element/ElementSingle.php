@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
+use GoetasWebservices\XML\XSDReader\Schema\MetaInformationContainerInterface;
 use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
 
-interface ElementSingle extends ElementItem, InterfaceSetMinMax, InterfaceSetFixed, InterfaceSetDefault
+interface ElementSingle extends ElementItem, InterfaceSetMinMax, InterfaceSetFixed, InterfaceSetDefault, MetaInformationContainerInterface
 {
     public function getType(): ?Type;
 
