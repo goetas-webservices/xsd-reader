@@ -15,6 +15,7 @@ use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItem;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeRef;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeSingle;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
+use GoetasWebservices\XML\XSDReader\Schema\CustomAttribute;
 use GoetasWebservices\XML\XSDReader\Schema\Element\AbstractElementSingle;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Choice;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Element;
@@ -236,6 +237,27 @@ class SchemaReader
         if ($node->hasAttribute('use')) {
             $attribute->setUse($node->getAttribute('use'));
         }
+
+        $attribute->setCustomAttributes($this->loadCustomAttributesForElement($attribute, $node));
+    }
+
+    /**
+     * @return list<CustomAttribute>
+     */
+    private function loadCustomAttributesForElement(SchemaItem $item, \DOMElement $node): array
+    {
+        $customAttributes = [];
+        foreach ($node->attributes as $attr) {
+            if (null !== $attr->namespaceURI && self::XSD_NS !== $attr->namespaceURI) {
+                $customAttributes[] = new CustomAttribute(
+                    $attr->namespaceURI,
+                    $attr->name,
+                    $attr->value
+                );
+            }
+        }
+
+        return $customAttributes;
     }
 
     private function loadAttributeOrElementDef(
@@ -1456,6 +1478,8 @@ class SchemaReader
                 $element->setLocal(true);
             }
         }
+
+        $element->setCustomAttributes($this->loadCustomAttributesForElement($element, $node));
     }
 
     private function addAttributeFromAttributeOrRef(

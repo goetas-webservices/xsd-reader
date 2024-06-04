@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
+use GoetasWebservices\XML\XSDReader\Schema\CustomAttributeContainerTrait;
 use GoetasWebservices\XML\XSDReader\Schema\Item;
 
 class AbstractElementSingle extends Item implements ElementSingle, InterfaceSetAbstract
 {
+    use CustomAttributeContainerTrait;
+
     protected int $min = 1;
 
     protected int $max = 1;

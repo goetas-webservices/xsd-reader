@@ -144,4 +144,82 @@ class AttributesTest extends BaseTest
         self::assertEquals('language', $attribute->getType()->getName());
         self::assertEquals(AttributeSingle::USE_REQUIRED, $attribute->getUse());
     }
+
+    public function testCustomAttributesInformation(): void
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.example.com" xmlns:tns="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xs:attribute name="myAttribute" type="xs:string" tns:customAttributes="hello" />
+            </xs:schema>'
+        );
+
+        $myAttribute = $schema->findAttribute('myAttribute', 'http://www.example.com');
+        self::assertInstanceOf(AttributeDef::class, $myAttribute);
+
+        $customAttributes = $myAttribute->getCustomAttributes();
+        self::assertCount(1, $customAttributes);
+        self::assertEquals('customAttributes', $customAttributes[0]->getName());
+        self::assertEquals('hello', $customAttributes[0]->getValue());
+        self::assertEquals('http://www.example.com', $customAttributes[0]->getNamespaceURI());
+    }
+
+    public function testExternalSchemaReferencingCustomAttributesInformationPrefixed(): void
+    {
+        $dom = new \DOMDocument();
+        $dom->loadXML(
+            '
+            <types xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xs:schema targetNamespace="http://www.ref.com">
+                    <xs:attribute name="customAttributesType" type="xs:string" />
+                </xs:schema>
+                <xs:schema targetNamespace="http://www.example.com" xmlns:ref="http://www.ref.com">
+                    <xs:import namespace="http://www.ref.com" />
+                    <xs:attribute name="myAttribute" type="xs:string" ref:customAttributesType="xs:string" />
+                </xs:schema>
+            </types>
+        ');
+        $schema = $this->reader->readNodes(iterator_to_array($dom->documentElement->childNodes), 'file.xsd');
+
+        $myAttribute = $schema->findAttribute('myAttribute', 'http://www.example.com');
+        self::assertInstanceOf(AttributeDef::class, $myAttribute);
+
+        $customAttributes = $myAttribute->getCustomAttributes();
+        self::assertCount(1, $customAttributes);
+        self::assertEquals('customAttributesType', $customAttributes[0]->getName());
+        self::assertEquals('xs:string', $customAttributes[0]->getValue());
+
+        $refAttr = $schema->findAttribute('customAttributesType', 'http://www.ref.com');
+        self::assertSame($refAttr->getSchema()->getTargetNamespace(), $customAttributes[0]->getNamespaceURI());
+    }
+
+    public function testExternalSchemaReferencingCustomAttributesInformationUnprefixed(): void
+    {
+        $dom = new \DOMDocument();
+        $dom->loadXML(
+            '
+            <types xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xs:schema targetNamespace="http://www.ref.com">
+                    <xs:attribute name="customAttributesType" type="xs:string" />
+                </xs:schema>
+                <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.com" xmlns:ref="http://www.ref.com">
+                    <import namespace="http://www.ref.com" />
+                    <attribute name="myAttribute" type="string" ref:customAttributesType="string" />
+                </schema>
+            </types>
+        ');
+        $schema = $this->reader->readNodes(iterator_to_array($dom->documentElement->childNodes), 'file.xsd');
+
+        $myAttribute = $schema->findAttribute('myAttribute', 'http://www.example.com');
+        self::assertInstanceOf(AttributeDef::class, $myAttribute);
+
+        $customAttributes = $myAttribute->getCustomAttributes();
+
+        self::assertCount(1, $customAttributes);
+        self::assertEquals('customAttributesType', $customAttributes[0]->getName());
+        self::assertEquals('string', $customAttributes[0]->getValue());
+
+        $refAttr = $schema->findAttribute('customAttributesType', 'http://www.ref.com');
+        self::assertSame($refAttr->getSchema()->getTargetNamespace(), $customAttributes[0]->getNamespaceURI());
+    }
 }
