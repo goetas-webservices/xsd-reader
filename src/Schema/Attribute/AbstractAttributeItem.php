@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace GoetasWebservices\XML\XSDReader\Schema\Attribute;
 
+use GoetasWebservices\XML\XSDReader\Schema\CustomAttributeContainerTrait;
 use GoetasWebservices\XML\XSDReader\Schema\Item;
-use GoetasWebservices\XML\XSDReader\Schema\MetaInformationContainerTrait;
 
 abstract class AbstractAttributeItem extends Item implements AttributeSingle
 {
-    use MetaInformationContainerTrait;
+    use CustomAttributeContainerTrait;
 
     protected ?string $fixed = null;
 

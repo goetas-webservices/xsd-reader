@@ -12,7 +12,6 @@ use GoetasWebservices\XML\XSDReader\Schema\Element\Group;
 use GoetasWebservices\XML\XSDReader\Schema\Element\GroupRef;
 use GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType;
 use GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType;
-use GoetasWebservices\XML\XSDReader\SchemaReader;
 
 class ElementsTest extends BaseTest
 {
@@ -274,27 +273,26 @@ class ElementsTest extends BaseTest
         self::assertSame('Alone description', $aloneElement->getDoc());
     }
 
-    public function testMetaInformation(): void
+    public function testCustomAttributesInformation(): void
     {
         $schema = $this->reader->readString(
             '
             <xs:schema targetNamespace="http://www.example.com" xmlns:tns="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-                <xs:element name="myElement" type="xs:string" tns:meta="hello" />
+                <xs:element name="myElement" type="xs:string" tns:customAttributes="hello" />
             </xs:schema>'
         );
 
         $myElement = $schema->findElement('myElement', 'http://www.example.com');
         self::assertInstanceOf(ElementDef::class, $myElement);
 
-        $meta = $myElement->getMeta();
-        self::assertCount(1, $meta);
-        self::assertEquals('meta', $meta[0]->getName());
-        self::assertEquals('hello', $meta[0]->getValue());
-        self::assertEquals('http://www.example.com', $meta[0]->getNamespaceURI());
-        self::assertSame(SchemaReader::XSD_NS, $meta[0]->getContextSchema()->getTargetNamespace());
+        $customAttributes = $myElement->getCustomAttributes();
+        self::assertCount(1, $customAttributes);
+        self::assertEquals('customAttributes', $customAttributes[0]->getName());
+        self::assertEquals('hello', $customAttributes[0]->getValue());
+        self::assertEquals('http://www.example.com', $customAttributes[0]->getNamespaceURI());
     }
 
-    public function testDfdlElementMetaInformation(): void
+    public function testDfdlElementCustomAttributesInformation(): void
     {
         $schema = $this->reader->readString(
             '
@@ -315,28 +313,28 @@ class ElementsTest extends BaseTest
         $myElement = $schema->findElement('myElement', 'http://www.example.com');
         self::assertInstanceOf(ElementDef::class, $myElement);
 
-        $meta = $myElement->getMeta();
+        $customAttributes = $myElement->getCustomAttributes();
         $namespaceUri = 'http://www.ogf.org/dfdl/dfdl-1.0/extensions';
 
-        self::assertCount(5, $meta);
-        self::assertEquals($namespaceUri, $meta[0]->getNamespaceURI());
-        self::assertEquals('encoding', $meta[0]->getName());
-        self::assertEquals('iso-8859-1', $meta[0]->getValue());
+        self::assertCount(5, $customAttributes);
+        self::assertEquals($namespaceUri, $customAttributes[0]->getNamespaceURI());
+        self::assertEquals('encoding', $customAttributes[0]->getName());
+        self::assertEquals('iso-8859-1', $customAttributes[0]->getValue());
 
-        self::assertEquals($namespaceUri, $meta[1]->getNamespaceURI());
-        self::assertEquals('initiator', $meta[1]->getName());
-        self::assertEquals('UNA', $meta[1]->getValue());
+        self::assertEquals($namespaceUri, $customAttributes[1]->getNamespaceURI());
+        self::assertEquals('initiator', $customAttributes[1]->getName());
+        self::assertEquals('UNA', $customAttributes[1]->getValue());
 
-        self::assertEquals($namespaceUri, $meta[2]->getNamespaceURI());
-        self::assertEquals('length', $meta[2]->getName());
-        self::assertEquals('6', $meta[2]->getValue());
+        self::assertEquals($namespaceUri, $customAttributes[2]->getNamespaceURI());
+        self::assertEquals('length', $customAttributes[2]->getName());
+        self::assertEquals('6', $customAttributes[2]->getValue());
 
-        self::assertEquals($namespaceUri, $meta[3]->getNamespaceURI());
-        self::assertEquals('lengthKind', $meta[3]->getName());
-        self::assertEquals('explicit', $meta[3]->getValue());
+        self::assertEquals($namespaceUri, $customAttributes[3]->getNamespaceURI());
+        self::assertEquals('lengthKind', $customAttributes[3]->getName());
+        self::assertEquals('explicit', $customAttributes[3]->getValue());
 
-        self::assertEquals($namespaceUri, $meta[4]->getNamespaceURI());
-        self::assertEquals('terminator', $meta[4]->getName());
-        self::assertEquals('%NL;%WSP*; %WSP*;', $meta[4]->getValue());
+        self::assertEquals($namespaceUri, $customAttributes[4]->getNamespaceURI());
+        self::assertEquals('terminator', $customAttributes[4]->getName());
+        self::assertEquals('%NL;%WSP*; %WSP*;', $customAttributes[4]->getValue());
     }
 }

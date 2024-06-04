@@ -15,6 +15,7 @@ use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeItem;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeRef;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeSingle;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
+use GoetasWebservices\XML\XSDReader\Schema\CustomAttribute;
 use GoetasWebservices\XML\XSDReader\Schema\Element\AbstractElementSingle;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Choice;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Element;
@@ -28,14 +29,12 @@ use GoetasWebservices\XML\XSDReader\Schema\Element\InterfaceSetDefault;
 use GoetasWebservices\XML\XSDReader\Schema\Element\InterfaceSetFixed;
 use GoetasWebservices\XML\XSDReader\Schema\Element\InterfaceSetMinMax;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Sequence;
-use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\TypeNotFoundException;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Base;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Extension;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\Restriction;
 use GoetasWebservices\XML\XSDReader\Schema\Inheritance\RestrictionType;
 use GoetasWebservices\XML\XSDReader\Schema\Item;
-use GoetasWebservices\XML\XSDReader\Schema\MetaInformation;
 use GoetasWebservices\XML\XSDReader\Schema\Schema;
 use GoetasWebservices\XML\XSDReader\Schema\SchemaItem;
 use GoetasWebservices\XML\XSDReader\Schema\Type\BaseComplexType;
@@ -239,19 +238,18 @@ class SchemaReader
             $attribute->setUse($node->getAttribute('use'));
         }
 
-        $attribute->setMeta($this->loadMetaAttributesForElement($attribute, $node));
+        $attribute->setCustomAttributes($this->loadCustomAttributesForElement($attribute, $node));
     }
 
     /**
-     * @return list<MetaInformation>
+     * @return list<CustomAttribute>
      */
-    private function loadMetaAttributesForElement(SchemaItem $item, \DOMElement $node): array
+    private function loadCustomAttributesForElement(SchemaItem $item, \DOMElement $node): array
     {
-        $meta = [];
+        $customAttributes = [];
         foreach ($node->attributes as $attr) {
             if (null !== $attr->namespaceURI && self::XSD_NS !== $attr->namespaceURI) {
-                $meta[] = new MetaInformation(
-                    $this->findSchemaForNamespace($item->getSchema(), $attr->parentNode->namespaceURI),
+                $customAttributes[] = new CustomAttribute(
                     $attr->namespaceURI,
                     $attr->name,
                     $attr->value
@@ -259,7 +257,7 @@ class SchemaReader
             }
         }
 
-        return $meta;
+        return $customAttributes;
     }
 
     private function loadAttributeOrElementDef(
@@ -1117,19 +1115,6 @@ class SchemaReader
         throw new TypeException(sprintf("Can't find %s named {%s}#%s, at line %d in %s ", 'type', $namespace, $name, $node->getLineNo(), $node->ownerDocument->documentURI));
     }
 
-    public function findSchemaForNamespace(Schema $currentSchema, string $namespace): Schema
-    {
-        if ($currentSchema->getTargetNamespace() === $namespace) {
-            return $currentSchema;
-        }
-
-        if (array_key_exists($namespace, $this->loadedSchemas) && count($this->loadedSchemas[$namespace]) > 0) {
-            return $this->loadedSchemas[$namespace][0];
-        }
-
-        throw new SchemaException(sprintf("Can't find schema for namespace %s", $namespace));
-    }
-
     private function fillItem(Item $element, \DOMElement $node, ?\DOMElement $parentNode = null): void
     {
         if ($element instanceof ElementDef) {
@@ -1494,7 +1479,7 @@ class SchemaReader
             }
         }
 
-        $element->setMeta($this->loadMetaAttributesForElement($element, $node));
+        $element->setCustomAttributes($this->loadCustomAttributesForElement($element, $node));
     }
 
     private function addAttributeFromAttributeOrRef(

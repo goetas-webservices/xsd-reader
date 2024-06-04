@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace GoetasWebservices\XML\XSDReader\Schema\Attribute;
 
-use GoetasWebservices\XML\XSDReader\Schema\MetaInformationContainerInterface;
+use GoetasWebservices\XML\XSDReader\Schema\CustomAttributeContainerInterface;
 use GoetasWebservices\XML\XSDReader\Schema\Type\Type;
 
-interface AttributeSingle extends AttributeItem, MetaInformationContainerInterface
+interface AttributeSingle extends AttributeItem, CustomAttributeContainerInterface
 {
     public const USE_OPTIONAL = 'optional';
 

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace GoetasWebservices\XML\XSDReader\Schema\Element;
 
+use GoetasWebservices\XML\XSDReader\Schema\CustomAttributeContainerTrait;
 use GoetasWebservices\XML\XSDReader\Schema\Item;
-use GoetasWebservices\XML\XSDReader\Schema\MetaInformationContainerTrait;
 
 class AbstractElementSingle extends Item implements ElementSingle, InterfaceSetAbstract
 {
-    use MetaInformationContainerTrait;
+    use CustomAttributeContainerTrait;
 
     protected int $min = 1;
 

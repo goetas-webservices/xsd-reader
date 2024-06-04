@@ -11,7 +11,6 @@ use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeSingle;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group;
 use GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType;
 use GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType;
-use GoetasWebservices\XML\XSDReader\SchemaReader;
 
 class AttributesTest extends BaseTest
 {
@@ -146,38 +145,37 @@ class AttributesTest extends BaseTest
         self::assertEquals(AttributeSingle::USE_REQUIRED, $attribute->getUse());
     }
 
-    public function testMetaInformation(): void
+    public function testCustomAttributesInformation(): void
     {
         $schema = $this->reader->readString(
             '
             <xs:schema targetNamespace="http://www.example.com" xmlns:tns="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-                <xs:attribute name="myAttribute" type="xs:string" tns:meta="hello" />
+                <xs:attribute name="myAttribute" type="xs:string" tns:customAttributes="hello" />
             </xs:schema>'
         );
 
         $myAttribute = $schema->findAttribute('myAttribute', 'http://www.example.com');
         self::assertInstanceOf(AttributeDef::class, $myAttribute);
 
-        $meta = $myAttribute->getMeta();
-        self::assertCount(1, $meta);
-        self::assertEquals('meta', $meta[0]->getName());
-        self::assertEquals('hello', $meta[0]->getValue());
-        self::assertEquals('http://www.example.com', $meta[0]->getNamespaceURI());
-        self::assertSame(SchemaReader::XSD_NS, $meta[0]->getContextSchema()->getTargetNamespace());
+        $customAttributes = $myAttribute->getCustomAttributes();
+        self::assertCount(1, $customAttributes);
+        self::assertEquals('customAttributes', $customAttributes[0]->getName());
+        self::assertEquals('hello', $customAttributes[0]->getValue());
+        self::assertEquals('http://www.example.com', $customAttributes[0]->getNamespaceURI());
     }
 
-    public function testExternalSchemaReferencingMetaInformationPrefixed(): void
+    public function testExternalSchemaReferencingCustomAttributesInformationPrefixed(): void
     {
         $dom = new \DOMDocument();
         $dom->loadXML(
             '
             <types xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xs:schema targetNamespace="http://www.ref.com">
-                    <xs:attribute name="metaType" type="xs:string" />
+                    <xs:attribute name="customAttributesType" type="xs:string" />
                 </xs:schema>
                 <xs:schema targetNamespace="http://www.example.com" xmlns:ref="http://www.ref.com">
                     <xs:import namespace="http://www.ref.com" />
-                    <xs:attribute name="myAttribute" type="xs:string" ref:metaType="xs:string" />
+                    <xs:attribute name="myAttribute" type="xs:string" ref:customAttributesType="xs:string" />
                 </xs:schema>
             </types>
         ');
@@ -186,28 +184,27 @@ class AttributesTest extends BaseTest
         $myAttribute = $schema->findAttribute('myAttribute', 'http://www.example.com');
         self::assertInstanceOf(AttributeDef::class, $myAttribute);
 
-        $meta = $myAttribute->getMeta();
-        self::assertCount(1, $meta);
-        self::assertEquals('metaType', $meta[0]->getName());
-        self::assertEquals('xs:string', $meta[0]->getValue());
+        $customAttributes = $myAttribute->getCustomAttributes();
+        self::assertCount(1, $customAttributes);
+        self::assertEquals('customAttributesType', $customAttributes[0]->getName());
+        self::assertEquals('xs:string', $customAttributes[0]->getValue());
 
-        $refAttr = $schema->findAttribute('metaType', 'http://www.ref.com');
-        self::assertSame($refAttr->getSchema()->getTargetNamespace(), $meta[0]->getNamespaceURI());
-        self::assertSame(SchemaReader::XSD_NS, $meta[0]->getContextSchema()->getTargetNamespace());
+        $refAttr = $schema->findAttribute('customAttributesType', 'http://www.ref.com');
+        self::assertSame($refAttr->getSchema()->getTargetNamespace(), $customAttributes[0]->getNamespaceURI());
     }
 
-    public function testExternalSchemaReferencingMetaInformationUnprefixed(): void
+    public function testExternalSchemaReferencingCustomAttributesInformationUnprefixed(): void
     {
         $dom = new \DOMDocument();
         $dom->loadXML(
             '
             <types xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xs:schema targetNamespace="http://www.ref.com">
-                    <xs:attribute name="metaType" type="xs:string" />
+                    <xs:attribute name="customAttributesType" type="xs:string" />
                 </xs:schema>
                 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.com" xmlns:ref="http://www.ref.com">
                     <import namespace="http://www.ref.com" />
-                    <attribute name="myAttribute" type="string" ref:metaType="string" />
+                    <attribute name="myAttribute" type="string" ref:customAttributesType="string" />
                 </schema>
             </types>
         ');
@@ -216,14 +213,13 @@ class AttributesTest extends BaseTest
         $myAttribute = $schema->findAttribute('myAttribute', 'http://www.example.com');
         self::assertInstanceOf(AttributeDef::class, $myAttribute);
 
-        $meta = $myAttribute->getMeta();
+        $customAttributes = $myAttribute->getCustomAttributes();
 
-        self::assertCount(1, $meta);
-        self::assertEquals('metaType', $meta[0]->getName());
-        self::assertEquals('string', $meta[0]->getValue());
+        self::assertCount(1, $customAttributes);
+        self::assertEquals('customAttributesType', $customAttributes[0]->getName());
+        self::assertEquals('string', $customAttributes[0]->getValue());
 
-        $refAttr = $schema->findAttribute('metaType', 'http://www.ref.com');
-        self::assertSame($refAttr->getSchema()->getTargetNamespace(), $meta[0]->getNamespaceURI());
-        self::assertSame(SchemaReader::XSD_NS, $meta[0]->getContextSchema()->getTargetNamespace());
+        $refAttr = $schema->findAttribute('customAttributesType', 'http://www.ref.com');
+        self::assertSame($refAttr->getSchema()->getTargetNamespace(), $customAttributes[0]->getNamespaceURI());
     }
 }
