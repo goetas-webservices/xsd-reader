@@ -231,9 +231,13 @@ class SchemaReader
         if ($node->hasAttribute('nillable')) {
             $attribute->setNil('true' === $node->getAttribute('nillable'));
         }
-        if ($node->hasAttribute('form')) {
-            $attribute->setQualified('qualified' === $node->getAttribute('form'));
-        }
+
+        $attribute->setQualified(
+            $node->hasAttribute('form')
+                ? 'qualified' === $node->getAttribute('form')
+                : $attribute->getSchema()->getAttributesQualification()
+        );
+
         if ($node->hasAttribute('use')) {
             $attribute->setUse($node->getAttribute('use'));
         }
@@ -1466,9 +1470,12 @@ class SchemaReader
         if ($node->hasAttribute('nillable')) {
             $element->setNil('true' === $node->getAttribute('nillable'));
         }
-        if ($node->hasAttribute('form')) {
-            $element->setQualified('qualified' === $node->getAttribute('form'));
-        }
+
+        $element->setQualified(
+            $node->hasAttribute('form')
+                ? 'qualified' === $node->getAttribute('form')
+                : $element->getSchema()->getElementsQualification()
+        );
 
         $parentNode = $node->parentNode;
         if ('schema' !== $parentNode->localName || self::XSD_NS !== $parentNode->namespaceURI) {

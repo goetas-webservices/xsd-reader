@@ -222,4 +222,33 @@ class AttributesTest extends BaseTest
         $refAttr = $schema->findAttribute('customAttributesType', 'http://www.ref.com');
         self::assertSame($refAttr->getSchema()->getTargetNamespace(), $customAttributes[0]->getNamespaceURI());
     }
+
+    public function testDefaultSchemaQualificationInheritance(): void
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema version="1.0" targetNamespace="http://www.example.com"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="qualified">
+                <xs:complexType name="root">
+                    <xs:attribute name="item1" type="xs:int" form="qualified"/>
+                    <xs:attribute name="item2" type="xs:int" form="unqualified"/>
+                    <xs:attribute name="item3" type="xs:int"/>
+                </xs:complexType>
+            </xs:schema>
+            '
+        );
+
+        $myType = $schema->findType('root', 'http://www.example.com');
+        self::assertInstanceOf(ComplexType::class, $myType);
+        self::assertTrue($schema->getAttributesQualification());
+
+        $attribute = $myType->getAttributes()[0];
+        self::assertTrue($attribute->isQualified());
+
+        $attribute = $myType->getAttributes()[1];
+        self::assertFalse($attribute->isQualified());
+
+        $attribute = $myType->getAttributes()[2];
+        self::assertTrue($attribute->isQualified());
+    }
 }
