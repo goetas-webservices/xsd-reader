@@ -8,3 +8,4 @@ vendor/
 /composer.lock
 /.phpunit.result.cache
 /.php-cs-fixer.cache
+/clover.xml
