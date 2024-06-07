@@ -163,6 +163,40 @@ class ElementsTest extends BaseTest
         self::assertTrue($element->isQualified());
     }
 
+    public function testDefaultSchemaQualificationInheritance(): void
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema version="1.0" targetNamespace="http://www.example.com"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+                <xs:complexType name="root">
+                    <xs:sequence>
+                        <xs:element name="item1" type="xs:string" form="qualified" />
+                        <xs:element name="item2" type="xs:string" form="unqualified" />
+                        <xs:element name="item3" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:schema>
+            '
+        );
+
+        $myType = $schema->findType('root', 'http://www.example.com');
+        self::assertInstanceOf(ComplexType::class, $myType);
+        self::assertTrue($schema->getElementsQualification());
+
+        /**
+         * @var $element ElementSingle
+         */
+        $element = $myType->getElements()[0];
+        self::assertTrue($element->isQualified());
+
+        $element = $myType->getElements()[1];
+        self::assertFalse($element->isQualified());
+
+        $element = $myType->getElements()[2];
+        self::assertTrue($element->isQualified());
+    }
+
     public function testGroupRefOccurrences(): void
     {
         $schema = $this->reader->readString(
