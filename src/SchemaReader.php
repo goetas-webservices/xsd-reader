@@ -17,6 +17,8 @@ use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeSingle;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
 use GoetasWebservices\XML\XSDReader\Schema\CustomAttribute;
 use GoetasWebservices\XML\XSDReader\Schema\Element\AbstractElementSingle;
+use GoetasWebservices\XML\XSDReader\Schema\Element\Any\Any;
+use GoetasWebservices\XML\XSDReader\Schema\Element\Any\ProcessContents;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Choice;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Element;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementContainer;
@@ -499,6 +501,15 @@ class SchemaReader
                     $elementContainer
                 );
                 break;
+            case 'any':
+                $this->loadSequenceChildNodeLoadAny(
+                    $elementContainer,
+                    $node,
+                    $childNode,
+                    $max,
+                    $min
+                );
+                break;
         }
     }
 
@@ -524,6 +535,26 @@ class SchemaReader
         }
 
         $this->resolveSubstitutionGroup($schema, $node, $childNode, $element);
+
+        if (null !== $min) {
+            $element->setMin($min);
+        }
+
+        if (null !== $max && 1 < $max) {
+            $element->setMax($max);
+        }
+        $elementContainer->addElement($element);
+    }
+
+    private function loadSequenceChildNodeLoadAny(
+        ElementContainer $elementContainer,
+        \DOMElement $node,
+        \DOMElement $childNode,
+        ?int $max,
+        ?int $min
+    ): void {
+        $schema = $elementContainer->getSchema();
+        $element = $this->createAnyElement($schema, $childNode);
 
         if (null !== $min) {
             $element->setMin($min);
@@ -1487,6 +1518,36 @@ class SchemaReader
         }
 
         $element->setCustomAttributes($this->loadCustomAttributesForElement($element, $node));
+    }
+
+    private function createAnyElement(Schema $schema, \DOMElement $node): Any
+    {
+        $element = new Any($schema);
+        $this->fillAnyElement($element, $node);
+
+        return $element;
+    }
+
+    private function fillAnyElement(Any $element, \DOMElement $node): void
+    {
+        self::maybeSetMax($element, $node);
+        self::maybeSetMin($element, $node);
+
+        if ($node->hasAttribute('id')) {
+            $element->setId($node->getAttribute('id'));
+        }
+
+        if ($node->hasAttribute('namespace')) {
+            $element->setNamespace($node->getAttribute('namespace'));
+        }
+
+        if ($node->hasAttribute('processContents')) {
+            $element->setProcessContents(
+                ProcessContents::tryFrom($node->getAttribute('processContents')) ?? ProcessContents::default()
+            );
+        }
+
+        $element->setDoc($this->getDocumentation($node));
     }
 
     private function addAttributeFromAttributeOrRef(
