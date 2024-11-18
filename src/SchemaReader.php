@@ -1032,10 +1032,16 @@ class SchemaReader
             [$prefix, $name] = explode(':', $typeName);
         }
 
-        /**
-         * @psalm-suppress PossiblyNullArgument
-         */
+        // Get namespace URI for prefix. If prefix is null, it will return the default namespace
         $namespace = $node->lookupNamespaceUri($prefix);
+
+        // If no namespace is found, throw an exception only if a prefix was provided.
+        // If no prefix was provided and the above lookup failed, this means that there
+        // was no defalut namespace defined, making the element part of no namespace.
+        // In this case, we should not throw an exception since this is valid xml.
+        if (!$namespace && $prefix !== null) {
+            throw new TypeException(sprintf("Can't find namespace for prefix '%s', at line %d in %s ", $prefix, $node->getLineNo(), $node->ownerDocument->documentURI));
+        }
 
         return [
             $name,
@@ -1047,11 +1053,6 @@ class SchemaReader
     private function findAttributeItem(Schema $schema, \DOMElement $node, string $typeName): AttributeItem
     {
         [$name, $namespace] = self::splitParts($node, $typeName);
-
-        /**
-         * @var string|null $namespace
-         */
-        $namespace = $namespace ?: $schema->getTargetNamespace();
 
         try {
             /**
@@ -1069,11 +1070,6 @@ class SchemaReader
     {
         [$name, $namespace] = self::splitParts($node, $typeName);
 
-        /**
-         * @var string|null $namespace
-         */
-        $namespace = $namespace ?: $schema->getTargetNamespace();
-
         try {
             /**
              * @var AttributeGroup $out
@@ -1090,11 +1086,6 @@ class SchemaReader
     {
         [$name, $namespace] = self::splitParts($node, $typeName);
 
-        /**
-         * @var string|null $namespace
-         */
-        $namespace = $namespace ?: $schema->getTargetNamespace();
-
         try {
             return $schema->findElement((string) $name, $namespace);
         } catch (TypeNotFoundException $e) {
@@ -1105,11 +1096,6 @@ class SchemaReader
     private function findGroup(Schema $schema, \DOMElement $node, string $typeName): Group
     {
         [$name, $namespace] = self::splitParts($node, $typeName);
-
-        /**
-         * @var string|null $namespace
-         */
-        $namespace = $namespace ?: $schema->getTargetNamespace();
 
         try {
             /**
@@ -1126,11 +1112,6 @@ class SchemaReader
     private function findType(Schema $schema, \DOMElement $node, string $typeName): SchemaItem
     {
         [$name, $namespace] = self::splitParts($node, $typeName);
-
-        /**
-         * @var string|null $namespace
-         */
-        $namespace = $namespace ?: $schema->getTargetNamespace();
 
         $tryFindType = static function (Schema $schema, string $name, ?string $namespace): ?SchemaItem {
             try {
@@ -1199,13 +1180,17 @@ class SchemaReader
              */
             $type = $this->findSomeType($element, $node, 'type');
         } else {
+            $prefix = $node->lookupPrefix(self::XSD_NS);
+            if ($prefix) {
+                $prefix .= ':';
+            }
             /**
              * @var Type
              */
             $type = $this->findSomeTypeFromAttribute(
                 $element,
                 $node,
-                $node->lookupPrefix(self::XSD_NS) . ':anyType'
+                $prefix . 'anyType'
             );
         }
 
