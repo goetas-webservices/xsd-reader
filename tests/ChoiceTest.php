@@ -15,14 +15,14 @@ class ChoiceTest extends BaseTest
     {
         $schema = $this->reader->readString(
             '
-            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
                 <xs:element name="Languages">
                     <xs:complexType>
                         <xs:choice>
-                            <xs:element ref="german"/>
-                            <xs:element ref="english"/>
-                            <xs:element ref="spanish"/>
+                            <xs:element ref="ex:german"/>
+                            <xs:element ref="ex:english"/>
+                            <xs:element ref="ex:spanish"/>
                         </xs:choice>
                     </xs:complexType>
                 </xs:element>
@@ -33,7 +33,7 @@ class ChoiceTest extends BaseTest
                 <xs:element name="root">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element ref="Languages"/>
+                            <xs:element ref="ex:Languages"/>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
@@ -61,14 +61,14 @@ class ChoiceTest extends BaseTest
     {
         $schema = $this->reader->readString(
             '
-            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
                 <xs:element name="Languages">
                     <xs:complexType>
                         <xs:choice minOccurs="0">
-                            <xs:element ref="german"/>
-                            <xs:element ref="english"/>
-                            <xs:element ref="spanish"/>
+                            <xs:element ref="ex:german"/>
+                            <xs:element ref="ex:english"/>
+                            <xs:element ref="ex:spanish"/>
                         </xs:choice>
                     </xs:complexType>
                 </xs:element>
@@ -79,7 +79,7 @@ class ChoiceTest extends BaseTest
                 <xs:element name="root">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element ref="Languages"/>
+                            <xs:element ref="ex:Languages"/>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
@@ -107,14 +107,14 @@ class ChoiceTest extends BaseTest
     {
         $schema = $this->reader->readString(
             '
-            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
                 <xs:element name="Languages">
                     <xs:complexType>
                         <xs:choice>
-                            <xs:element ref="german"/>
-                            <xs:element ref="english"/>
-                            <xs:element ref="spanish" minOccurs="0"/>
+                            <xs:element ref="ex:german"/>
+                            <xs:element ref="ex:english"/>
+                            <xs:element ref="ex:spanish" minOccurs="0"/>
                         </xs:choice>
                     </xs:complexType>
                 </xs:element>
@@ -125,7 +125,7 @@ class ChoiceTest extends BaseTest
                 <xs:element name="root">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element ref="Languages"/>
+                            <xs:element ref="ex:Languages"/>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
@@ -154,14 +154,14 @@ class ChoiceTest extends BaseTest
     {
         $schema = $this->reader->readString(
             '
-            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
                 <xs:element name="Languages">
                     <xs:complexType>
                         <xs:choice maxOccurs="unbounded">
-                            <xs:element ref="german"/>
-                            <xs:element ref="english"/>
-                            <xs:element ref="spanish"/>
+                            <xs:element ref="ex:german"/>
+                            <xs:element ref="ex:english"/>
+                            <xs:element ref="ex:spanish"/>
                         </xs:choice>
                     </xs:complexType>
                 </xs:element>
@@ -172,7 +172,7 @@ class ChoiceTest extends BaseTest
                 <xs:element name="root">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element ref="Languages"/>
+                            <xs:element ref="ex:Languages"/>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
@@ -200,28 +200,28 @@ class ChoiceTest extends BaseTest
     {
         $schema = $this->reader->readString(
             '
-            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
                 <xs:element name="LunchMenu">
                     <xs:complexType>
                         <xs:sequence>
                             <xs:choice minOccurs="0">
-                                <xs:element ref="Soup1"/>
+                                <xs:element ref="ex:Soup1"/>
                                 <xs:choice>
-                                    <xs:element ref="Soup2"/>
-                                    <xs:element ref="Soup3"/>
+                                    <xs:element ref="ex:Soup2"/>
+                                    <xs:element ref="ex:Soup3"/>
                                 </xs:choice>
                             </xs:choice>
                             <xs:choice>
-                                <xs:element ref="MainMenu1"/>
+                                <xs:element ref="ex:MainMenu1"/>
                                 <xs:choice>
-                                    <xs:element ref="MainMenu2"/>
-                                    <xs:element ref="MainMenu3"/>
+                                    <xs:element ref="ex:MainMenu2"/>
+                                    <xs:element ref="ex:MainMenu3"/>
                                 </xs:choice>
                             </xs:choice>
                             <xs:choice minOccurs="0" maxOccurs="unbounded">
-                                <xs:element ref="Dessert1"/>
-                                <xs:element ref="Dessert2"/>
+                                <xs:element ref="ex:Dessert1"/>
+                                <xs:element ref="ex:Dessert2"/>
                             </xs:choice>
                         </xs:sequence>
                     </xs:complexType>
@@ -238,7 +238,7 @@ class ChoiceTest extends BaseTest
                 <xs:element name="root">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element ref="LunchMenu"/>
+                            <xs:element ref="ex:LunchMenu"/>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>

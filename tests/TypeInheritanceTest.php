@@ -54,24 +54,24 @@ class TypeInheritanceTest extends BaseTest
     {
         $schema = $this->reader->readString(
             '
-            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
                 <xs:simpleType name="mySimple">
                     <xs:restriction base="xs:string"></xs:restriction>
                 </xs:simpleType>
 
                 <xs:simpleType name="mySimpleWithRestr">
-                    <xs:restriction base="mySimple"></xs:restriction>
+                    <xs:restriction base="ex:mySimple"></xs:restriction>
                 </xs:simpleType>
 
                 <xs:complexType name="myComplex">
                     <xs:simpleContent>
-                        <xs:extension base="mySimpleWithRestr"></xs:extension>
+                        <xs:extension base="ex:mySimpleWithRestr"></xs:extension>
                     </xs:simpleContent>
                 </xs:complexType>
 
                 <xs:simpleType name="mySimpleWithUnion">
-                    <xs:union memberTypes="xs:string mySimpleWithRestr"></xs:union>
+                    <xs:union memberTypes="xs:string ex:mySimpleWithRestr"></xs:union>
                 </xs:simpleType>
 
             </xs:schema>'

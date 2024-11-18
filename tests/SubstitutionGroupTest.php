@@ -12,22 +12,22 @@ class SubstitutionGroupTest extends BaseTest
     {
         $schema = $this->reader->readString(
             '
-            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
                 <xs:element name="language" abstract="true"/>
-                <xs:element name="german"  substitutionGroup="language"/>
-                <xs:element name="english" substitutionGroup="language"/>
-                <xs:element name="spanish" substitutionGroup="language"/>
+                <xs:element name="german"  substitutionGroup="ex:language"/>
+                <xs:element name="english" substitutionGroup="ex:language"/>
+                <xs:element name="spanish" substitutionGroup="ex:language"/>
                 <xs:complexType name="Languages">
                     <xs:sequence>
-                        <xs:element ref="language" minOccurs="1" maxOccurs="unbounded"/>
+                        <xs:element ref="ex:language" minOccurs="1" maxOccurs="unbounded"/>
                     </xs:sequence>
                 </xs:complexType>
 
                 <xs:element name="root">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element name="myLanguages" type="Languages"/>
+                            <xs:element name="myLanguages" type="ex:Languages"/>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
@@ -58,22 +58,22 @@ class SubstitutionGroupTest extends BaseTest
     {
         $schema = $this->reader->readString(
             '
-            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-                <xs:element name="german"  substitutionGroup="language"/>
-                <xs:element name="english" substitutionGroup="language"/>
-                <xs:element name="spanish" substitutionGroup="language"/>
+                <xs:element name="german"  substitutionGroup="ex:language"/>
+                <xs:element name="english" substitutionGroup="ex:language"/>
+                <xs:element name="spanish" substitutionGroup="ex:language"/>
                 <xs:element name="language" abstract="true"/>
                 <xs:complexType name="Languages">
                     <xs:sequence>
-                        <xs:element ref="language" minOccurs="1" maxOccurs="unbounded"/>
+                        <xs:element ref="ex:language" minOccurs="1" maxOccurs="unbounded"/>
                     </xs:sequence>
                 </xs:complexType>
 
                 <xs:element name="root">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element name="myLanguages" type="Languages"/>
+                            <xs:element name="myLanguages" type="ex:Languages"/>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
@@ -104,25 +104,25 @@ class SubstitutionGroupTest extends BaseTest
     {
         $schema = $this->reader->readString(
             '
-            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
                 <xs:element name="name" type="xs:string"/>
-                <xs:element name="navn" substitutionGroup="name"/>
+                <xs:element name="navn" substitutionGroup="ex:name"/>
 
                 <xs:complexType name="custinfo">
                 <xs:sequence>
-                    <xs:element ref="customer"/>
-                    <xs:element ref="name"/>
+                    <xs:element ref="ex:customer"/>
+                    <xs:element ref="ex:name"/>
                 </xs:sequence>
                 </xs:complexType>
 
                 <xs:element name="customer" type="xs:string"/>
-                <xs:element name="kunde" substitutionGroup="customer"/>
+                <xs:element name="kunde" substitutionGroup="ex:customer"/>
 
                 <xs:element name="root">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element name="customerInfo" type="custinfo"/>
+                            <xs:element name="customerInfo" type="ex:custinfo"/>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>

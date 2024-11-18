@@ -97,9 +97,9 @@ class SchemaTest extends BaseTest
     {
         $schema = $this->reader->readString(
             '
-            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xs:complexType name="myType"></xs:complexType>
-                <xs:element name="myElement" type="myType"></xs:element>
+                <xs:element name="myElement" type="ex:myType"></xs:element>
 
                 <xs:group name="myGroup">
                     <xs:sequence></xs:sequence>
@@ -131,9 +131,9 @@ class SchemaTest extends BaseTest
         $file = 'schema.xsd';
         $schema1 = $this->reader->readString(
             '
-            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xs:complexType name="myType"></xs:complexType>
-                <xs:element name="myElement" type="myType"></xs:element>
+                <xs:element name="myElement" type="ex:myType"></xs:element>
 
                 <xs:group name="myGroup">
                     <xs:sequence></xs:sequence>
@@ -171,9 +171,9 @@ class SchemaTest extends BaseTest
         $file = 'schema.xsd';
         $schema1 = $this->reader->readString(
             '
-            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xs:complexType name="myType"></xs:complexType>
-                <xs:element name="myElement" type="myType"></xs:element>
+                <xs:element name="myElement" type="ex:myType"></xs:element>
             </xs:schema>',
             $file
         );
@@ -187,9 +187,9 @@ class SchemaTest extends BaseTest
         // Now use a second schema which uses the same targetNamespace
         $schema2 = $this->reader->readString(
             '
-            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xs:import namespace="http://www.example.com"/>
-                <xs:element name="myElement2" type="ns1:myType"></xs:element>
+                <xs:element name="myElement2" type="ex:myType"></xs:element>
             </xs:schema>',
             $file
         );
@@ -201,7 +201,7 @@ class SchemaTest extends BaseTest
         self::assertInstanceOf(ElementDef::class, $schema2->findElement('myElement2', 'http://www.example.com'));
 
         self::assertCount(1, $schema1->getTypes());
-        self::assertCount(1, $schema2->getElements());
+        self::assertCount(1, $schema1->getElements());
         self::assertInstanceOf(ElementDef::class, $schema1->findElement('myElement2', 'http://www.example.com'));
     }
 
@@ -209,10 +209,10 @@ class SchemaTest extends BaseTest
     {
         $schema1 = $this->reader->readString(
             '
-        <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+        <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
             <xs:element name="myElement">
                 <xs:complexType>
-                    <xs:group ref="myGroup"/>
+                    <xs:group ref="ex:myGroup"/>
                 </xs:complexType>
             </xs:element>
             <xs:group name="myGroup">

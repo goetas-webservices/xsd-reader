@@ -19,7 +19,7 @@ class ElementsTest extends BaseTest
     {
         $schema = $this->reader->readString(
             '
-            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xs:element name="myElement" type="xs:string"></xs:element>
 
                 <xs:element name="myElementAnonType">
@@ -67,19 +67,19 @@ class ElementsTest extends BaseTest
     {
         $schema = $this->reader->readString(
             '
-            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xs:complexType name="myType">
                     <xs:sequence>
-                        <xs:group ref="myGroup" minOccurs="1" />
-                        <xs:group ref="myGroup" minOccurs="2" />
+                        <xs:group ref="ex:myGroup" minOccurs="1" />
+                        <xs:group ref="ex:myGroup" minOccurs="2" />
 
-                        <xs:group ref="myGroup" maxOccurs="1" />
-                        <xs:group ref="myGroup" maxOccurs="unbounded" />
+                        <xs:group ref="ex:myGroup" maxOccurs="1" />
+                        <xs:group ref="ex:myGroup" maxOccurs="unbounded" />
 
-                        <xs:group ref="myGroup" minOccurs="1" maxOccurs="1"/>
-                        <xs:group ref="myGroup" minOccurs="2" maxOccurs="2"/>
+                        <xs:group ref="ex:myGroup" minOccurs="1" maxOccurs="1"/>
+                        <xs:group ref="ex:myGroup" minOccurs="2" maxOccurs="2"/>
 
-                        <xs:group ref="myGroup" minOccurs="1" maxOccurs="unbounded"/>
+                        <xs:group ref="ex:myGroup" minOccurs="1" maxOccurs="unbounded"/>
 
                     </xs:sequence>
                 </xs:complexType>
@@ -201,10 +201,10 @@ class ElementsTest extends BaseTest
     {
         $schema = $this->reader->readString(
             '
-            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xs:complexType name="myType">
                     <xs:sequence>
-                        <xs:group ref="myGroup" />
+                        <xs:group ref="ex:myGroup" />
                     </xs:sequence>
                 </xs:complexType>
 
