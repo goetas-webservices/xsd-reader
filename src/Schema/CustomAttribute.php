@@ -21,7 +21,7 @@ class CustomAttribute
     public function __construct(
         string $namespaceURI,
         string $name,
-        string $value
+        string $value,
     ) {
         $this->namespaceURI = $namespaceURI;
         $this->name = $name;

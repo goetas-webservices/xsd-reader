@@ -151,7 +151,7 @@ class SchemaReader
 
     private function loadAttributeGroup(
         Schema $schema,
-        \DOMElement $node
+        \DOMElement $node,
     ): \Closure {
         $attGroup = new AttributeGroup($schema, $node->getAttribute('name'));
         $attGroup->setDoc($this->getDocumentation($node));
@@ -187,7 +187,7 @@ class SchemaReader
     private function getAttributeFromAttributeOrRef(
         \DOMElement $childNode,
         Schema $schema,
-        \DOMElement $node
+        \DOMElement $node,
     ): AttributeItem {
         if ($childNode->hasAttribute('ref')) {
             $attributeDef = $this->findAttributeItem($schema, $node, $childNode->getAttribute('ref'));
@@ -270,7 +270,7 @@ class SchemaReader
         Schema $schema,
         \DOMElement $node,
         \DOMElement $childNode,
-        bool $isAttribute
+        bool $isAttribute,
     ): \Closure {
         $name = $childNode->getAttribute('name');
         if ($isAttribute) {
@@ -463,7 +463,7 @@ class SchemaReader
         \DOMElement $node,
         \DOMElement $childNode,
         ?int $max,
-        ?int $min = null
+        ?int $min = null,
     ): void {
         switch ($childNode->localName) {
             case 'sequence':
@@ -518,7 +518,7 @@ class SchemaReader
         \DOMElement $node,
         \DOMElement $childNode,
         ?int $max,
-        ?int $min
+        ?int $min,
     ): void {
         $schema = $elementContainer->getSchema();
         if ($childNode->hasAttribute('ref')) {
@@ -551,7 +551,7 @@ class SchemaReader
         \DOMElement $node,
         \DOMElement $childNode,
         ?int $max,
-        ?int $min
+        ?int $min,
     ): void {
         $schema = $elementContainer->getSchema();
         $element = $this->createAnyElement($schema, $childNode);
@@ -570,7 +570,7 @@ class SchemaReader
         Schema $schema,
         \DOMElement $node,
         \DOMElement $childNode,
-        AbstractElementSingle $element
+        AbstractElementSingle $element,
     ): void {
         if ($childNode->hasAttribute('substitutionGroup')) {
             $substitutionGroup = $childNode->getAttribute('substitutionGroup');
@@ -583,7 +583,7 @@ class SchemaReader
         Schema $schema,
         \DOMElement $node,
         \DOMElement $childNode,
-        ElementContainer $elementContainer
+        ElementContainer $elementContainer,
     ): void {
         $referencedGroup = $this->findGroup(
             $schema,
@@ -598,7 +598,7 @@ class SchemaReader
     private function loadChoiceWithChildren(
         Schema $schema,
         \DOMElement $node,
-        ElementContainer $elementContainer
+        ElementContainer $elementContainer,
     ): void {
         $choice = $this->createChoice($schema, $node);
         $elementContainer->addElement($choice);
@@ -732,7 +732,7 @@ class SchemaReader
         BaseComplexType $type,
         \DOMElement $node,
         \DOMElement $childNode,
-        Schema $schema
+        Schema $schema,
     ): void {
         switch ($childNode->localName) {
             case 'sequence':
@@ -818,7 +818,7 @@ class SchemaReader
     private function findSomeType(
         SchemaItem $fromThis,
         \DOMElement $node,
-        string $attributeName
+        string $attributeName,
     ): SchemaItem {
         return $this->findSomeTypeFromAttribute(
             $fromThis,
@@ -830,7 +830,7 @@ class SchemaReader
     private function findSomeTypeFromAttribute(
         SchemaItem $fromThis,
         \DOMElement $node,
-        string $attributeName
+        string $attributeName,
     ): SchemaItem {
         return $this->findType(
             $fromThis->getSchema(),
@@ -919,7 +919,7 @@ class SchemaReader
 
     private function loadExtensionChildNodes(
         BaseComplexType $type,
-        \DOMElement $node
+        \DOMElement $node,
     ): void {
         self::againstDOMNodeList(
             $node,
@@ -941,7 +941,7 @@ class SchemaReader
     private function loadChildAttributesAndAttributeGroups(
         BaseComplexType $type,
         \DOMElement $node,
-        \DOMElement $childNode
+        \DOMElement $childNode,
     ): void {
         switch ($childNode->localName) {
             case 'attribute':
@@ -974,7 +974,7 @@ class SchemaReader
                 $node,
                 function (
                     \DOMElement $node,
-                    \DOMElement $childNode
+                    \DOMElement $childNode,
                 ) use (
                     $type,
                     $restriction
@@ -995,7 +995,7 @@ class SchemaReader
     private function loadRestrictionChildNodes(
         Type $type,
         Restriction $restriction,
-        \DOMElement $node
+        \DOMElement $node,
     ): void {
         self::againstDOMNodeList(
             $node,
@@ -1039,7 +1039,7 @@ class SchemaReader
         // If no prefix was provided and the above lookup failed, this means that there
         // was no defalut namespace defined, making the element part of no namespace.
         // In this case, we should not throw an exception since this is valid xml.
-        if (!$namespace && $prefix !== null) {
+        if (!$namespace && null !== $prefix) {
             throw new TypeException(sprintf("Can't find namespace for prefix '%s', at line %d in %s ", $prefix, $node->getLineNo(), $node->ownerDocument->documentURI));
         }
 
@@ -1199,7 +1199,7 @@ class SchemaReader
 
     private function loadImport(
         Schema $schema,
-        \DOMElement $node
+        \DOMElement $node,
     ): \Closure {
         $namespace = $node->getAttribute('namespace');
         $schemaLocation = $node->getAttribute('schemaLocation');
@@ -1253,7 +1253,7 @@ class SchemaReader
     private function loadImportFresh(
         string $namespace,
         Schema $schema,
-        string $file
+        string $file,
     ): \Closure {
         return function () use ($namespace, $schema, $file): void {
             $dom = $this->getDOM(
@@ -1539,7 +1539,7 @@ class SchemaReader
         BaseComplexType $type,
         \DOMElement $childNode,
         Schema $schema,
-        \DOMElement $node
+        \DOMElement $node,
     ): void {
         $attribute = $this->getAttributeFromAttributeOrRef(
             $childNode,
@@ -1554,7 +1554,7 @@ class SchemaReader
         Schema $schema,
         \DOMElement $node,
         \DOMElement $childNode,
-        AttributeContainer $addToThis
+        AttributeContainer $addToThis,
     ): void {
         $attribute = $this->findAttributeGroup($schema, $node, $childNode->getAttribute('ref'));
         $addToThis->addAttribute($attribute);
@@ -1585,7 +1585,7 @@ class SchemaReader
     private function setSchemaThingsFromNode(
         Schema $schema,
         \DOMElement $node,
-        ?Schema $parent = null
+        ?Schema $parent = null,
     ): void {
         $schema->setDoc($this->getDocumentation($node));
 
