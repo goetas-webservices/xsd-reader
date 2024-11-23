@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace GoetasWebservices\XML\XSDReader\Tests;
 
 use GoetasWebservices\XML\XSDReader\Exception\IOException;
+use GoetasWebservices\XML\XSDReader\Exception\TypeException;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\AttributeDef;
 use GoetasWebservices\XML\XSDReader\Schema\Attribute\Group as AttributeGroup;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
@@ -97,9 +98,9 @@ class SchemaTest extends BaseTest
     {
         $schema = $this->reader->readString(
             '
-            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xs:complexType name="myType"></xs:complexType>
-                <xs:element name="myElement" type="myType"></xs:element>
+                <xs:element name="myElement" type="ex:myType"></xs:element>
 
                 <xs:group name="myGroup">
                     <xs:sequence></xs:sequence>
@@ -131,9 +132,9 @@ class SchemaTest extends BaseTest
         $file = 'schema.xsd';
         $schema1 = $this->reader->readString(
             '
-            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xs:complexType name="myType"></xs:complexType>
-                <xs:element name="myElement" type="myType"></xs:element>
+                <xs:element name="myElement" type="ex:myType"></xs:element>
 
                 <xs:group name="myGroup">
                     <xs:sequence></xs:sequence>
@@ -171,9 +172,9 @@ class SchemaTest extends BaseTest
         $file = 'schema.xsd';
         $schema1 = $this->reader->readString(
             '
-            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xs:complexType name="myType"></xs:complexType>
-                <xs:element name="myElement" type="myType"></xs:element>
+                <xs:element name="myElement" type="ex:myType"></xs:element>
             </xs:schema>',
             $file
         );
@@ -187,9 +188,9 @@ class SchemaTest extends BaseTest
         // Now use a second schema which uses the same targetNamespace
         $schema2 = $this->reader->readString(
             '
-            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xs:import namespace="http://www.example.com"/>
-                <xs:element name="myElement2" type="ns1:myType"></xs:element>
+                <xs:element name="myElement2" type="ex:myType"></xs:element>
             </xs:schema>',
             $file
         );
@@ -201,7 +202,7 @@ class SchemaTest extends BaseTest
         self::assertInstanceOf(ElementDef::class, $schema2->findElement('myElement2', 'http://www.example.com'));
 
         self::assertCount(1, $schema1->getTypes());
-        self::assertCount(1, $schema2->getElements());
+        self::assertCount(1, $schema1->getElements());
         self::assertInstanceOf(ElementDef::class, $schema1->findElement('myElement2', 'http://www.example.com'));
     }
 
@@ -209,10 +210,10 @@ class SchemaTest extends BaseTest
     {
         $schema1 = $this->reader->readString(
             '
-        <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+        <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
             <xs:element name="myElement">
                 <xs:complexType>
-                    <xs:group ref="myGroup"/>
+                    <xs:group ref="ex:myGroup"/>
                 </xs:complexType>
             </xs:element>
             <xs:group name="myGroup">
@@ -266,5 +267,68 @@ class SchemaTest extends BaseTest
 
         self::assertInstanceOf(ElementDef::class, $schema->findElement('CategoryList', 'http://tempuri.org/2'));
         self::assertInstanceOf(ComplexType::class, $schema->findType('Categories', 'http://tempuri.org/1'));
+    }
+
+    public function testDefaultNamespaceForSchema(): void
+    {
+        // Default namespace is provided. Validation does not fail.
+        $schema1 = $this->reader->readString(
+            '
+        <schema targetNamespace="http://www.example.com" xmlns="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:element name="myElement">
+                <xs:complexType>
+                    <xs:group ref="myGroup"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:group name="myGroup">
+                <xs:choice>
+                    <xs:element name="groupElement" type="xs:string"/>
+                </xs:choice>
+            </xs:group>
+        </schema>
+        '
+        );
+
+        // Default namespace is provided but does not provide the myGroup component. Validation fails.
+        $this->expectException(TypeException::class);
+        $this->expectExceptionMessage("Can't find group named {http://www.example2.com}#myGroup, at line 4 in schema.xsd ");
+        $schema1 = $this->reader->readString(
+            '
+        <schema targetNamespace="http://www.example.com" xmlns="http://www.example2.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:element name="myElement">
+                <xs:complexType>
+                    <xs:group ref="myGroup"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:group name="myGroup">
+                <xs:choice>
+                    <xs:element name="groupElement" type="xs:string"/>
+                </xs:choice>
+            </xs:group>
+        </schema>
+        '
+        );
+    }
+
+    public function testUnknownNamespaceForSchema(): void
+    {
+        $this->expectException(TypeException::class);
+        $this->expectExceptionMessage("Can't find namespace for prefix 'ex2', at line 4 in schema.xsd ");
+        $schema1 = $this->reader->readString(
+            '
+        <schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:element name="myElement">
+                <xs:complexType>
+                    <xs:group ref="ex2:myGroup"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:group name="myGroup">
+                <xs:choice>
+                    <xs:element name="groupElement" type="xs:string"/>
+                </xs:choice>
+            </xs:group>
+        </schema>
+        '
+        );
     }
 }

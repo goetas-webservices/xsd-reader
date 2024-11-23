@@ -401,7 +401,7 @@ class RestrictionsTest extends BaseTest
     {
         $schema = $this->reader->readString(
             '
-            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
                 <xs:complexType name="BaseAmountType">
                   <xs:simpleContent>
@@ -416,7 +416,7 @@ class RestrictionsTest extends BaseTest
 
                 <xs:complexType name="AmountType">
                   <xs:simpleContent>
-                      <xs:restriction base="BaseAmountType">
+                      <xs:restriction base="ex:BaseAmountType">
                         <xs:attribute name="currencyID" type="xs:string" use="required">
                         </xs:attribute>
                       </xs:restriction>
@@ -426,7 +426,7 @@ class RestrictionsTest extends BaseTest
                 <xs:element name="root">
                     <xs:complexType>
                         <xs:sequence>
-                          <xs:element name="myAmount" type="AmountType"/>
+                          <xs:element name="myAmount" type="ex:AmountType"/>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
@@ -458,7 +458,7 @@ class RestrictionsTest extends BaseTest
     {
         $schema = $this->reader->readString(
             '
-            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
                 <xs:complexType name="BaseAmountType">
                   <xs:simpleContent>
@@ -473,7 +473,7 @@ class RestrictionsTest extends BaseTest
 
                 <xs:complexType name="AmountType">
                   <xs:simpleContent>
-                      <xs:restriction base="BaseAmountType">
+                      <xs:restriction base="ex:BaseAmountType">
                         <xs:attribute name="currencyID" type="xs:string" use="required">
                         </xs:attribute>
                       </xs:restriction>
@@ -482,14 +482,14 @@ class RestrictionsTest extends BaseTest
 
                 <xs:complexType name="MyAmountType">
                   <xs:simpleContent>
-                    <xs:restriction base="AmountType"/>
+                    <xs:restriction base="ex:AmountType"/>
                   </xs:simpleContent>
                 </xs:complexType>
 
                 <xs:element name="root">
                     <xs:complexType>
                         <xs:sequence>
-                          <xs:element name="myAmount" type="MyAmountType"/>
+                          <xs:element name="myAmount" type="ex:MyAmountType"/>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
@@ -523,7 +523,7 @@ class RestrictionsTest extends BaseTest
     {
         $schema = $this->reader->readString(
             '
-            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
                 <xs:complexType name="BaseQuantityType">
                   <xs:simpleContent>
@@ -535,20 +535,20 @@ class RestrictionsTest extends BaseTest
 
                 <xs:complexType name="QuantityType">
                   <xs:simpleContent>
-                    <xs:extension base="BaseQuantityType"/>
+                    <xs:extension base="ex:BaseQuantityType"/>
                   </xs:simpleContent>
                 </xs:complexType>
 
                 <xs:complexType name="MyQuantityType">
                   <xs:simpleContent>
-                    <xs:restriction base="QuantityType"/>
+                    <xs:restriction base="ex:QuantityType"/>
                   </xs:simpleContent>
                 </xs:complexType>
 
                 <xs:element name="root">
                     <xs:complexType>
                         <xs:sequence>
-                          <xs:element name="myQuantity" type="MyQuantityType"/>
+                          <xs:element name="myQuantity" type="ex:MyQuantityType"/>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
@@ -583,7 +583,7 @@ class RestrictionsTest extends BaseTest
     {
         $schema = $this->reader->readString(
             '
-            <xs:schema targetNamespace="http://www.example.com" xlmns:tns="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://www.example.com" xmlns:tns="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <!-- SOAP 1.1 enc:Array-->
                 <xs:group name="Array">
                     <xs:sequence>

@@ -18,7 +18,7 @@ class AttributesTest extends BaseTest
     {
         $schema = $this->reader->readString(
             '
-            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xs:attribute name="myAttribute" type="xs:string"></xs:attribute>
                 <xs:attribute name="myAttributeOptions" type="xs:string" use="required" nil="true"></xs:attribute>
 
@@ -101,22 +101,22 @@ class AttributesTest extends BaseTest
     {
         $schema = $this->reader->readString(
             '
-            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xs:attribute name="lang" use="optional" type="xs:language"/>
                 <xs:element name="Name">
                     <xs:complexType mixed="true">
-                        <xs:attribute ref="lang" use="required"/>
+                        <xs:attribute ref="ex:lang" use="required"/>
                     </xs:complexType>
                 </xs:element>
                 <xs:complexType name="MyNameType">
                     <xs:sequence>
-                        <xs:element ref="Name"/>
+                        <xs:element ref="ex:Name"/>
                     </xs:sequence>
                 </xs:complexType>
                 <xs:element name="root">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element name="myName" type="MyNameType"/>
+                            <xs:element name="myName" type="ex:MyNameType"/>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>

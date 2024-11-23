@@ -278,14 +278,14 @@ class TypesTest extends BaseTest
     {
         $schema = $this->reader->readString(
             '
-            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xs:complexType name="complexType">
                     <xs:sequence>
                         <xs:element name="el1" type="xs:string"></xs:element>
                         <xs:element name="el2">
                         </xs:element>
                         <xs:element ref="ex:el3"></xs:element>
-                        <xs:group ref="g1"></xs:group>
+                        <xs:group ref="ex:g1"></xs:group>
                     </xs:sequence>
                     <xs:attribute name="att1" type="xs:string"></xs:attribute>
                     <xs:attribute name="att2"></xs:attribute>
@@ -365,7 +365,7 @@ class TypesTest extends BaseTest
     {
         $schema = $this->reader->readString(
             '
-            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xs:complexType name="complexType">
                     <xs:simpleContent>
                         <xs:extension base="xs:string"></xs:extension>
