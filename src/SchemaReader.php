@@ -439,8 +439,8 @@ class SchemaReader
     {
         $maxOccurs = $node->getAttribute('maxOccurs');
 
-        if (null === $max && 'unbounded' === $maxOccurs) {
-            return null;
+        if ('unbounded' === $maxOccurs) {
+            return -1;
         }
 
         if (is_numeric($maxOccurs)) {
@@ -482,7 +482,7 @@ class SchemaReader
                 );
                 break;
             case 'choice':
-                $this->loadChoiceWithChildren($elementContainer->getSchema(), $childNode, $elementContainer);
+                $this->loadChoiceWithChildren($elementContainer->getSchema(), $childNode, $elementContainer, $max, $min);
                 break;
             case 'element':
                 $this->loadSequenceChildNodeLoadElement(
@@ -540,8 +540,8 @@ class SchemaReader
             $element->setMin($min);
         }
 
-        if (null !== $max && 1 < $max) {
-            $element->setMax($max);
+        if (null !== $max && 0 !== $max) {
+            $element->setMax(-1);
         }
         $elementContainer->addElement($element);
     }
@@ -599,19 +599,24 @@ class SchemaReader
         Schema $schema,
         \DOMElement $node,
         ElementContainer $elementContainer,
+        ?int $max = null,
+        ?int $min = null,
     ): void {
         $choice = $this->createChoice($schema, $node);
         $elementContainer->addElement($choice);
 
+        $min = $this->loadMinFromNode($node, $min);
+        $max = $this->loadMaxFromNode($node, $max);
+
         self::againstDOMNodeList(
             $node,
-            function (\DOMElement $node, \DOMElement $childNode) use ($choice): void {
+            function (\DOMElement $node, \DOMElement $childNode) use ($choice, $max, $min): void {
                 $this->loadSequenceChildNode(
                     $choice,
                     $node,
                     $childNode,
-                    null,
-                    null
+                    $max,
+                    $min
                 );
             }
         );
