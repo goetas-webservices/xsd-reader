@@ -121,4 +121,11 @@ class ImportTest extends BaseTest
 
         self::assertInstanceOf(ElementDef::class, $schema->findElement('outerEl', 'http://tempuri.org/1'));
     }
+
+    public function testDefaultNamespaceImport(): void
+    {
+        $schema = $this->reader->readfile(__DIR__ . '/schema/schema.xsd');
+
+        self::assertInstanceOf(Schema::class, $schema);
+    }
 }
