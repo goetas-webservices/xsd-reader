@@ -63,7 +63,7 @@ class ElementsTest extends BaseTest
     /**
      * @dataProvider getGroupCounts
      */
-    public function testGroupOccurrences($item, $min, $max): void
+    public function testGroupOccurrences($groupItem, array $groupMinMax, array $elementsMinMax): void
     {
         $schema = $this->reader->readString(
             '
@@ -86,7 +86,10 @@ class ElementsTest extends BaseTest
 
                 <xs:group name="myGroup">
                     <xs:sequence>
-                        <xs:element name="groupEl1" type="xs:string" />
+                        <xs:element name="nullable" type="xs:string" minOccurs="0" />
+                        <xs:element name="list" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+                        <xs:element name="scoped" type="xs:string" minOccurs="3" maxOccurs="5" />
+                        <xs:element name="single" type="xs:string" minOccurs="1" maxOccurs="1"/>
                     </xs:sequence>
                 </xs:group>
             </xs:schema>');
@@ -97,39 +100,69 @@ class ElementsTest extends BaseTest
         $myGroup = $schema->findGroup('myGroup', 'http://www.example.com');
         self::assertInstanceOf(Group::class, $myGroup);
 
-        $myGroupRef = $myType->getElements()[$item];
+        $myGroupRef = $myType->getElements()[$groupItem];
         self::assertInstanceOf(GroupRef::class, $myGroupRef);
 
         $wrappedEls = $myGroupRef->getElements();
-        if (-1 === $max || $max > 0) {
-            self::assertEquals($max, $wrappedEls[0]->getMax());
-        } else {
-            self::assertEquals(1, $wrappedEls[0]->getMax());
-        }
-
-        if ($min > 1) {
-            self::assertEquals($max, $wrappedEls[0]->getMin());
-        } else {
-            self::assertEquals(1, $wrappedEls[0]->getMin());
+        foreach ($wrappedEls as $elementIndex => $element) {
+            [$elementMin, $elementMax] = $elementsMinMax[$elementIndex];
+            self::assertEquals($elementMin, $element->getMin(), 'Failed asserting on element index ' . $elementIndex);
+            self::assertEquals($elementMax, $element->getMax(), 'Failed asserting on element index ' . $elementIndex);
         }
 
         self::assertEquals('myGroup', $myGroupRef->getName());
 
-        self::assertEquals($min, $myGroupRef->getMin());
-        self::assertEquals($max, $myGroupRef->getMax());
+        [$groupMin, $groupMax] = $groupMinMax;
+        self::assertEquals($groupMin, $myGroupRef->getMin());
+        self::assertEquals($groupMax, $myGroupRef->getMax());
     }
 
     public function getGroupCounts(): array
     {
         return [
             // item, min, max
-            [0, 1, 1],
-            [1, 2, 2], // if the min = 2, max must be at least 2
-            [2, 1, 1],
-            [3, 1, -1],
-            [4, 1, 1],
-            [5, 2, 2],
-            [6, 1, -1],
+            [0, [1, 1], [
+                [0, 1],
+                [0, -1],
+                [3, 5],
+                [1, 1],
+            ]],
+            [1, [2, 2], [
+                [0, 2],
+                [0, -1],
+                [6, 10],
+                [2, 2],
+            ]],
+            [2, [1, 1], [
+                [0, 1],
+                [0, -1],
+                [3, 5],
+                [1, 1],
+            ]],
+            [3, [1, -1], [
+                [0, -1],
+                [0, -1],
+                [3, -1],
+                [1, -1],
+            ]],
+            [4, [1, 1], [
+                [0, 1],
+                [0, -1],
+                [3, 5],
+                [1, 1],
+            ]],
+            [5, [2, 2], [
+                [0, 2],
+                [0, -1],
+                [6, 10],
+                [2, 2],
+            ]],
+            [6, [1, -1], [
+                [0, -1],
+                [0, -1],
+                [3, -1],
+                [1, -1],
+            ]],
         ];
     }
 
@@ -154,7 +187,7 @@ class ElementsTest extends BaseTest
         self::assertFalse($schema->getElementsQualification());
 
         /**
-         * @var $element ElementSingle
+         * @var ElementSingle $element
          */
         $element = $myType->getElements()[0];
         self::assertFalse($element->isQualified());

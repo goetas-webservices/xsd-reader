@@ -58,12 +58,17 @@ class GroupRef extends Group implements InterfaceSetMinMax
              * @var Element|ElementRef|ElementSingle|GroupRef $clonedElement
              */
             $clonedElement = clone $element;
-            if (0 < $this->getMax() || -1 === $this->getMax()) {
-                $clonedElement->setMax($this->getMax());
+
+            $groupMax = $this->getMax();
+            if (1 !== $groupMax) {
+                $elementMax = $clonedElement->getMax();
+                $clonedElement->setMax((-1 === $groupMax || -1 === $elementMax) ? -1 : $groupMax * $elementMax);
             }
 
-            if (1 < $this->getMin() && 1 === $clonedElement->getMin()) {
-                $clonedElement->setMin($this->getMin());
+            $groupMin = $this->getMin();
+            if (1 !== $groupMin) {
+                $elementMin = $clonedElement->getMin();
+                $clonedElement->setMin($groupMin * $elementMin);
             }
 
             $elements[$k] = $clonedElement;
