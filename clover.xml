@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1735905392">
-  <project timestamp="1735905392">
+<coverage generated="1757357211">
+  <project timestamp="1757357211">
     <file name="/home/runner/work/xsd-reader/xsd-reader/src/Documentation/DocumentationReader.php">
       <metrics loc="11" ncloc="11" classes="0" methods="0" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="0" coveredstatements="0" elements="0" coveredelements="0"/>
     </file>
@@ -291,7 +291,7 @@
     </file>
     <file name="/home/runner/work/xsd-reader/xsd-reader/src/Schema/Element/GroupRef.php">
       <class name="GoetasWebservices\XML\XSDReader\Schema\Element\GroupRef" namespace="global">
-        <metrics complexity="13" methods="8" coveredmethods="7" conditionals="0" coveredconditionals="0" statements="17" coveredstatements="16" elements="25" coveredelements="23"/>
+        <metrics complexity="13" methods="8" coveredmethods="7" conditionals="0" coveredconditionals="0" statements="21" coveredstatements="20" elements="29" coveredelements="27"/>
       </class>
       <line num="15" type="method" name="__construct" visibility="public" complexity="1" crap="1" count="113"/>
       <line num="17" type="stmt" count="113"/>
@@ -310,15 +310,19 @@
       <line num="51" type="stmt" count="8"/>
       <line num="56" type="stmt" count="8"/>
       <line num="60" type="stmt" count="8"/>
-      <line num="61" type="stmt" count="8"/>
       <line num="62" type="stmt" count="8"/>
-      <line num="65" type="stmt" count="8"/>
-      <line num="66" type="stmt" count="2"/>
+      <line num="63" type="stmt" count="8"/>
+      <line num="64" type="stmt" count="4"/>
+      <line num="65" type="stmt" count="4"/>
+      <line num="68" type="stmt" count="8"/>
       <line num="69" type="stmt" count="8"/>
-      <line num="72" type="stmt" count="8"/>
-      <line num="75" type="method" name="addElement" visibility="public" complexity="1" crap="2" count="0"/>
-      <line num="77" type="stmt" count="0"/>
-      <metrics loc="80" ncloc="71" classes="1" methods="8" coveredmethods="7" conditionals="0" coveredconditionals="0" statements="17" coveredstatements="16" elements="25" coveredelements="23"/>
+      <line num="70" type="stmt" count="2"/>
+      <line num="71" type="stmt" count="2"/>
+      <line num="74" type="stmt" count="8"/>
+      <line num="77" type="stmt" count="8"/>
+      <line num="80" type="method" name="addElement" visibility="public" complexity="1" crap="2" count="0"/>
+      <line num="82" type="stmt" count="0"/>
+      <metrics loc="85" ncloc="76" classes="1" methods="8" coveredmethods="7" conditionals="0" coveredconditionals="0" statements="21" coveredstatements="20" elements="29" coveredelements="27"/>
     </file>
     <file name="/home/runner/work/xsd-reader/xsd-reader/src/Schema/Element/InterfaceSetAbstract.php">
       <metrics loc="13" ncloc="13" classes="0" methods="0" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="0" coveredstatements="0" elements="0" coveredelements="0"/>
@@ -1554,6 +1558,6 @@
       <line num="106" type="stmt" count="8"/>
       <metrics loc="109" ncloc="89" classes="1" methods="4" coveredmethods="3" conditionals="0" coveredconditionals="0" statements="44" coveredstatements="43" elements="48" coveredelements="46"/>
     </file>
-    <metrics files="54" loc="3505" ncloc="3220" classes="26" methods="217" coveredmethods="176" conditionals="0" coveredconditionals="0" statements="1054" coveredstatements="994" elements="1271" coveredelements="1170"/>
+    <metrics files="54" loc="3510" ncloc="3225" classes="26" methods="217" coveredmethods="176" conditionals="0" coveredconditionals="0" statements="1058" coveredstatements="998" elements="1275" coveredelements="1174"/>
   </project>
 </coverage>
