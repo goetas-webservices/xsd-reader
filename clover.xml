@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1757357211">
-  <project timestamp="1757357211">
+<coverage generated="1757414503">
+  <project timestamp="1757414503">
     <file name="/home/runner/work/xsd-reader/xsd-reader/src/Documentation/DocumentationReader.php">
       <metrics loc="11" ncloc="11" classes="0" methods="0" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="0" coveredstatements="0" elements="0" coveredelements="0"/>
     </file>
@@ -639,7 +639,7 @@
     </file>
     <file name="/home/runner/work/xsd-reader/xsd-reader/src/SchemaReader.php">
       <class name="GoetasWebservices\XML\XSDReader\SchemaReader" namespace="global">
-        <metrics complexity="241" methods="76" coveredmethods="62" conditionals="0" coveredconditionals="0" statements="785" coveredstatements="752" elements="861" coveredelements="814"/>
+        <metrics complexity="241" methods="76" coveredmethods="64" conditionals="0" coveredconditionals="0" statements="785" coveredstatements="754" elements="861" coveredelements="818"/>
       </class>
       <line num="108" type="method" name="extractErrorMessage" visibility="private" complexity="2" crap="2" count="2"/>
       <line num="110" type="stmt" count="2"/>
@@ -684,7 +684,7 @@
       <line num="182" type="stmt" count="113"/>
       <line num="183" type="stmt" count="113"/>
       <line num="184" type="stmt" count="113"/>
-      <line num="187" type="method" name="getAttributeFromAttributeOrRef" visibility="private" complexity="4" crap="4.01" count="113"/>
+      <line num="187" type="method" name="getAttributeFromAttributeOrRef" visibility="private" complexity="4" crap="4" count="113"/>
       <line num="192" type="stmt" count="113"/>
       <line num="193" type="stmt" count="113"/>
       <line num="194" type="stmt" count="113"/>
@@ -693,7 +693,7 @@
       <line num="197" type="stmt" count="113"/>
       <line num="199" type="stmt" count="113"/>
       <line num="200" type="stmt" count="113"/>
-      <line num="203" type="stmt" count="0"/>
+      <line num="203" type="stmt" count="113"/>
       <line num="209" type="stmt" count="113"/>
       <line num="212" type="stmt" count="113"/>
       <line num="215" type="method" name="createAttribute" visibility="private" complexity="1" crap="1" count="113"/>
@@ -883,7 +883,7 @@
       <line num="510" type="stmt" count="113"/>
       <line num="511" type="stmt" count="113"/>
       <line num="512" type="stmt" count="113"/>
-      <line num="516" type="method" name="loadSequenceChildNodeLoadElement" visibility="private" complexity="6" crap="6.01" count="113"/>
+      <line num="516" type="method" name="loadSequenceChildNodeLoadElement" visibility="private" complexity="6" crap="6" count="113"/>
       <line num="523" type="stmt" count="113"/>
       <line num="524" type="stmt" count="113"/>
       <line num="525" type="stmt" count="113"/>
@@ -891,7 +891,7 @@
       <line num="527" type="stmt" count="113"/>
       <line num="528" type="stmt" count="113"/>
       <line num="530" type="stmt" count="113"/>
-      <line num="531" type="stmt" count="0"/>
+      <line num="531" type="stmt" count="113"/>
       <line num="534" type="stmt" count="113"/>
       <line num="537" type="stmt" count="113"/>
       <line num="539" type="stmt" count="113"/>
@@ -1502,7 +1502,7 @@
       <line num="1602" type="stmt" count="113"/>
       <line num="1603" type="stmt" count="113"/>
       <line num="1604" type="stmt" count="113"/>
-      <metrics loc="1607" ncloc="1502" classes="1" methods="76" coveredmethods="62" conditionals="0" coveredconditionals="0" statements="785" coveredstatements="752" elements="861" coveredelements="814"/>
+      <metrics loc="1607" ncloc="1502" classes="1" methods="76" coveredmethods="64" conditionals="0" coveredconditionals="0" statements="785" coveredstatements="754" elements="861" coveredelements="818"/>
     </file>
     <file name="/home/runner/work/xsd-reader/xsd-reader/src/Utils/UrlUtils.php">
       <class name="GoetasWebservices\XML\XSDReader\Utils\UrlUtils" namespace="global">
@@ -1558,6 +1558,6 @@
       <line num="106" type="stmt" count="8"/>
       <metrics loc="109" ncloc="89" classes="1" methods="4" coveredmethods="3" conditionals="0" coveredconditionals="0" statements="44" coveredstatements="43" elements="48" coveredelements="46"/>
     </file>
-    <metrics files="54" loc="3510" ncloc="3225" classes="26" methods="217" coveredmethods="176" conditionals="0" coveredconditionals="0" statements="1058" coveredstatements="998" elements="1275" coveredelements="1174"/>
+    <metrics files="54" loc="3510" ncloc="3225" classes="26" methods="217" coveredmethods="178" conditionals="0" coveredconditionals="0" statements="1058" coveredstatements="1000" elements="1275" coveredelements="1178"/>
   </project>
 </coverage>
