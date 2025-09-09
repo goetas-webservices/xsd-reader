@@ -8,7 +8,7 @@ class UrlUtils
 {
     public static function resolveRelativeUrl(string $base, string $rel): string
     {
-        if ('' === mb_trim($rel)) {
+        if ('' === trim($rel)) {
             return $base;
         }
 

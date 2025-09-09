@@ -110,7 +110,7 @@ class SchemaReader
         $errors = [];
 
         foreach (libxml_get_errors() as $error) {
-            $errors[] = sprintf("Error[%s] code %s: %s in '%s' at position %s:%s", $error->level, $error->code, mb_trim($error->message), $error->file, $error->line, $error->column);
+            $errors[] = sprintf("Error[%s] code %s: %s in '%s' at position %s:%s", $error->level, $error->code, trim($error->message), $error->file, $error->line, $error->column);
         }
         $e = new \Exception(implode('; ', $errors));
         libxml_use_internal_errors(false);
@@ -1244,7 +1244,7 @@ class SchemaReader
 
     private function createOrUseSchemaForNs(Schema $schema, string $namespace): Schema
     {
-        if ('' !== mb_trim($namespace)) {
+        if ('' !== trim($namespace)) {
             $newSchema = new Schema();
             $newSchema->addSchema($this->getGlobalSchema());
             $schema->addSchema($newSchema);

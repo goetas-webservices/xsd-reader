@@ -31,6 +31,6 @@ class StandardDocumentationReader implements DocumentationReader
         }
         $doc = preg_replace('/[\t ]+/', ' ', $doc);
 
-        return mb_trim($doc);
+        return trim($doc);
     }
 }

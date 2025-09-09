@@ -218,7 +218,7 @@ class ElementsTest extends BaseTest
         self::assertTrue($schema->getElementsQualification());
 
         /**
-         * @var $element ElementSingle
+         * @var ElementSingle $element
          */
         $element = $myType->getElements()[0];
         self::assertTrue($element->isQualified());
