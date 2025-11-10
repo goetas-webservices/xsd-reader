@@ -32,7 +32,7 @@ class Schema
             return $this->typeCache[$cid];
         }
 
-        if ($this->getTargetNamespace() === $namespace) {
+        if ($this->getTargetNamespace() === $namespace || $namespace === null) {
             /**
              * @var SchemaItem|null $item
              */

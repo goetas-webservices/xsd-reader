@@ -1042,7 +1042,7 @@ class SchemaReader
 
         // If no namespace is found, throw an exception only if a prefix was provided.
         // If no prefix was provided and the above lookup failed, this means that there
-        // was no defalut namespace defined, making the element part of no namespace.
+        // was no default namespace defined, making the element part of no namespace.
         // In this case, we should not throw an exception since this is valid xml.
         if (!$namespace && null !== $prefix) {
             throw new TypeException(sprintf("Can't find namespace for prefix '%s', at line %d in %s ", $prefix, $node->getLineNo(), $node->ownerDocument->documentURI));
