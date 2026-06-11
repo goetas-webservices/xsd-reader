@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace GoetasWebservices\XML\XSDReader\Tests;
 
+use GoetasWebservices\XML\XSDReader\Schema\Element\Choice;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Element;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
 use GoetasWebservices\XML\XSDReader\Schema\Element\ElementItem;
@@ -261,6 +262,50 @@ class ElementsTest extends BaseTest
         // @todo this is not yet really working
         //        self::assertEquals(2, $myGroupRef->getMin());
         //        self::assertEquals(5, $myGroupRef->getMax());
+    }
+
+    public function testRepeatingGroupRefAroundChoiceMakesMembersOptionalUnboundedLists(): void
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xs:complexType name="myType">
+                    <xs:sequence>
+                        <xs:group minOccurs="0" maxOccurs="unbounded" ref="ex:myGroup" />
+                    </xs:sequence>
+                </xs:complexType>
+
+                <xs:group name="myGroup">
+                    <xs:choice>
+                        <xs:element name="delete" type="xs:string" />
+                        <xs:element name="write" type="xs:string" />
+                    </xs:choice>
+                </xs:group>
+            </xs:schema>');
+
+        $myType = $schema->findType('myType', 'http://www.example.com');
+        self::assertInstanceOf(ComplexType::class, $myType);
+
+        $myGroupRef = $myType->getElements()[0];
+        self::assertInstanceOf(GroupRef::class, $myGroupRef);
+
+        $choice = $myGroupRef->getElements()[0];
+        self::assertInstanceOf(Choice::class, $choice);
+        self::assertEquals(-1, $choice->getMax());
+
+        // The group repeats unbounded, so each choice member can occur any number
+        // of times. Because it is a choice, every member is also optional (one
+        // branch is picked per occurrence) - so min must be 0, not multiplied.
+        $members = $choice->getElements();
+        self::assertCount(2, $members);
+
+        self::assertEquals('delete', $members[0]->getName());
+        self::assertEquals(0, $members[0]->getMin());
+        self::assertEquals(-1, $members[0]->getMax());
+
+        self::assertEquals('write', $members[1]->getName());
+        self::assertEquals(0, $members[1]->getMin());
+        self::assertEquals(-1, $members[1]->getMax());
     }
 
     public function testAnonym(): void

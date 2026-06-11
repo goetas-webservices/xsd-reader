@@ -196,6 +196,68 @@ class ChoiceTest extends BaseTest
         self::assertCount(3, $choice->getElements());
     }
 
+    public function testRepeatingChoiceExposesMembersAsOptionalUnboundedLists(): void
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xs:element name="Languages">
+                    <xs:complexType>
+                        <xs:choice maxOccurs="unbounded">
+                            <xs:element name="german" type="xs:string" />
+                            <xs:element name="english" type="xs:string" />
+                        </xs:choice>
+                    </xs:complexType>
+                </xs:element>
+            </xs:schema>'
+        );
+
+        $choice = $schema->getElements()['Languages']->getType()->getElements()[0];
+        self::assertInstanceOf(Choice::class, $choice);
+        self::assertEquals(1, $choice->getMin());
+        self::assertEquals(-1, $choice->getMax());
+
+        // More than one member: a single occurrence selects exactly one branch,
+        // so every member is optional (minOccurs 0) and - because the choice
+        // repeats - unbounded (maxOccurs -1), regardless of the choice's own min.
+        $members = $choice->getElements();
+        self::assertCount(2, $members);
+        foreach ($members as $member) {
+            self::assertEquals(0, $member->getMin());
+            self::assertEquals(-1, $member->getMax());
+        }
+    }
+
+    public function testRepeatingSingleMemberChoiceKeepsChoiceMinForItsMember(): void
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.example.com" xmlns:ex="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xs:element name="Languages">
+                    <xs:complexType>
+                        <xs:choice maxOccurs="unbounded">
+                            <xs:element name="german" type="xs:string" />
+                        </xs:choice>
+                    </xs:complexType>
+                </xs:element>
+            </xs:schema>'
+        );
+
+        $choice = $schema->getElements()['Languages']->getType()->getElements()[0];
+        self::assertInstanceOf(Choice::class, $choice);
+        self::assertEquals(1, $choice->getMin());
+        self::assertEquals(-1, $choice->getMax());
+
+        // A single-member choice degenerates to that one member: it is always
+        // the selected branch, so it keeps the choice's own minOccurs (1 here)
+        // instead of dropping to 0, while still being an unbounded list.
+        $members = $choice->getElements();
+        self::assertCount(1, $members);
+        self::assertEquals('german', $members[0]->getName());
+        self::assertEquals(1, $members[0]->getMin());
+        self::assertEquals(-1, $members[0]->getMax());
+    }
+
     public function testChoiceNested(): void
     {
         $schema = $this->reader->readString(
