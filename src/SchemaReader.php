@@ -540,7 +540,7 @@ class SchemaReader
             $element->setMin($min);
         }
 
-        if (null !== $max && 0 !== $max) {
+        if (null !== $max && (-1 === $max || 1 < $max || -1 === $element->getMax() || 1 < $element->getMax())) {
             $element->setMax(-1);
         }
         $elementContainer->addElement($element);

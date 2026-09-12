@@ -251,6 +251,56 @@ class TypesTest extends BaseTest
         ];
     }
 
+    /**
+     * A container (sequence/choice) with an explicit maxOccours="1" is NOT
+     * repeatable: a scalar child (no maxOccurs attribute of its own, XSD
+     * default is 1) inside it must stay scalar, not be forced into an array.
+     * Regression test for https://github.com/goetas-webservices/xsd-reader/issues/XXX.
+     */
+    public function testNonRepeatableSequenceDoesNotForceScalarChildToArray(): void
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xs:complexType name="complexType">
+                    <xs:sequence maxOccurs="1">
+                        <xs:element name="el1" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:schema>'
+        );
+
+        $complex = $schema->findType('complexType', 'http://www.example.com');
+        self::assertInstanceOf(ComplexType::class, $complex);
+        $elements = $complex->getElements();
+        self::assertEquals(1, $elements[0]->getMax());
+    }
+
+    public function testNonRepeatableChoiceDoesNotForceScalarChildToArray(): void
+    {
+        $schema = $this->reader->readString(
+            '
+            <xs:schema targetNamespace="http://www.example.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xs:complexType name="complexType">
+                    <xs:sequence>
+                        <xs:choice maxOccurs="1">
+                            <xs:element name="el1" type="xs:string"></xs:element>
+                            <xs:element name="el2" type="xs:string"></xs:element>
+                        </xs:choice>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:schema>'
+        );
+
+        $complex = $schema->findType('complexType', 'http://www.example.com');
+        self::assertInstanceOf(ComplexType::class, $complex);
+        $choice = $complex->getElements()[0];
+        $elements = $choice->getElements();
+
+        self::assertEquals(1, $elements[0]->getMax());
+        self::assertEquals(1, $elements[1]->getMax());
+    }
+
     public function getMinOccurences(): array
     {
         return [
