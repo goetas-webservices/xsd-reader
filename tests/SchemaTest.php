@@ -12,6 +12,7 @@ use GoetasWebservices\XML\XSDReader\Schema\Element\ElementDef;
 use GoetasWebservices\XML\XSDReader\Schema\Element\Group as ElementGroup;
 use GoetasWebservices\XML\XSDReader\Schema\Element\GroupRef;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\TypeNotFoundException;
+use GoetasWebservices\XML\XSDReader\Schema\Schema;
 use GoetasWebservices\XML\XSDReader\Schema\Type\ComplexType;
 use GoetasWebservices\XML\XSDReader\Schema\Type\SimpleType;
 
@@ -267,6 +268,154 @@ class SchemaTest extends BaseTest
 
         self::assertInstanceOf(ElementDef::class, $schema->findElement('CategoryList', 'http://tempuri.org/2'));
         self::assertInstanceOf(ComplexType::class, $schema->findType('Categories', 'http://tempuri.org/1'));
+    }
+
+    public static function getDependentReferences(): array
+    {
+        $holder = static fn (Schema $schema) => $schema->findType('Holder', 'http://tempuri.org/2');
+
+        return [
+            'element ref' => [
+                '<xs:complexType name="Holder"><xs:sequence><xs:element ref="q1:Item"/></xs:sequence></xs:complexType>',
+                static fn (Schema $schema) => $holder($schema)->getElements()[0]->getReferencedElement(),
+            ],
+            'group ref' => [
+                '<xs:complexType name="Holder"><xs:sequence><xs:group ref="q1:ItemGroup"/></xs:sequence></xs:complexType>',
+                static fn (Schema $schema) => $holder($schema)->getElements()[0],
+            ],
+            'attribute ref' => [
+                '<xs:complexType name="Holder"><xs:attribute ref="q1:itemAttribute"/></xs:complexType>',
+                static fn (Schema $schema) => $holder($schema)->getAttributes()[0]->getReferencedAttribute(),
+            ],
+            'attributeGroup ref' => [
+                '<xs:complexType name="Holder"><xs:attributeGroup ref="q1:ItemAttributeGroup"/></xs:complexType>',
+                static fn (Schema $schema) => $holder($schema)->getAttributes()[0],
+            ],
+            'element type' => [
+                '<xs:element name="Holder" type="q1:ItemType"/>',
+                static fn (Schema $schema) => $schema->findElement('Holder', 'http://tempuri.org/2')->getType(),
+            ],
+            'attribute type' => [
+                '<xs:complexType name="Holder"><xs:attribute name="code" type="q1:ItemCode"/></xs:complexType>',
+                static fn (Schema $schema) => $holder($schema)->getAttributes()[0]->getType(),
+            ],
+            'extension base' => [
+                '<xs:complexType name="Holder"><xs:complexContent><xs:extension base="q1:ItemType"/></xs:complexContent></xs:complexType>',
+                static fn (Schema $schema) => $holder($schema)->getExtension()->getBase(),
+            ],
+            'restriction base' => [
+                '<xs:simpleType name="Holder"><xs:restriction base="q1:ItemCode"/></xs:simpleType>',
+                static fn (Schema $schema) => $holder($schema)->getRestriction()->getBase(),
+            ],
+            'list itemType' => [
+                '<xs:simpleType name="Holder"><xs:list itemType="q1:ItemCode"/></xs:simpleType>',
+                static fn (Schema $schema) => $holder($schema)->getList(),
+            ],
+            'union memberTypes' => [
+                '<xs:simpleType name="Holder"><xs:union memberTypes="q1:ItemCode"/></xs:simpleType>',
+                static fn (Schema $schema) => $holder($schema)->getUnions()[0],
+            ],
+            'substitutionGroup' => [
+                '<xs:element name="Holder" type="xs:string" substitutionGroup="q1:Item"/>',
+                static function (Schema $schema) {
+                    $head = $schema->findElement('Item', 'http://tempuri.org/1');
+                    self::assertTrue($head->hasSubstitutionCandidates());
+
+                    return $head;
+                },
+            ],
+        ];
+    }
+
+    /**
+     * Inline schemas of a WSDL often refer to each other without an import.
+     * The references should resolve against the sibling schemas, the same way for every kind of reference.
+     *
+     * @dataProvider getDependentReferences
+     */
+    public function testDependentReferencingSchemesForAllReferences(string $content, callable $resolveReference): void
+    {
+        $dom = new \DOMDocument();
+        $dom->loadXML('
+        <types xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://tempuri.org/1">
+                <xs:element name="Item" type="xs:string" />
+                <xs:group name="ItemGroup">
+                    <xs:sequence>
+                        <xs:element name="Item" type="xs:string" />
+                    </xs:sequence>
+                </xs:group>
+                <xs:attribute name="itemAttribute" type="xs:string" />
+                <xs:attributeGroup name="ItemAttributeGroup">
+                    <xs:attribute name="itemAttribute" type="xs:string" />
+                </xs:attributeGroup>
+                <xs:complexType name="ItemType">
+                    <xs:sequence>
+                        <xs:element name="Item" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+                <xs:simpleType name="ItemCode">
+                    <xs:restriction base="xs:string" />
+                </xs:simpleType>
+            </xs:schema>
+            <xs:schema targetNamespace="http://tempuri.org/2" xmlns:q1="http://tempuri.org/1">' . $content . '</xs:schema>
+        </types>
+        ');
+        $schema = $this->reader->readNodes(iterator_to_array($dom->documentElement->childNodes), 'file.xsd');
+
+        $referenced = $resolveReference($schema);
+        self::assertSame('http://tempuri.org/1', $referenced->getSchema()->getTargetNamespace());
+    }
+
+    public function testDependentReferencingSchemesPreferTheCurrentSchema(): void
+    {
+        $dom = new \DOMDocument();
+        $dom->loadXML('
+        <types xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://tempuri.org/1">
+                <xs:element name="Item" type="xs:string" />
+            </xs:schema>
+            <xs:schema targetNamespace="http://tempuri.org/1" xmlns:q1="http://tempuri.org/1">
+                <xs:element name="Item" type="xs:int" />
+                <xs:complexType name="Holder">
+                    <xs:sequence>
+                        <xs:element ref="q1:Item" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:schema>
+        </types>
+        ');
+        $schema = $this->reader->readNodes(iterator_to_array($dom->documentElement->childNodes), 'file.xsd');
+
+        $type = $schema->findType('Holder', 'http://tempuri.org/1');
+        self::assertSame('int', $type->getElements()[0]->getReferencedElement()->getType()->getName());
+    }
+
+    public function testDependentReferencingSchemesStillFailOnUnknownReferences(): void
+    {
+        $dom = new \DOMDocument();
+        $dom->loadXML('
+        <types xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema targetNamespace="http://tempuri.org/1">
+                <xs:element name="Item" type="xs:string" />
+            </xs:schema>
+            <xs:schema targetNamespace="http://tempuri.org/2" xmlns:q1="http://tempuri.org/1">
+                <xs:complexType name="Holder">
+                    <xs:sequence>
+                        <xs:element ref="q1:Unknown" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:schema>
+        </types>
+        ');
+
+        try {
+            $this->reader->readNodes(iterator_to_array($dom->documentElement->childNodes), 'file.xsd');
+            self::fail('Expected the unknown reference to fail.');
+        } catch (TypeException $e) {
+            self::assertStringContainsString("Can't find element named {http://tempuri.org/1}#Unknown", $e->getMessage());
+            self::assertInstanceOf(TypeNotFoundException::class, $e->getPrevious());
+        }
     }
 
     public function testDefaultNamespaceForSchema(): void

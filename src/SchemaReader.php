@@ -1057,83 +1057,54 @@ class SchemaReader
 
     private function findAttributeItem(Schema $schema, \DOMElement $node, string $typeName): AttributeItem
     {
-        [$name, $namespace] = self::splitParts($node, $typeName);
-
-        try {
-            /**
-             * @var AttributeItem $out
-             */
-            $out = $schema->findAttribute((string) $name, $namespace);
-
-            return $out;
-        } catch (TypeNotFoundException $e) {
-            throw new TypeException(sprintf("Can't find %s named {%s}#%s, at line %d in %s ", 'attribute', $namespace, $name, $node->getLineNo(), $node->ownerDocument->documentURI), 0, $e);
-        }
+        return $this->findSchemaItem($schema, $node, $typeName, 'attribute', static fn (Schema $schema, string $name, ?string $namespace) => $schema->findAttribute($name, $namespace));
     }
 
     private function findAttributeGroup(Schema $schema, \DOMElement $node, string $typeName): AttributeGroup
     {
-        [$name, $namespace] = self::splitParts($node, $typeName);
-
-        try {
-            /**
-             * @var AttributeGroup $out
-             */
-            $out = $schema->findAttributeGroup((string) $name, $namespace);
-
-            return $out;
-        } catch (TypeNotFoundException $e) {
-            throw new TypeException(sprintf("Can't find %s named {%s}#%s, at line %d in %s ", 'attributegroup', $namespace, $name, $node->getLineNo(), $node->ownerDocument->documentURI), 0, $e);
-        }
+        return $this->findSchemaItem($schema, $node, $typeName, 'attributegroup', static fn (Schema $schema, string $name, ?string $namespace) => $schema->findAttributeGroup($name, $namespace));
     }
 
     private function findElement(Schema $schema, \DOMElement $node, string $typeName): ElementDef
     {
-        [$name, $namespace] = self::splitParts($node, $typeName);
-
-        try {
-            return $schema->findElement((string) $name, $namespace);
-        } catch (TypeNotFoundException $e) {
-            throw new TypeException(sprintf("Can't find %s named {%s}#%s, at line %d in %s ", 'element', $namespace, $name, $node->getLineNo(), $node->ownerDocument->documentURI), 0, $e);
-        }
+        return $this->findSchemaItem($schema, $node, $typeName, 'element', static fn (Schema $schema, string $name, ?string $namespace) => $schema->findElement($name, $namespace));
     }
 
     private function findGroup(Schema $schema, \DOMElement $node, string $typeName): Group
     {
-        [$name, $namespace] = self::splitParts($node, $typeName);
-
-        try {
-            /**
-             * @var Group $out
-             */
-            $out = $schema->findGroup((string) $name, $namespace);
-
-            return $out;
-        } catch (TypeNotFoundException $e) {
-            throw new TypeException(sprintf("Can't find %s named {%s}#%s, at line %d in %s ", 'group', $namespace, $name, $node->getLineNo(), $node->ownerDocument->documentURI), 0, $e);
-        }
+        return $this->findSchemaItem($schema, $node, $typeName, 'group', static fn (Schema $schema, string $name, ?string $namespace) => $schema->findGroup($name, $namespace));
     }
 
     private function findType(Schema $schema, \DOMElement $node, string $typeName): SchemaItem
     {
+        return $this->findSchemaItem($schema, $node, $typeName, 'type', static fn (Schema $schema, string $name, ?string $namespace) => $schema->findType($name, $namespace));
+    }
+
+    /**
+     * The current schema and its imports win, then any schema already loaded for the same namespace.
+     * Strictly, XSD requires an import for this, but most SOAP toolkits and WSDLs in the wild,
+     * with inline schemas referring to each other, rely on the lookup succeeding without one.
+     *
+     * @template T of SchemaItem
+     *
+     * @param \Closure(Schema, string, ?string): T $find
+     *
+     * @return T
+     */
+    private function findSchemaItem(Schema $schema, \DOMElement $node, string $typeName, string $kind, \Closure $find): SchemaItem
+    {
         [$name, $namespace] = self::splitParts($node, $typeName);
 
-        $tryFindType = static function (Schema $schema, string $name, ?string $namespace): ?SchemaItem {
+        $notFound = null;
+        foreach (array_merge([$schema], $this->loadedSchemas[(string) $namespace] ?? []) as $candidate) {
             try {
-                return $schema->findType($name, $namespace);
+                return $find($candidate, (string) $name, $namespace);
             } catch (TypeNotFoundException $e) {
-                return null;
-            }
-        };
-
-        $interestingSchemas = array_merge([$schema], $this->loadedSchemas[$namespace] ?? []);
-        foreach ($interestingSchemas as $interestingSchema) {
-            if ($result = $tryFindType($interestingSchema, $name, $namespace)) {
-                return $result;
+                $notFound ??= $e;
             }
         }
 
-        throw new TypeException(sprintf("Can't find %s named {%s}#%s, at line %d in %s ", 'type', $namespace, $name, $node->getLineNo(), $node->ownerDocument->documentURI));
+        throw new TypeException(sprintf("Can't find %s named {%s}#%s, at line %d in %s ", $kind, $namespace, $name, $node->getLineNo(), $node->ownerDocument->documentURI), 0, $notFound);
     }
 
     private function fillItem(Item $element, \DOMElement $node, ?\DOMElement $parentNode = null): void
