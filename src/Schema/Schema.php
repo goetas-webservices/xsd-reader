@@ -25,7 +25,7 @@ class Schema
         ?string $namespace = null,
         array &$calling = [],
     ): ?SchemaItem {
-        $calling[spl_object_hash($this)] = true;
+        $calling[spl_object_id($this)] = true;
         $cid = "$getter, $name, $namespace";
 
         if (isset($this->typeCache[$cid])) {
@@ -65,7 +65,7 @@ class Schema
         array &$calling = [],
     ): ?SchemaItem {
         foreach ($schemas as $childSchema) {
-            if (!isset($calling[spl_object_hash($childSchema)])) {
+            if (!isset($calling[spl_object_id($childSchema)])) {
                 /**
                  * @var SchemaItem|null
                  */
